@@ -64,6 +64,11 @@ function startApp() {
         currentUser.display_name;
 
     loadRides();
+
+if (currentUser.role === "admin") {
+    document.getElementById("adminPanel").style.display = "block";
+    loadUsers();
+}
 }
 
 async function saveRide() {
