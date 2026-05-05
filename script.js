@@ -229,3 +229,78 @@ async function loadRides() {
 }
 
 startApp();
+
+async function createUser() {
+
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung");
+        return;
+    }
+
+    const username = document.getElementById("new_username").value;
+    const display_name = document.getElementById("new_display_name").value;
+    const password = document.getElementById("new_password").value;
+    const role = document.getElementById("new_role").value;
+
+    const { error } = await client
+        .from("taxi_users")
+        .insert([
+            {
+                username,
+                display_name,
+                password,
+                role,
+                active: true
+            }
+        ]);
+
+    if (error) {
+        alert("Benutzer konnte nicht erstellt werden");
+        console.error(error);
+        return;
+    }
+
+    alert("Benutzer erstellt");
+
+    document.getElementById("new_username").value = "";
+    document.getElementById("new_display_name").value = "";
+    document.getElementById("new_password").value = "";
+
+    loadUsers();
+}
+
+async function loadUsers() {
+
+    if (!currentUser || currentUser.role !== "admin") {
+        return;
+    }
+
+    const usersList = document.getElementById("users_list");
+
+    const { data, error } = await client
+        .from("taxi_users")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    usersList.innerHTML = "";
+
+    data.forEach(user => {
+
+        usersList.innerHTML += `
+            <div class="ride-card">
+                <strong>${user.display_name}</strong>
+                <br>
+                Benutzer: ${user.username}
+                <br>
+                Rolle: ${user.role}
+                <br>
+                Aktiv: ${user.active ? "Ja" : "Nein"}
+            </div>
+        `;
+    });
+}
