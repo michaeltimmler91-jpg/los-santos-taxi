@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los Santos Taxi Leitstelle</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>🚕 Los Santos Taxi</h1>
+            <p>Leitstelle & Fahrtenbuch</p>
+        </div>
+
+        <div class="card">
+
+            <h2>Neue Fahrt</h2>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Fahrer</label>
+                    <input type="text" id="driver_name">
+                </div>
+
+                <div class="field">
+                    <label>Kunde</label>
+                    <input type="text" id="customer_name">
+                </div>
+
+                <div class="field">
+                    <label>Fahrtart</label>
+
+                    <select id="ride_type">
+                        <option>Normale Fahrt</option>
+                        <option>Essenslieferung</option>
+                        <option>EMS</option>
+                        <option>Gebrauchtwagenhändler</option>
+                        <option>Bambi-Tour</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Von</label>
+                    <input type="text" id="start_location">
+                </div>
+
+                <div class="field">
+                    <label>Nach</label>
+                    <input type="text" id="end_location">
+                </div>
+
+                <div class="field">
+                    <label>Kilometer</label>
+                    <input type="number" id="kilometers">
+                </div>
+
+                <div class="field">
+                    <label>Trinkgeld</label>
+                    <input type="number" id="tip_amount">
+                </div>
+
+                <div class="field">
+                    <label>Essen-Auslage</label>
+                    <input type="number" id="food_advance">
+                </div>
+
+                <div class="field">
+                    <label>Auslage über</label>
+
+                    <select id="advance_source">
+                        <option value="">Keine</option>
+                        <option>Schließfach</option>
+                        <option>Trinkgeldauszahlung</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button onclick="saveRide()">
+                Fahrt speichern
+            </button>
+
+        </div>
+
+        <div class="card">
+
+            <h2>Letzte Fahrten</h2>
+
+            <div id="rides_list"></div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
