@@ -123,7 +123,47 @@
                 <h2>Letzte Fahrten</h2>
                 <div id="rides_list"></div>
             </div>
+<div class="card" id="adminPanel" style="display:none;">
 
+    <h2>Adminbereich</h2>
+
+    <div class="form-grid">
+
+        <div class="field">
+            <label>Benutzername</label>
+            <input type="text" id="new_username">
+        </div>
+
+        <div class="field">
+            <label>Anzeigename</label>
+            <input type="text" id="new_display_name">
+        </div>
+
+        <div class="field">
+            <label>Passwort</label>
+            <input type="text" id="new_password">
+        </div>
+
+        <div class="field">
+            <label>Rolle</label>
+
+            <select id="new_role">
+                <option value="fahrer">Fahrer</option>
+                <option value="admin">Admin</option>
+            </select>
+        </div>
+
+    </div>
+
+    <button onclick="createUser()">
+        Benutzer erstellen
+    </button>
+
+    <br><br>
+
+    <div id="users_list"></div>
+
+</div>
         </div>
 
     </div>
