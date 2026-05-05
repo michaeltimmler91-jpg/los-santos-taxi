@@ -178,14 +178,6 @@ async function loadRides() {
         })
         .limit(20);
 
-    if (currentUser.role !== "admin") {
-
-        query = query.eq(
-            "driver_name",
-            currentUser.display_name
-        );
-    }
-
     const { data, error } = await query;
 
     if (error) {
