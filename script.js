@@ -9,7 +9,6 @@ const client = supabase.createClient(
 let currentUser = null;
 
 async function loginUser() {
-
     const username = document.getElementById("login_username").value;
     const password = document.getElementById("login_password").value;
 
@@ -26,23 +25,16 @@ async function loginUser() {
     }
 
     currentUser = data;
-
-    localStorage.setItem(
-        "taxiUser",
-        JSON.stringify(data)
-    );
-
+    localStorage.setItem("taxiUser", JSON.stringify(data));
     startApp();
 }
 
 function logoutUser() {
-
     localStorage.removeItem("taxiUser");
     location.reload();
 }
 
 function startApp() {
-
     const savedUser = localStorage.getItem("taxiUser");
 
     if (!savedUser) {
@@ -54,53 +46,72 @@ function startApp() {
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("appBox").style.display = "block";
 
-    document.getElementById("currentUserName").innerText =
-        currentUser.display_name;
-
-    document.getElementById("currentUserRole").innerText =
-        currentUser.role;
-
-    document.getElementById("driver_name").value =
-        currentUser.display_name;
+    document.getElementById("currentUserName").innerText = currentUser.display_name;
+    document.getElementById("currentUserRole").innerText = currentUser.role;
+    document.getElementById("driver_name").value = currentUser.display_name;
 
     loadRides();
 
-if (currentUser.role === "admin") {
-    document.getElementById("adminPanel").style.display = "block";
-    loadUsers();
+    if (currentUser.role === "admin") {
+        document.getElementById("adminPanel").style.display = "block";
+        loadUsers();
+    }
 }
+
+async function checkBambiTour(playerName) {
+    if (!playerName) {
+        return false;
+    }
+
+    const { data, error } = await client
+        .from("taxi_bambi_tours")
+        .select("*")
+        .ilike("player_name", playerName)
+        .maybeSingle();
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return !!data;
 }
 
 async function saveRide() {
-
     const driver_name = currentUser.display_name;
+    const customer_name = document.getElementById("customer_name").value.trim();
+    const ride_type = document.getElementById("ride_type").value;
+    const start_location = document.getElementById("start_location").value;
+    const end_location = document.getElementById("end_location").value;
+    const kilometers = Number(document.getElementById("kilometers").value);
+    const tip_amount = Number(document.getElementById("tip_amount").value);
+    const food_advance = Number(document.getElementById("food_advance").value);
+    const advance_source = document.getElementById("advance_source").value;
+    const notes = document.getElementById("notes").value;
 
-    const customer_name =
-        document.getElementById("customer_name").value;
+    if (!customer_name) {
+        alert("Bitte Kunde/Spieler eintragen.");
+        return;
+    }
 
-    const ride_type =
-        document.getElementById("ride_type").value;
+    if (!ride_type) {
+        alert("Bitte Fahrtart auswählen.");
+        return;
+    }
 
-    const start_location =
-        document.getElementById("start_location").value;
+    if (ride_type !== "Bambi-Tour" && kilometers <= 0) {
+        alert("Bitte Kilometer eintragen.");
+        return;
+    }
 
-    const end_location =
-        document.getElementById("end_location").value;
+    if (ride_type === "Bambi-Tour") {
+        const alreadyHadTour = await checkBambiTour(customer_name);
 
-    const kilometers =
-        Number(document.getElementById("kilometers").value);
-
-    const tip_amount =
-        Number(document.getElementById("tip_amount").value);
-
-    const food_advance =
-        Number(document.getElementById("food_advance").value);
-
-    const advance_source =
-        document.getElementById("advance_source").value;
-
-    const notes =
-        document.getElementById("notes").value;
+        if (alreadyHadTour) {
+            alert("ACHTUNG: Dieser Spieler hatte bereits eine Bambi-Tour!");
+            return;
+        }
+    }
 
     let fare_amount = 0;
     let billed_to = "Kunde";
@@ -152,6 +163,23 @@ async function saveRide() {
         return;
     }
 
+    if (ride_type === "Bambi-Tour") {
+        const { error: bambiError } = await client
+            .from("taxi_bambi_tours")
+            .insert([
+                {
+                    player_name: customer_name,
+                    driver_name,
+                    notes
+                }
+            ]);
+
+        if (bambiError) {
+            console.error(bambiError);
+            alert("Fahrt gespeichert, aber Bambi-Liste konnte nicht aktualisiert werden.");
+        }
+    }
+
     alert("Fahrt gespeichert");
 
     document.getElementById("customer_name").value = "";
@@ -166,19 +194,13 @@ async function saveRide() {
 }
 
 async function loadRides() {
+    const ridesList = document.getElementById("rides_list");
 
-    const ridesList =
-        document.getElementById("rides_list");
-
-    let query = client
+    const { data, error } = await client
         .from("taxi_rides")
         .select("*")
-        .order("created_at", {
-            ascending: false
-        })
-        .limit(20);
-
-    const { data, error } = await query;
+        .order("created_at", { ascending: false })
+        .limit(25);
 
     if (error) {
         console.error(error);
@@ -188,10 +210,8 @@ async function loadRides() {
     ridesList.innerHTML = "";
 
     data.forEach(ride => {
-
         ridesList.innerHTML += `
             <div class="ride-card">
-
                 <strong>${ride.driver_name}</strong>
                 (${ride.ride_type})
 
@@ -201,34 +221,34 @@ async function loadRides() {
 
                 <br>
 
-                📍 ${ride.start_location}
-                → ${ride.end_location}
+                📍 ${ride.start_location || "-"}
+                → ${ride.end_location || "-"}
 
                 <br>
 
-                🚕 ${ride.kilometers} KM
+                🚕 ${ride.kilometers || 0} KM
 
                 <br>
 
-                💰 ${ride.fare_amount}$
+                💰 ${ride.fare_amount || 0}$
 
                 <br>
 
-                🎁 ${ride.tip_amount}$ Trinkgeld
+                🎁 ${ride.tip_amount || 0}$ Trinkgeld
+
+                <br>
+
+                🧾 Rechnung an: ${ride.billed_to || "-"}
 
                 <br>
 
                 📝 ${ride.notes || "-"}
-
             </div>
         `;
     });
 }
 
-startApp();
-
 async function createUser() {
-
     if (!currentUser || currentUser.role !== "admin") {
         alert("Keine Berechtigung");
         return;
@@ -267,7 +287,6 @@ async function createUser() {
 }
 
 async function loadUsers() {
-
     if (!currentUser || currentUser.role !== "admin") {
         return;
     }
@@ -287,7 +306,6 @@ async function loadUsers() {
     usersList.innerHTML = "";
 
     data.forEach(user => {
-
         usersList.innerHTML += `
             <div class="ride-card">
                 <strong>${user.display_name}</strong>
@@ -301,3 +319,5 @@ async function loadUsers() {
         `;
     });
 }
+
+startApp();
