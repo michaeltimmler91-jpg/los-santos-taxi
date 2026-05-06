@@ -5,6 +5,7 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 let companies = [];
+let activeDispatchers = [];
 
 async function loginUser() {
     const username = document.getElementById("login_username").value.trim();
@@ -43,6 +44,7 @@ async function startApp() {
     document.getElementById("currentUserName").innerText = currentUser.display_name;
     document.getElementById("currentUserRole").innerText = currentUser.role;
 
+    await loadDispatchers();
     await loadCompanies();
     updateJobForm();
     await loadJobs();
@@ -51,6 +53,118 @@ async function startApp() {
         document.getElementById("adminPanel").style.display = "block";
         loadUsers();
     }
+}
+
+function canUseDispatcher() {
+    return currentUser && (
+        currentUser.role === "admin" ||
+        currentUser.role === "leitstelle"
+    );
+}
+
+function isActiveDispatcher() {
+    return activeDispatchers.some(d => d.username === currentUser.username);
+}
+
+async function loadDispatchers() {
+    const { data, error } = await client
+        .from("taxi_dispatchers")
+        .select("*")
+        .eq("active", true)
+        .order("started_at", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    activeDispatchers = data || [];
+    renderDispatchers();
+}
+
+function renderDispatchers() {
+    const box = document.getElementById("dispatcher_status");
+    const createBox = document.getElementById("createJobBox");
+
+    let html = "<strong>Aktive Leitstelle:</strong><br>";
+
+    if (activeDispatchers.length === 0) {
+        html += "Keine Leitstelle aktiv.";
+    } else {
+        activeDispatchers.forEach((dispatcher, index) => {
+            html += `${index + 1}. ${dispatcher.display_name}<br>`;
+        });
+    }
+
+    html += `<br><small>${activeDispatchers.length}/2 Plätze belegt</small>`;
+
+    if (!canUseDispatcher()) {
+        html += `<br><br><strong>Du kannst die Leitstelle nicht übernehmen.</strong>`;
+    }
+
+    box.innerHTML = html;
+
+    if (canUseDispatcher() && isActiveDispatcher()) {
+        createBox.classList.remove("locked-box");
+    } else {
+        createBox.classList.add("locked-box");
+    }
+}
+
+async function takeDispatcher() {
+    if (!canUseDispatcher()) {
+        alert("Nur Admin oder Leitstelle kann die Leitstelle übernehmen.");
+        return;
+    }
+
+    await loadDispatchers();
+
+    if (isActiveDispatcher()) {
+        alert("Du bist bereits aktive Leitstelle.");
+        return;
+    }
+
+    if (activeDispatchers.length >= 2) {
+        alert("Es sind bereits 2 Leitstellen aktiv.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_dispatchers")
+        .insert([{
+            username: currentUser.username,
+            display_name: currentUser.display_name,
+            active: true
+        }]);
+
+    if (error) {
+        alert("Leitstelle konnte nicht übernommen werden.");
+        console.error(error);
+        return;
+    }
+
+    await loadDispatchers();
+}
+
+async function leaveDispatcher() {
+    if (!canUseDispatcher()) {
+        alert("Keine Berechtigung.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_dispatchers")
+        .update({ active: false })
+        .eq("username", currentUser.username)
+        .eq("active", true);
+
+    if (error) {
+        alert("Leitstelle konnte nicht abgegeben werden.");
+        console.error(error);
+        return;
+    }
+
+    await loadDispatchers();
 }
 
 async function loadCompanies() {
@@ -115,6 +229,11 @@ async function checkBambiTour(playerName) {
 }
 
 async function createJob() {
+    if (!isActiveDispatcher()) {
+        alert("Du musst zuerst die Leitstelle übernehmen.");
+        return;
+    }
+
     const ride_type = document.getElementById("job_ride_type").value;
     const pickup_location = document.getElementById("job_pickup_location").value.trim();
     const destination = document.getElementById("job_destination").value.trim();
@@ -194,34 +313,35 @@ async function takeJob(jobId) {
     loadJobs();
 }
 
+function getFareLabel(rideType) {
+    if (rideType === "EMS") return "Interne EMS-Abrechnung";
+    if (rideType === "Gebrauchtwagenhändler") return "Interne Händler-Abrechnung";
+    if (rideType === "Bambi-Tour") return "Kostenlose Fahrt";
+    return "Rechnung ohne Trinkgeld";
+}
+
 function calculatePreview(jobId, rideType) {
     const km = Number(document.getElementById(`km_${jobId}`)?.value || 0);
     const invoice = Number(document.getElementById(`invoice_${jobId}`)?.value || 0);
     const foodCost = Number(document.getElementById(`food_${jobId}`)?.value || 0);
-    const foodPaidBy = document.getElementById(`foodpaid_${jobId}`)?.value || "";
 
-    const fare = km * 5;
+    let fare = km * 5;
     let tip = 0;
+
+    if (rideType === "Bambi-Tour") {
+        fare = 0;
+        tip = invoice;
+    }
 
     if (rideType === "Normale Fahrt") {
         tip = invoice - fare;
     }
 
     if (rideType === "Essenslieferung") {
-        if (foodPaidBy === "Schließfach") {
-            tip = invoice - foodCost - fare;
-        }
-
-        if (foodPaidBy === "Eigene Tasche") {
-            tip = invoice - fare;
-        }
+        tip = invoice - foodCost - fare;
     }
 
-    if (
-        rideType === "EMS" ||
-        rideType === "Gebrauchtwagenhändler" ||
-        rideType === "Bambi-Tour"
-    ) {
+    if (rideType === "EMS" || rideType === "Gebrauchtwagenhändler") {
         tip = invoice;
     }
 
@@ -233,12 +353,11 @@ async function completeJob(jobId, rideType) {
     const kilometers = Number(document.getElementById(`km_${jobId}`).value);
     const invoice_amount = Number(document.getElementById(`invoice_${jobId}`).value);
     const final_destination = document.getElementById(`destination_${jobId}`).value.trim();
+    const final_customer = document.getElementById(`customer_${jobId}`).value.trim();
     const foodCostInput = document.getElementById(`food_${jobId}`);
-    const foodPaidByInput = document.getElementById(`foodpaid_${jobId}`);
     const notesInput = document.getElementById(`done_notes_${jobId}`);
 
     const food_cost = foodCostInput ? Number(foodCostInput.value) : 0;
-    const food_paid_by = foodPaidByInput ? foodPaidByInput.value : "";
     const done_notes = notesInput.value.trim();
 
     if (kilometers < 0) {
@@ -256,27 +375,32 @@ async function completeJob(jobId, rideType) {
         return;
     }
 
-    const fare_amount = kilometers * 5;
+    if (rideType === "Bambi-Tour" && !final_customer) {
+        alert("Bei Bambi-Touren muss der Spielername eingetragen werden.");
+        return;
+    }
+
+    if (rideType === "Essenslieferung" && !final_customer) {
+        alert("Bitte eintragen, wer das Essen bekommt.");
+        return;
+    }
+
+    let fare_amount = kilometers * 5;
     let tip_amount = 0;
     let billed_to = "Kunde";
+
+    if (rideType === "Bambi-Tour") {
+        fare_amount = 0;
+        billed_to = "Kostenlos";
+        tip_amount = invoice_amount;
+    }
 
     if (rideType === "Normale Fahrt") {
         tip_amount = invoice_amount - fare_amount;
     }
 
     if (rideType === "Essenslieferung") {
-        if (!food_paid_by) {
-            alert("Bitte auswählen, wer die Essens-Auslage bezahlt hat.");
-            return;
-        }
-
-        if (food_paid_by === "Schließfach") {
-            tip_amount = invoice_amount - food_cost - fare_amount;
-        }
-
-        if (food_paid_by === "Eigene Tasche") {
-            tip_amount = invoice_amount - fare_amount;
-        }
+        tip_amount = invoice_amount - food_cost - fare_amount;
     }
 
     if (rideType === "EMS") {
@@ -286,11 +410,6 @@ async function completeJob(jobId, rideType) {
 
     if (rideType === "Gebrauchtwagenhändler") {
         billed_to = "Gebrauchtwagenhändler";
-        tip_amount = invoice_amount;
-    }
-
-    if (rideType === "Bambi-Tour") {
-        billed_to = "Kostenlos";
         tip_amount = invoice_amount;
     }
 
@@ -316,13 +435,14 @@ async function completeJob(jobId, rideType) {
         .update({
             job_status: "Erledigt",
             completed_at: new Date().toISOString(),
+            customer_name: final_customer,
             destination: final_destination,
             kilometers,
             fare_amount,
             invoice_amount,
             tip_amount,
             food_cost,
-            food_paid_by,
+            food_paid_by: "",
             refund_amount: 0,
             billed_to,
             notes: done_notes || jobData.notes
@@ -339,7 +459,7 @@ async function completeJob(jobId, rideType) {
         .from("taxi_rides")
         .insert([{
             driver_name: currentUser.display_name,
-            customer_name: jobData.customer_name,
+            customer_name: final_customer,
             ride_type: jobData.ride_type,
             start_location: jobData.pickup_location,
             end_location: final_destination,
@@ -347,16 +467,16 @@ async function completeJob(jobId, rideType) {
             fare_amount,
             tip_amount,
             food_advance: food_cost,
-            advance_source: food_paid_by,
+            advance_source: "",
             billed_to,
             notes: done_notes || jobData.notes
         }]);
 
-    if (rideType === "Bambi-Tour" && jobData.customer_name) {
+    if (rideType === "Bambi-Tour" && final_customer) {
         await client
             .from("taxi_bambi_tours")
             .insert([{
-                player_name: jobData.customer_name,
+                player_name: final_customer,
                 driver_name: currentUser.display_name,
                 notes: done_notes || jobData.notes
             }]);
@@ -370,6 +490,7 @@ async function loadJobs() {
     await loadOpenJobs();
     await loadMyJobs();
     await loadDoneJobs();
+    await loadDispatchers();
 }
 
 async function loadOpenJobs() {
@@ -394,7 +515,7 @@ async function loadOpenJobs() {
                 <strong>${job.ride_type}</strong><br>
                 📍 Abholung: ${job.pickup_location || "-"}<br>
                 🎯 Ziel: ${job.destination || "-"}<br>
-                👤 Kunde: ${job.customer_name || "-"}<br>
+                👤 Kunde/Empfänger: ${job.customer_name || "-"}<br>
                 🏢 Firma: ${job.company_name || "-"}<br>
                 🚑 EMS: ${job.ems_staff_name || "-"}<br>
                 📝 ${job.notes || "-"}<br>
@@ -427,27 +548,22 @@ async function loadMyJobs() {
                 <label>Essenskosten</label>
                 <input type="number" id="food_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
             </div>
-
-            <div class="field">
-                <label>Auslage bezahlt durch</label>
-                <select id="foodpaid_${job.id}" onchange="calculatePreview('${job.id}', '${job.ride_type}')">
-                    <option value="">Bitte wählen</option>
-                    <option>Schließfach</option>
-                    <option>Eigene Tasche</option>
-                </select>
-            </div>
         ` : "";
 
         box.innerHTML += `
             <div class="ride-card">
                 <strong>${job.ride_type}</strong><br>
                 📍 Abholung: ${job.pickup_location || "-"}<br>
-                👤 Kunde: ${job.customer_name || "-"}<br>
                 🏢 Firma: ${job.company_name || "-"}<br>
                 🚑 EMS: ${job.ems_staff_name || "-"}<br>
                 📝 ${job.notes || "-"}<br><br>
 
                 <div class="form-grid">
+                    <div class="field">
+                        <label>Kunde / Empfänger</label>
+                        <input type="text" id="customer_${job.id}" value="${job.customer_name || ""}">
+                    </div>
+
                     <div class="field">
                         <label>Ziel</label>
                         <input type="text" id="destination_${job.id}" value="${job.destination || ""}">
@@ -459,7 +575,7 @@ async function loadMyJobs() {
                     </div>
 
                     <div class="field">
-                        <label>Rechnung ohne Trinkgeld</label>
+                        <label>${getFareLabel(job.ride_type)}</label>
                         <div class="preview-box" id="preview_fare_${job.id}">0$</div>
                     </div>
 
@@ -510,9 +626,10 @@ async function loadDoneJobs() {
         box.innerHTML += `
             <div class="ride-card">
                 <strong>${job.assigned_driver}</strong> (${job.ride_type})<br><br>
+                👤 Kunde/Empfänger: ${job.customer_name || "-"}<br>
                 📍 ${job.pickup_location || "-"} → ${job.destination || "-"}<br>
                 🚕 ${job.kilometers || 0} KM<br>
-                💰 Fahrtkosten: ${job.fare_amount || 0}$<br>
+                💰 Fahrtkosten / interne Abrechnung: ${job.fare_amount || 0}$<br>
                 🧾 Rechnung: ${job.invoice_amount || 0}$<br>
                 🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
                 🍔 Essenskosten: ${job.food_cost || 0}$<br>
