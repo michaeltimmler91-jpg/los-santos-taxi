@@ -44,8 +44,22 @@
             <button class="small-btn" onclick="logoutUser()">Logout</button>
         </div>
 
-        <div class="card">
-            <h2>📞 Leitstelle: Auftrag erstellen</h2>
+<div class="card" id="dispatcherBox">
+    <h2>📡 Leitstellen-Dienst</h2>
+
+    <div id="dispatcher_status"></div>
+
+    <button class="small-btn" onclick="takeDispatcher()">
+        Leitstelle übernehmen
+    </button>
+
+    <button class="small-btn danger-btn" onclick="leaveDispatcher()">
+        Leitstelle abgeben
+    </button>
+</div>
+
+<div class="card" id="createJobBox">
+    <h2>📞 Leitstelle: Auftrag erstellen</h2>
 
             <div class="form-grid">
 
