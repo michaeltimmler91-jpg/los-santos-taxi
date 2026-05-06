@@ -56,10 +56,7 @@ async function startApp() {
 }
 
 function canUseDispatcher() {
-    return currentUser && (
-        currentUser.role === "admin" ||
-        currentUser.role === "leitstelle"
-    );
+    return !!currentUser;
 }
 
 function isActiveDispatcher() {
@@ -97,10 +94,6 @@ function renderDispatchers() {
     }
 
     html += `<br><small>${activeDispatchers.length}/2 Plätze belegt</small>`;
-
-    if (!canUseDispatcher()) {
-        html += `<br><br><strong>Du kannst die Leitstelle nicht übernehmen.</strong>`;
-    }
 
     box.innerHTML = html;
 
