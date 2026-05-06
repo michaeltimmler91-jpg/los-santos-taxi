@@ -48,7 +48,7 @@ async function startApp() {
     await loadCompanies();
     updateJobForm();
     await loadJobs();
-
+setupRealtime();
     if (currentUser.role === "admin") {
     document.getElementById("adminPanel").style.display = "block";
     loadUsers();
@@ -961,5 +961,40 @@ async function loadDashboardStats() {
     document.getElementById("stat_taken").innerText = taken;
     document.getElementById("stat_done").innerText = done;
     document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
+}
+
+function setupRealtime() {
+
+    client
+        .channel('taxi-live-jobs')
+
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'taxi_jobs'
+            },
+            payload => {
+                console.log('Live Update taxi_jobs', payload);
+                loadJobs();
+            }
+        )
+
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'taxi_dispatchers'
+            },
+            payload => {
+                console.log('Live Update taxi_dispatchers', payload);
+                loadDispatchers();
+                loadDashboardStats();
+            }
+        )
+
+        .subscribe();
 }
 startApp();
