@@ -25,6 +25,11 @@
                 Eingeloggt als<br>
                 <strong id="currentUserName"></strong>
             </div>
+
+            <a href="admin.html" id="adminLink" style="display:none;">
+                <button class="small-btn">Adminbereich</button>
+            </a>
+
             <button class="small-btn" onclick="logoutUser()">Logout</button>
         </div>
     </div>
@@ -77,13 +82,10 @@
                 <div id="dispatcher_status"></div>
 
                 <div class="dispatcher-buttons">
-    <button
-        class="small-btn"
-        id="dispatcherToggleBtn"
-        onclick="toggleDispatcherStatus()">
-        Leitstelle übernehmen
-    </button>
-</div>
+                    <button class="small-btn" id="dispatcherToggleBtn" onclick="toggleDispatcherStatus()">
+                        📡 Leitstelle übernehmen
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -174,58 +176,6 @@
                 </div>
             </div>
 
-        </div>
-
-        <div class="card" id="adminPanel" style="display:none;">
-            <h2>Adminbereich</h2>
-
-            <h3>Benutzer erstellen</h3>
-
-            <div class="form-grid">
-
-                <div class="field">
-                    <label>Benutzername</label>
-                    <input type="text" id="new_username">
-                </div>
-
-                <div class="field">
-                    <label>Anzeigename</label>
-                    <input type="text" id="new_display_name">
-                </div>
-
-                <div class="field">
-                    <label>Passwort</label>
-                    <input type="text" id="new_password">
-                </div>
-
-                <div class="field">
-                    <label>Rolle</label>
-                    <select id="new_role">
-                        <option value="fahrer">Fahrer</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-
-            </div>
-
-            <button onclick="createUser()">Benutzer erstellen</button>
-
-            <h3>Liefer-Unternehmen hinzufügen</h3>
-
-            <div class="form-grid">
-                <div class="field">
-                    <label>Unternehmen</label>
-                    <input type="text" id="new_company_name">
-                </div>
-            </div>
-
-            <button onclick="createCompany()">Unternehmen hinzufügen</button>
-
-            <h3>🎁 Trinkgeld-Auswertung</h3>
-            <div id="tips_stats"></div>
-
-            <h3>Benutzerverwaltung</h3>
-            <div id="users_list"></div>
         </div>
 
     </div>
