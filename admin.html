@@ -1,1 +1,116 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi Adminbereich</title>
 
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="top-header">
+        <div>
+            <a href="index.html">
+                <button class="small-btn">⬅ Zur Leitstelle</button>
+            </a>
+        </div>
+
+        <div class="header">
+            <h1>👑 Taxi Adminbereich</h1>
+            <p>Benutzer, Firmen, Fahrten & Trinkgeld</p>
+        </div>
+
+        <div class="login-info" id="adminLoginInfo">
+            <div>
+                Eingeloggt als<br>
+                <strong id="adminUserName">-</strong>
+            </div>
+            <button class="small-btn" onclick="logoutAdmin()">Logout</button>
+        </div>
+    </div>
+
+    <div id="adminAccessDenied" class="card" style="display:none;">
+        <h2>Kein Zugriff</h2>
+        <p>Du bist kein Admin.</p>
+        <a href="index.html">
+            <button>Zurück zur Leitstelle</button>
+        </a>
+    </div>
+
+    <div id="adminApp" style="display:none;">
+
+        <div class="card">
+            <h2>🎁 Trinkgeld-Auswertung</h2>
+            <div id="tips_stats"></div>
+        </div>
+
+        <div class="card">
+            <h2>👥 Benutzer erstellen</h2>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>Benutzername</label>
+                    <input type="text" id="new_username">
+                </div>
+
+                <div class="field">
+                    <label>Anzeigename</label>
+                    <input type="text" id="new_display_name">
+                </div>
+
+                <div class="field">
+                    <label>Passwort</label>
+                    <input type="text" id="new_password">
+                </div>
+
+                <div class="field">
+                    <label>Rolle</label>
+                    <select id="new_role">
+                        <option value="fahrer">Fahrer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="createUser()">Benutzer erstellen</button>
+        </div>
+
+        <div class="card">
+            <h2>👥 Benutzerverwaltung</h2>
+            <div id="users_list"></div>
+        </div>
+
+        <div class="card">
+            <h2>🏢 Liefer-Unternehmen</h2>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>Neues Unternehmen</label>
+                    <input type="text" id="new_company_name">
+                </div>
+            </div>
+
+            <button onclick="createCompany()">Unternehmen hinzufügen</button>
+
+            <br><br>
+
+            <div id="companies_list"></div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Erledigte Fahrten bearbeiten/löschen</h2>
+            <div id="admin_done_jobs"></div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
