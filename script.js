@@ -448,23 +448,6 @@ async function completeJob(jobId, rideType) {
         return;
     }
 
-    await client
-        .from("taxi_rides")
-        .insert([{
-            driver_name: currentUser.display_name,
-            customer_name: final_customer,
-            ride_type: jobData.ride_type,
-            start_location: jobData.pickup_location,
-            end_location: final_destination,
-            kilometers,
-            fare_amount,
-            tip_amount,
-            food_advance: food_cost,
-            advance_source: "",
-            billed_to,
-            notes: done_notes || jobData.notes
-        }]);
-
     if (rideType === "Bambi-Tour" && final_customer) {
         await client
             .from("taxi_bambi_tours")
