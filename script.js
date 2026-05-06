@@ -721,6 +721,55 @@ async function loadUsers() {
                 Benutzer: ${user.username}<br>
                 Rolle: ${user.role}<br>
                 Aktiv: ${user.active ? "Ja" : "Nein"}
+
+                <br><br>
+
+                <button class="small-btn" onclick="toggleUserEdit('${user.id}')">
+                    Benutzer bearbeiten
+                </button>
+
+                <button class="small-btn danger-btn" onclick="deleteUser('${user.id}', '${user.display_name}')">
+                    Benutzer löschen
+                </button>
+
+                <div id="user_edit_${user.id}" style="display:none; margin-top:15px;">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Benutzername</label>
+                            <input type="text" id="edit_username_${user.id}" value="${user.username}">
+                        </div>
+
+                        <div class="field">
+                            <label>Anzeigename</label>
+                            <input type="text" id="edit_display_${user.id}" value="${user.display_name}">
+                        </div>
+
+                        <div class="field">
+                            <label>Neues Passwort</label>
+                            <input type="text" id="edit_password_${user.id}" value="${user.password}">
+                        </div>
+
+                        <div class="field">
+                            <label>Rolle</label>
+                            <select id="edit_role_${user.id}">
+                                <option value="fahrer" ${user.role === "fahrer" ? "selected" : ""}>Fahrer</option>
+                                <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Aktiv</label>
+                            <select id="edit_active_${user.id}">
+                                <option value="true" ${user.active ? "selected" : ""}>Ja</option>
+                                <option value="false" ${!user.active ? "selected" : ""}>Nein</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="saveUserEdit('${user.id}')">
+                        Änderungen speichern
+                    </button>
+                </div>
             </div>
         `;
     });
@@ -996,5 +1045,76 @@ function setupRealtime() {
         )
 
         .subscribe();
+}
+
+function toggleUserEdit(userId) {
+    const box = document.getElementById(`user_edit_${userId}`);
+
+    if (!box) return;
+
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+async function saveUserEdit(userId) {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
+        return;
+    }
+
+    const username = document.getElementById(`edit_username_${userId}`).value.trim();
+    const displayName = document.getElementById(`edit_display_${userId}`).value.trim();
+    const password = document.getElementById(`edit_password_${userId}`).value.trim();
+    const role = document.getElementById(`edit_role_${userId}`).value;
+    const active = document.getElementById(`edit_active_${userId}`).value === "true";
+
+    if (!username || !displayName || !password) {
+        alert("Benutzername, Anzeigename und Passwort dürfen nicht leer sein.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_users")
+        .update({
+            username: username,
+            display_name: displayName,
+            password: password,
+            role: role,
+            active: active
+        })
+        .eq("id", userId);
+
+    if (error) {
+        alert("Benutzer konnte nicht gespeichert werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Benutzer gespeichert.");
+    loadUsers();
+}
+
+async function deleteUser(userId, displayName) {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
+        return;
+    }
+
+    const ok = confirm(`Benutzer "${displayName}" wirklich komplett löschen?`);
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_users")
+        .delete()
+        .eq("id", userId);
+
+    if (error) {
+        alert("Benutzer konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Benutzer gelöscht.");
+    loadUsers();
 }
 startApp();
