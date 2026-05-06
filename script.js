@@ -143,6 +143,7 @@ function renderDispatchers() {
 } else {
     createBox.style.display = "none";
 }
+    updateDispatcherButton();
 }
 
 async function takeDispatcher() {
@@ -1117,5 +1118,31 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+async function toggleDispatcherStatus() {
 
+    if (isActiveDispatcher()) {
+        await leaveDispatcher();
+    } else {
+        await takeDispatcher();
+    }
+
+    updateDispatcherButton();
+}
+function updateDispatcherButton() {
+
+    const btn = document.getElementById("dispatcherToggleBtn");
+
+    if (!btn) return;
+
+    if (isActiveDispatcher()) {
+
+        btn.innerText = "❌ Leitstelle verlassen";
+        btn.classList.add("danger-btn");
+
+    } else {
+
+        btn.innerText = "📡 Leitstelle übernehmen";
+        btn.classList.remove("danger-btn");
+    }
+}
 startApp();
