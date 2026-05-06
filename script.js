@@ -58,7 +58,18 @@ async function startApp() {
 
     setupRealtime();
 }
+function playNewJobSound() {
 
+    const sound = document.getElementById("newJobSound");
+
+    if (!sound) return;
+
+    sound.currentTime = 0;
+
+    sound.play().catch(() => {
+        console.log("Sound konnte nicht abgespielt werden.");
+    });
+}
 function setupRealtime() {
     if (realtimeStarted) return;
     realtimeStarted = true;
@@ -76,18 +87,25 @@ function setupRealtime() {
                 loadJobs();
             }
         )
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "taxi_dispatchers"
-            },
-            () => {
-                loadDispatchers();
-                loadDashboardStats();
-            }
-        )
+       .on(
+    "postgres_changes",
+    {
+        event: "*",
+        schema: "public",
+        table: "taxi_jobs"
+    },
+    (payload) => {
+
+        if (
+            payload.eventType === "INSERT" &&
+            payload.new.job_status === "Offen"
+        ) {
+            playNewJobSound();
+        }
+
+        loadJobs();
+    }
+)
         .subscribe();
 }
 
