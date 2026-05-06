@@ -616,6 +616,13 @@ async function loadDoneJobs() {
     box.innerHTML = "";
 
     data.forEach(job => {
+        const adminButtons = currentUser.role === "admin" ? `
+            <br><br>
+            <button class="small-btn danger-btn" onclick="deleteDoneJob('${job.id}')">
+                Fahrt löschen
+            </button>
+        ` : "";
+
         box.innerHTML += `
             <div class="ride-card">
                 <strong>${job.assigned_driver}</strong> (${job.ride_type})<br><br>
@@ -627,6 +634,7 @@ async function loadDoneJobs() {
                 🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
                 🍔 Essenskosten: ${job.food_cost || 0}$<br>
                 🧾 Rechnung an: ${job.billed_to || "-"}
+                ${adminButtons}
             </div>
         `;
     });
@@ -721,5 +729,32 @@ async function createCompany() {
     await loadCompanies();
     updateJobForm();
 }
+async function deleteDoneJob(jobId) {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
+        return;
+    }
 
+    const ok = confirm("Diese erledigte Fahrt wirklich löschen? Sie wird nur ausgeblendet, nicht endgültig entfernt.");
+
+    if (!ok) {
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Gelöscht"
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Fahrt konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Fahrt gelöscht.");
+    loadJobs();
+}
 startApp();
