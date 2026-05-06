@@ -488,17 +488,30 @@ async function loadOpenJobs() {
     box.innerHTML = "";
 
     data.forEach(job => {
-        box.innerHTML += `
-            <div class="ride-card">
-                <strong>${job.ride_type}</strong><br>
-                📍 Abholung: ${job.pickup_location || "-"}<br>
-                🎯 Ziel: ${job.destination || "-"}<br>
-                👤 Kunde/Empfänger: ${job.customer_name || "-"}<br>
-                🏢 Firma: ${job.company_name || "-"}<br>
-                🚑 EMS: ${job.ems_staff_name || "-"}<br>
-                📝 ${job.notes || "-"}<br>
-                <button class="small-btn" onclick="takeJob('${job.id}')">Übernehmen</button>
-            </div>
+box.innerHTML += `
+    <div class="compact-ride">
+        <div>
+            <strong>${job.assigned_driver}</strong><br>
+            ${job.ride_type}
+        </div>
+
+        <div>
+            🚕 ${job.kilometers || 0} KM
+        </div>
+
+        <div>
+            🎁 ${job.tip_amount || 0}$
+        </div>
+
+        <div>
+            🧾 ${job.invoice_amount || 0}$
+        </div>
+
+        <div>
+            👤 ${job.customer_name || "-"}
+        </div>
+    </div>
+`;
         `;
     });
 }
@@ -1116,5 +1129,15 @@ async function deleteUser(userId, displayName) {
 
     alert("Benutzer gelöscht.");
     loadUsers();
+}
+function toggleSection(id) {
+    const box = document.getElementById(id);
+
+    if (!box) return;
+
+    box.style.display =
+        box.style.display === "none"
+            ? "block"
+            : "none";
 }
 startApp();
