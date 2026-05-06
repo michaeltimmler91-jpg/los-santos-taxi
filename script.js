@@ -202,7 +202,6 @@ function calculatePreview(jobId, rideType) {
 
     const fare = km * 5;
     let tip = 0;
-    let refund = 0;
 
     if (rideType === "Normale Fahrt") {
         tip = invoice - fare;
@@ -211,12 +210,10 @@ function calculatePreview(jobId, rideType) {
     if (rideType === "Essenslieferung") {
         if (foodPaidBy === "Schließfach") {
             tip = invoice - foodCost - fare;
-            refund = 0;
         }
 
         if (foodPaidBy === "Eigene Tasche") {
             tip = invoice - fare;
-            refund = foodCost;
         }
     }
 
@@ -230,11 +227,6 @@ function calculatePreview(jobId, rideType) {
 
     document.getElementById(`preview_fare_${jobId}`).innerText = `${fare}$`;
     document.getElementById(`preview_tip_${jobId}`).innerText = `${tip}$`;
-
-    const refundBox = document.getElementById(`preview_refund_${jobId}`);
-    if (refundBox) {
-        refundBox.innerText = `${refund}$`;
-    }
 }
 
 async function completeJob(jobId, rideType) {
@@ -266,7 +258,6 @@ async function completeJob(jobId, rideType) {
 
     const fare_amount = kilometers * 5;
     let tip_amount = 0;
-    let refund_amount = 0;
     let billed_to = "Kunde";
 
     if (rideType === "Normale Fahrt") {
@@ -281,12 +272,10 @@ async function completeJob(jobId, rideType) {
 
         if (food_paid_by === "Schließfach") {
             tip_amount = invoice_amount - food_cost - fare_amount;
-            refund_amount = 0;
         }
 
         if (food_paid_by === "Eigene Tasche") {
             tip_amount = invoice_amount - fare_amount;
-            refund_amount = food_cost;
         }
     }
 
@@ -334,7 +323,7 @@ async function completeJob(jobId, rideType) {
             tip_amount,
             food_cost,
             food_paid_by,
-            refund_amount,
+            refund_amount: 0,
             billed_to,
             notes: done_notes || jobData.notes
         })
@@ -447,11 +436,6 @@ async function loadMyJobs() {
                     <option>Eigene Tasche</option>
                 </select>
             </div>
-
-            <div class="field">
-                <label>Rückzahlung offen</label>
-                <div class="preview-box" id="preview_refund_${job.id}">0$</div>
-            </div>
         ` : "";
 
         box.innerHTML += `
@@ -532,7 +516,6 @@ async function loadDoneJobs() {
                 🧾 Rechnung: ${job.invoice_amount || 0}$<br>
                 🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
                 🍔 Essenskosten: ${job.food_cost || 0}$<br>
-                🔁 Rückzahlung offen: ${job.refund_amount || 0}$<br>
                 🧾 Rechnung an: ${job.billed_to || "-"}
             </div>
         `;
