@@ -12,9 +12,21 @@
 
 <div class="container">
 
-    <div class="header">
-        <h1>🚕 Los Santos Taxi</h1>
-        <p>Leitstelle & Auftragsverwaltung</p>
+    <div class="top-header">
+        <div></div>
+
+        <div class="header">
+            <h1>🚕 Los Santos Taxi</h1>
+            <p>Leitstelle & Auftragsverwaltung</p>
+        </div>
+
+        <div class="login-info" id="topLoginInfo" style="display:none;">
+            <div>
+                Eingeloggt als<br>
+                <strong id="currentUserName"></strong>
+            </div>
+            <button class="small-btn" onclick="logoutUser()">Logout</button>
+        </div>
     </div>
 
     <div class="card" id="loginBox">
@@ -35,44 +47,41 @@
 
     <div id="appBox" style="display:none;">
 
-        <div class="card userbar">
-            <div>
-                Eingeloggt als: <strong id="currentUserName"></strong><br>
-                Rolle: <span id="currentUserRole"></span>
+        <span id="currentUserRole" style="display:none;"></span>
+
+        <div class="top-dashboard">
+
+            <div class="stats-grid compact-stats">
+                <div class="stat-card">
+                    <h3>Offene Aufträge</h3>
+                    <div class="number" id="stat_open">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Übernommen</h3>
+                    <div class="number" id="stat_taken">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Erledigt</h3>
+                    <div class="number" id="stat_done">0</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Leitstelle</h3>
+                    <div class="number" id="stat_dispatchers">0/2</div>
+                </div>
             </div>
 
-            <button class="small-btn" onclick="logoutUser()">Logout</button>
-        </div>
+            <div class="card mini-dispatcher" id="dispatcherBox">
+                <div id="dispatcher_status"></div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Offene Aufträge</h3>
-                <div class="number" id="stat_open">0</div>
+                <div class="dispatcher-buttons">
+                    <button class="small-btn" onclick="takeDispatcher()">Leitstelle übernehmen</button>
+                    <button class="small-btn danger-btn" onclick="leaveDispatcher()">Abgeben</button>
+                </div>
             </div>
 
-            <div class="stat-card">
-                <h3>Übernommen</h3>
-                <div class="number" id="stat_taken">0</div>
-            </div>
-
-            <div class="stat-card">
-                <h3>Erledigt</h3>
-                <div class="number" id="stat_done">0</div>
-            </div>
-
-            <div class="stat-card">
-                <h3>Leitstelle</h3>
-                <div class="number" id="stat_dispatchers">0/2</div>
-            </div>
-        </div>
-
-        <div class="card mini-dispatcher" id="dispatcherBox">
-            <div id="dispatcher_status"></div>
-
-            <div class="dispatcher-buttons">
-                <button class="small-btn" onclick="takeDispatcher()">Leitstelle übernehmen</button>
-                <button class="small-btn danger-btn" onclick="leaveDispatcher()">Abgeben</button>
-            </div>
         </div>
 
         <div class="card" id="createJobBox" style="display:none;">
@@ -126,37 +135,41 @@
             <button onclick="createJob()">Auftrag erstellen</button>
         </div>
 
-        <div class="card">
-            <div class="section-header" onclick="toggleSection('open_jobs_wrapper')">
-                <h2>🟢 Offene Aufträge</h2>
-                <span>▼</span>
+        <div class="main-sections">
+
+            <div class="card">
+                <div class="section-header" onclick="toggleSection('open_jobs_wrapper')">
+                    <h2>🟢 Offene Aufträge</h2>
+                    <span>▼</span>
+                </div>
+
+                <div id="open_jobs_wrapper">
+                    <div id="open_jobs_list"></div>
+                </div>
             </div>
 
-            <div id="open_jobs_wrapper">
-                <div id="open_jobs_list"></div>
-            </div>
-        </div>
+            <div class="card">
+                <div class="section-header" onclick="toggleSection('my_jobs_wrapper')">
+                    <h2>🚕 Meine übernommenen Aufträge</h2>
+                    <span>▼</span>
+                </div>
 
-        <div class="card">
-            <div class="section-header" onclick="toggleSection('my_jobs_wrapper')">
-                <h2>🚕 Meine übernommenen Aufträge</h2>
-                <span>▼</span>
-            </div>
-
-            <div id="my_jobs_wrapper">
-                <div id="my_jobs_list"></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="section-header" onclick="toggleSection('done_jobs_wrapper')">
-                <h2>✅ Erledigte Fahrten</h2>
-                <span>▼</span>
+                <div id="my_jobs_wrapper">
+                    <div id="my_jobs_list"></div>
+                </div>
             </div>
 
-            <div id="done_jobs_wrapper">
-                <div id="done_jobs_list"></div>
+            <div class="card">
+                <div class="section-header" onclick="toggleSection('done_jobs_wrapper')">
+                    <h2>✅ Erledigte Fahrten</h2>
+                    <span>▼</span>
+                </div>
+
+                <div id="done_jobs_wrapper">
+                    <div id="done_jobs_list"></div>
+                </div>
             </div>
+
         </div>
 
         <div class="card" id="adminPanel" style="display:none;">
