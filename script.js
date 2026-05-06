@@ -618,9 +618,51 @@ async function loadDoneJobs() {
     data.forEach(job => {
         const adminButtons = currentUser.role === "admin" ? `
             <br><br>
+            <button class="small-btn" onclick="toggleEditDoneJob('${job.id}')">
+                Fahrt bearbeiten
+            </button>
+
             <button class="small-btn danger-btn" onclick="deleteDoneJob('${job.id}')">
                 Fahrt löschen
             </button>
+
+            <div id="edit_${job.id}" style="display:none; margin-top:15px;">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Kunde / Empfänger</label>
+                        <input type="text" id="edit_customer_${job.id}" value="${job.customer_name || ""}">
+                    </div>
+
+                    <div class="field">
+                        <label>Ziel</label>
+                        <input type="text" id="edit_destination_${job.id}" value="${job.destination || ""}">
+                    </div>
+
+                    <div class="field">
+                        <label>Kilometer</label>
+                        <input type="number" id="edit_km_${job.id}" value="${job.kilometers || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Ausgestellte Rechnung</label>
+                        <input type="number" id="edit_invoice_${job.id}" value="${job.invoice_amount || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Essenskosten</label>
+                        <input type="number" id="edit_food_${job.id}" value="${job.food_cost || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Bemerkung</label>
+                        <input type="text" id="edit_notes_${job.id}" value="${job.notes || ""}">
+                    </div>
+                </div>
+
+                <button onclick="saveDoneJobEdit('${job.id}', '${job.ride_type}')">
+                    Änderungen speichern
+                </button>
+            </div>
         ` : "";
 
         box.innerHTML += `
@@ -755,6 +797,106 @@ async function deleteDoneJob(jobId) {
     }
 
     alert("Fahrt gelöscht.");
+    loadJobs();
+}
+function toggleEditDoneJob(jobId) {
+    const box = document.getElementById(`edit_${jobId}`);
+
+    if (!box) {
+        return;
+    }
+
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+function recalculateDoneJob(rideType, kilometers, invoiceAmount, foodCost) {
+    let fareAmount = kilometers * 5;
+    let tipAmount = 0;
+    let billedTo = "Kunde";
+
+    if (rideType === "Bambi-Tour") {
+        fareAmount = 0;
+        billedTo = "Kostenlos";
+        tipAmount = invoiceAmount;
+    }
+
+    if (rideType === "Normale Fahrt") {
+        tipAmount = invoiceAmount - fareAmount;
+    }
+
+    if (rideType === "Essenslieferung") {
+        tipAmount = invoiceAmount - foodCost - fareAmount;
+    }
+
+    if (rideType === "EMS") {
+        billedTo = "EMS";
+        tipAmount = invoiceAmount;
+    }
+
+    if (rideType === "Gebrauchtwagenhändler") {
+        billedTo = "Gebrauchtwagenhändler";
+        tipAmount = invoiceAmount;
+    }
+
+    return {
+        fareAmount,
+        tipAmount,
+        billedTo
+    };
+}
+
+async function saveDoneJobEdit(jobId, rideType) {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
+        return;
+    }
+
+    const customerName = document.getElementById(`edit_customer_${jobId}`).value.trim();
+    const destination = document.getElementById(`edit_destination_${jobId}`).value.trim();
+    const kilometers = Number(document.getElementById(`edit_km_${jobId}`).value);
+    const invoiceAmount = Number(document.getElementById(`edit_invoice_${jobId}`).value);
+    const foodCost = Number(document.getElementById(`edit_food_${jobId}`).value);
+    const notes = document.getElementById(`edit_notes_${jobId}`).value.trim();
+
+    if (!destination) {
+        alert("Bitte Ziel eintragen.");
+        return;
+    }
+
+    if (kilometers < 0 || invoiceAmount < 0 || foodCost < 0) {
+        alert("Negative Werte sind nicht erlaubt.");
+        return;
+    }
+
+    const result = recalculateDoneJob(
+        rideType,
+        kilometers,
+        invoiceAmount,
+        foodCost
+    );
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            customer_name: customerName,
+            destination: destination,
+            kilometers: kilometers,
+            fare_amount: result.fareAmount,
+            invoice_amount: invoiceAmount,
+            tip_amount: result.tipAmount,
+            food_cost: foodCost,
+            billed_to: result.billedTo,
+            notes: notes
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Fahrt konnte nicht bearbeitet werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Fahrt wurde bearbeitet.");
     loadJobs();
 }
 startApp();
