@@ -34,7 +34,6 @@ function logoutUser() {
 
 async function startApp() {
     const savedUser = localStorage.getItem("taxiUser");
-
     if (!savedUser) return;
 
     currentUser = JSON.parse(savedUser);
@@ -195,15 +194,57 @@ async function takeJob(jobId) {
     loadJobs();
 }
 
+function calculatePreview(jobId, rideType) {
+    const km = Number(document.getElementById(`km_${jobId}`)?.value || 0);
+    const invoice = Number(document.getElementById(`invoice_${jobId}`)?.value || 0);
+    const foodCost = Number(document.getElementById(`food_${jobId}`)?.value || 0);
+    const foodPaidBy = document.getElementById(`foodpaid_${jobId}`)?.value || "";
+
+    const fare = km * 5;
+    let tip = 0;
+    let refund = 0;
+
+    if (rideType === "Normale Fahrt") {
+        tip = invoice - fare;
+    }
+
+    if (rideType === "Essenslieferung") {
+        if (foodPaidBy === "Schließfach") {
+            tip = invoice - foodCost - fare;
+            refund = 0;
+        }
+
+        if (foodPaidBy === "Eigene Tasche") {
+            tip = invoice - fare;
+            refund = foodCost;
+        }
+    }
+
+    if (
+        rideType === "EMS" ||
+        rideType === "Gebrauchtwagenhändler" ||
+        rideType === "Bambi-Tour"
+    ) {
+        tip = invoice;
+    }
+
+    document.getElementById(`preview_fare_${jobId}`).innerText = `${fare}$`;
+    document.getElementById(`preview_tip_${jobId}`).innerText = `${tip}$`;
+
+    const refundBox = document.getElementById(`preview_refund_${jobId}`);
+    if (refundBox) {
+        refundBox.innerText = `${refund}$`;
+    }
+}
+
 async function completeJob(jobId, rideType) {
-    const kmInput = document.getElementById(`km_${jobId}`);
-    const invoiceInput = document.getElementById(`invoice_${jobId}`);
+    const kilometers = Number(document.getElementById(`km_${jobId}`).value);
+    const invoice_amount = Number(document.getElementById(`invoice_${jobId}`).value);
+    const final_destination = document.getElementById(`destination_${jobId}`).value.trim();
     const foodCostInput = document.getElementById(`food_${jobId}`);
     const foodPaidByInput = document.getElementById(`foodpaid_${jobId}`);
     const notesInput = document.getElementById(`done_notes_${jobId}`);
 
-    const kilometers = Number(kmInput.value);
-    const invoice_amount = Number(invoiceInput.value);
     const food_cost = foodCostInput ? Number(foodCostInput.value) : 0;
     const food_paid_by = foodPaidByInput ? foodPaidByInput.value : "";
     const done_notes = notesInput.value.trim();
@@ -215,6 +256,11 @@ async function completeJob(jobId, rideType) {
 
     if (invoice_amount < 0) {
         alert("Rechnung darf nicht negativ sein.");
+        return;
+    }
+
+    if (!final_destination) {
+        alert("Bitte Ziel eintragen.");
         return;
     }
 
@@ -281,6 +327,7 @@ async function completeJob(jobId, rideType) {
         .update({
             job_status: "Erledigt",
             completed_at: new Date().toISOString(),
+            destination: final_destination,
             kilometers,
             fare_amount,
             invoice_amount,
@@ -306,7 +353,7 @@ async function completeJob(jobId, rideType) {
             customer_name: jobData.customer_name,
             ride_type: jobData.ride_type,
             start_location: jobData.pickup_location,
-            end_location: jobData.destination,
+            end_location: final_destination,
             kilometers,
             fare_amount,
             tip_amount,
@@ -389,16 +436,21 @@ async function loadMyJobs() {
         const foodFields = job.ride_type === "Essenslieferung" ? `
             <div class="field">
                 <label>Essenskosten</label>
-                <input type="number" id="food_${job.id}" value="0">
+                <input type="number" id="food_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
             </div>
 
             <div class="field">
                 <label>Auslage bezahlt durch</label>
-                <select id="foodpaid_${job.id}">
+                <select id="foodpaid_${job.id}" onchange="calculatePreview('${job.id}', '${job.ride_type}')">
                     <option value="">Bitte wählen</option>
                     <option>Schließfach</option>
                     <option>Eigene Tasche</option>
                 </select>
+            </div>
+
+            <div class="field">
+                <label>Rückzahlung offen</label>
+                <div class="preview-box" id="preview_refund_${job.id}">0$</div>
             </div>
         ` : "";
 
@@ -406,7 +458,6 @@ async function loadMyJobs() {
             <div class="ride-card">
                 <strong>${job.ride_type}</strong><br>
                 📍 Abholung: ${job.pickup_location || "-"}<br>
-                🎯 Ziel: ${job.destination || "-"}<br>
                 👤 Kunde: ${job.customer_name || "-"}<br>
                 🏢 Firma: ${job.company_name || "-"}<br>
                 🚑 EMS: ${job.ems_staff_name || "-"}<br>
@@ -414,13 +465,28 @@ async function loadMyJobs() {
 
                 <div class="form-grid">
                     <div class="field">
+                        <label>Ziel</label>
+                        <input type="text" id="destination_${job.id}" value="${job.destination || ""}">
+                    </div>
+
+                    <div class="field">
                         <label>Kilometer</label>
-                        <input type="number" id="km_${job.id}" value="0">
+                        <input type="number" id="km_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
+                    </div>
+
+                    <div class="field">
+                        <label>Rechnung ohne Trinkgeld</label>
+                        <div class="preview-box" id="preview_fare_${job.id}">0$</div>
                     </div>
 
                     <div class="field">
                         <label>Ausgestellte Rechnung</label>
-                        <input type="number" id="invoice_${job.id}" value="0">
+                        <input type="number" id="invoice_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
+                    </div>
+
+                    <div class="field">
+                        <label>Errechnetes Trinkgeld</label>
+                        <div class="preview-box" id="preview_tip_${job.id}">0$</div>
                     </div>
 
                     ${foodFields}
@@ -434,6 +500,8 @@ async function loadMyJobs() {
                 <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
             </div>
         `;
+
+        setTimeout(() => calculatePreview(job.id, job.ride_type), 0);
     });
 }
 
