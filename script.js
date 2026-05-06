@@ -42,6 +42,7 @@ async function startApp() {
 
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("appBox").style.display = "block";
+    document.getElementById("topLoginInfo").style.display = "flex";
     document.getElementById("currentUserName").innerText = currentUser.display_name;
     document.getElementById("currentUserRole").innerText = currentUser.role;
 
