@@ -43,43 +43,40 @@
 
             <button class="small-btn" onclick="logoutUser()">Logout</button>
         </div>
-<div class="stats-grid">
-    <div class="stat-card">
-        <h3>Offene Aufträge</h3>
-        <div class="number" id="stat_open">0</div>
-    </div>
 
-    <div class="stat-card">
-        <h3>Übernommen</h3>
-        <div class="number" id="stat_taken">0</div>
-    </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Offene Aufträge</h3>
+                <div class="number" id="stat_open">0</div>
+            </div>
 
-    <div class="stat-card">
-        <h3>Erledigt</h3>
-        <div class="number" id="stat_done">0</div>
-    </div>
+            <div class="stat-card">
+                <h3>Übernommen</h3>
+                <div class="number" id="stat_taken">0</div>
+            </div>
 
-    <div class="stat-card">
-        <h3>Aktive Leitstelle</h3>
-        <div class="number" id="stat_dispatchers">0/2</div>
-    </div>
-</div>
-<div class="card" id="dispatcherBox">
-    <h2>📡 Leitstellen-Dienst</h2>
+            <div class="stat-card">
+                <h3>Erledigt</h3>
+                <div class="number" id="stat_done">0</div>
+            </div>
 
-    <div id="dispatcher_status"></div>
+            <div class="stat-card">
+                <h3>Leitstelle</h3>
+                <div class="number" id="stat_dispatchers">0/2</div>
+            </div>
+        </div>
 
-    <button class="small-btn" onclick="takeDispatcher()">
-        Leitstelle übernehmen
-    </button>
+        <div class="card mini-dispatcher" id="dispatcherBox">
+            <div id="dispatcher_status"></div>
 
-    <button class="small-btn danger-btn" onclick="leaveDispatcher()">
-        Leitstelle abgeben
-    </button>
-</div>
+            <div class="dispatcher-buttons">
+                <button class="small-btn" onclick="takeDispatcher()">Leitstelle übernehmen</button>
+                <button class="small-btn danger-btn" onclick="leaveDispatcher()">Abgeben</button>
+            </div>
+        </div>
 
-<div class="card" id="createJobBox">
-    <h2>📞 Leitstelle: Auftrag erstellen</h2>
+        <div class="card" id="createJobBox" style="display:none;">
+            <h2>📞 Leitstelle: Auftrag erstellen</h2>
 
             <div class="form-grid">
 
@@ -115,7 +112,7 @@
                 </div>
 
                 <div class="field">
-                    <label>Kunde / Spieler</label>
+                    <label>Kunde / Spieler / Empfänger</label>
                     <input type="text" id="job_customer_name">
                 </div>
 
@@ -130,37 +127,37 @@
         </div>
 
         <div class="card">
-    <div class="section-header" onclick="toggleSection('open_jobs_wrapper')">
-        <h2>🟢 Offene Aufträge</h2>
-        <span>▼</span>
-    </div>
+            <div class="section-header" onclick="toggleSection('open_jobs_wrapper')">
+                <h2>🟢 Offene Aufträge</h2>
+                <span>▼</span>
+            </div>
 
-    <div id="open_jobs_wrapper">
-        <div id="open_jobs_list"></div>
-    </div>
-</div>
+            <div id="open_jobs_wrapper">
+                <div id="open_jobs_list"></div>
+            </div>
+        </div>
 
-       <div class="card">
-    <div class="section-header" onclick="toggleSection('my_jobs_wrapper')">
-        <h2>🚕 Meine übernommenen Aufträge</h2>
-        <span>▼</span>
-    </div>
+        <div class="card">
+            <div class="section-header" onclick="toggleSection('my_jobs_wrapper')">
+                <h2>🚕 Meine übernommenen Aufträge</h2>
+                <span>▼</span>
+            </div>
 
-    <div id="my_jobs_wrapper">
-        <div id="my_jobs_list"></div>
-    </div>
-</div>
+            <div id="my_jobs_wrapper">
+                <div id="my_jobs_list"></div>
+            </div>
+        </div>
 
-       <div class="card">
-    <div class="section-header" onclick="toggleSection('done_jobs_wrapper')">
-        <h2>✅ Erledigte Fahrten</h2>
-        <span>▼</span>
-    </div>
+        <div class="card">
+            <div class="section-header" onclick="toggleSection('done_jobs_wrapper')">
+                <h2>✅ Erledigte Fahrten</h2>
+                <span>▼</span>
+            </div>
 
-    <div id="done_jobs_wrapper">
-        <div id="done_jobs_list"></div>
-    </div>
-</div>
+            <div id="done_jobs_wrapper">
+                <div id="done_jobs_list"></div>
+            </div>
+        </div>
 
         <div class="card" id="adminPanel" style="display:none;">
             <h2>Adminbereich</h2>
@@ -186,10 +183,10 @@
 
                 <div class="field">
                     <label>Rolle</label>
-<select id="new_role">
-    <option value="fahrer">Fahrer</option>
-    <option value="admin">Admin</option>
-</select>
+                    <select id="new_role">
+                        <option value="fahrer">Fahrer</option>
+                        <option value="admin">Admin</option>
+                    </select>
                 </div>
 
             </div>
@@ -207,9 +204,10 @@
 
             <button onclick="createCompany()">Unternehmen hinzufügen</button>
 
-            <br><br>
-<h3>🎁 Trinkgeld-Auswertung</h3>
-<div id="tips_stats"></div>
+            <h3>🎁 Trinkgeld-Auswertung</h3>
+            <div id="tips_stats"></div>
+
+            <h3>Benutzerverwaltung</h3>
             <div id="users_list"></div>
         </div>
 
