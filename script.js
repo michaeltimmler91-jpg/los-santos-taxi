@@ -50,9 +50,10 @@ async function startApp() {
     await loadJobs();
 
     if (currentUser.role === "admin") {
-        document.getElementById("adminPanel").style.display = "block";
-        loadUsers();
-    }
+    document.getElementById("adminPanel").style.display = "block";
+    loadUsers();
+    loadTipStats();
+}
 }
 
 function canUseDispatcher() {
@@ -881,5 +882,63 @@ async function saveDoneJobEdit(jobId, rideType) {
 
     alert("Fahrt wurde bearbeitet.");
     loadJobs();
+}
+
+async function loadTipStats() {
+    if (!currentUser || currentUser.role !== "admin") {
+        return;
+    }
+
+    const box = document.getElementById("tips_stats");
+
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("assigned_driver, tip_amount, fare_amount, invoice_amount, food_cost")
+        .eq("job_status", "Erledigt");
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden der Trinkgeld-Auswertung.";
+        return;
+    }
+
+    const stats = {};
+
+    data.forEach(job => {
+        const driver = job.assigned_driver || "Unbekannt";
+
+        if (!stats[driver]) {
+            stats[driver] = {
+                tips: 0,
+                rides: 0,
+                fare: 0,
+                invoice: 0,
+                food: 0
+            };
+        }
+
+        stats[driver].tips += Number(job.tip_amount || 0);
+        stats[driver].rides += 1;
+        stats[driver].fare += Number(job.fare_amount || 0);
+        stats[driver].invoice += Number(job.invoice_amount || 0);
+        stats[driver].food += Number(job.food_cost || 0);
+    });
+
+    let html = "";
+
+    Object.keys(stats).forEach(driver => {
+        html += `
+            <div class="ride-card">
+                <strong>${driver}</strong><br>
+                🚕 Fahrten: ${stats[driver].rides}<br>
+                🎁 Trinkgeld: ${stats[driver].tips}$<br>
+                💰 Fahrtkosten/interne Abrechnung: ${stats[driver].fare}$<br>
+                🧾 Ausgestellte Rechnungen: ${stats[driver].invoice}$<br>
+                🍔 Essenskosten: ${stats[driver].food}$
+            </div>
+        `;
+    });
+
+    box.innerHTML = html || "Noch keine erledigten Fahrten vorhanden.";
 }
 startApp();
