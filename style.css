@@ -112,3 +112,17 @@ button:hover {
     font-weight: bold;
     min-height: 20px;
 }
+
+.danger-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.danger-btn:hover {
+    background: #f87171;
+}
+
+.locked-box {
+    opacity: 0.45;
+    pointer-events: none;
+}
