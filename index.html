@@ -130,19 +130,37 @@
         </div>
 
         <div class="card">
-            <h2>🟢 Offene Aufträge</h2>
-            <div id="open_jobs_list"></div>
-        </div>
+    <div class="section-header" onclick="toggleSection('open_jobs_wrapper')">
+        <h2>🟢 Offene Aufträge</h2>
+        <span>▼</span>
+    </div>
 
-        <div class="card">
-            <h2>🚕 Meine übernommenen Aufträge</h2>
-            <div id="my_jobs_list"></div>
-        </div>
+    <div id="open_jobs_wrapper">
+        <div id="open_jobs_list"></div>
+    </div>
+</div>
 
-        <div class="card">
-            <h2>✅ Erledigte Fahrten</h2>
-            <div id="done_jobs_list"></div>
-        </div>
+       <div class="card">
+    <div class="section-header" onclick="toggleSection('my_jobs_wrapper')">
+        <h2>🚕 Meine übernommenen Aufträge</h2>
+        <span>▼</span>
+    </div>
+
+    <div id="my_jobs_wrapper">
+        <div id="my_jobs_list"></div>
+    </div>
+</div>
+
+       <div class="card">
+    <div class="section-header" onclick="toggleSection('done_jobs_wrapper')">
+        <h2>✅ Erledigte Fahrten</h2>
+        <span>▼</span>
+    </div>
+
+    <div id="done_jobs_wrapper">
+        <div id="done_jobs_list"></div>
+    </div>
+</div>
 
         <div class="card" id="adminPanel" style="display:none;">
             <h2>Adminbereich</h2>
