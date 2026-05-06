@@ -312,3 +312,67 @@ button:hover {
         width: 100%;
     }
 }
+.top-header {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.login-info {
+    justify-content: flex-end;
+    align-items: center;
+    gap: 14px;
+    text-align: right;
+    color: #d1d5db;
+}
+
+.login-info strong {
+    color: #facc15;
+}
+
+.top-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
+    align-items: stretch;
+    margin-bottom: 24px;
+}
+
+.compact-stats {
+    margin-bottom: 0;
+}
+
+.compact-stats .stat-card {
+    padding: 16px;
+}
+
+.compact-stats .stat-card h3 {
+    font-size: 13px;
+}
+
+.compact-stats .stat-card .number {
+    font-size: 24px;
+}
+
+.main-sections {
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+@media (max-width: 900px) {
+    .top-header {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .login-info {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .top-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
