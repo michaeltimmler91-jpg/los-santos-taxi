@@ -468,6 +468,7 @@ async function loadJobs() {
     await loadMyJobs();
     await loadDoneJobs();
     await loadDispatchers();
+    await loadDashboardStats();
 }
 
 async function loadOpenJobs() {
@@ -940,5 +941,25 @@ async function loadTipStats() {
     });
 
     box.innerHTML = html || "Noch keine erledigten Fahrten vorhanden.";
+}
+
+async function loadDashboardStats() {
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("job_status");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const open = data.filter(job => job.job_status === "Offen").length;
+    const taken = data.filter(job => job.job_status === "Übernommen").length;
+    const done = data.filter(job => job.job_status === "Erledigt").length;
+
+    document.getElementById("stat_open").innerText = open;
+    document.getElementById("stat_taken").innerText = taken;
+    document.getElementById("stat_done").innerText = done;
+    document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
 }
 startApp();
