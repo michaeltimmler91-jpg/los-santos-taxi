@@ -43,19 +43,18 @@ async function startApp() {
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("appBox").style.display = "block";
     document.getElementById("topLoginInfo").style.display = "flex";
+
     document.getElementById("currentUserName").innerText = currentUser.display_name;
     document.getElementById("currentUserRole").innerText = currentUser.role;
+
+    if (currentUser.role === "admin") {
+        document.getElementById("adminLink").style.display = "inline-block";
+    }
 
     await loadDispatchers();
     await loadCompanies();
     updateJobForm();
     await loadJobs();
-
-    if (currentUser.role === "admin") {
-        document.getElementById("adminPanel").style.display = "block";
-        loadUsers();
-        loadTipStats();
-    }
 
     setupRealtime();
 }
@@ -75,9 +74,6 @@ function setupRealtime() {
             },
             () => {
                 loadJobs();
-                if (currentUser && currentUser.role === "admin") {
-                    loadTipStats();
-                }
             }
         )
         .on(
@@ -93,10 +89,6 @@ function setupRealtime() {
             }
         )
         .subscribe();
-}
-
-function canUseDispatcher() {
-    return !!currentUser;
 }
 
 function isActiveDispatcher() {
@@ -131,7 +123,7 @@ function renderDispatchers() {
         html += "Keine Leitstelle aktiv.";
     } else {
         activeDispatchers.forEach((dispatcher, index) => {
-            html += `${index + 1}. ${dispatcher.display_name}<br>`;
+            html += `${index + 1}. ${escapeHtml(dispatcher.display_name)}<br>`;
         });
     }
 
@@ -139,11 +131,36 @@ function renderDispatchers() {
     box.innerHTML = html;
 
     if (isActiveDispatcher()) {
-    createBox.style.display = "block";
-} else {
-    createBox.style.display = "none";
-}
+        createBox.style.display = "block";
+    } else {
+        createBox.style.display = "none";
+    }
+
     updateDispatcherButton();
+}
+
+async function toggleDispatcherStatus() {
+    if (isActiveDispatcher()) {
+        await leaveDispatcher();
+    } else {
+        await takeDispatcher();
+    }
+
+    updateDispatcherButton();
+}
+
+function updateDispatcherButton() {
+    const btn = document.getElementById("dispatcherToggleBtn");
+
+    if (!btn) return;
+
+    if (isActiveDispatcher()) {
+        btn.innerText = "❌ Leitstelle verlassen";
+        btn.classList.add("danger-btn");
+    } else {
+        btn.innerText = "📡 Leitstelle übernehmen";
+        btn.classList.remove("danger-btn");
+    }
 }
 
 async function takeDispatcher() {
@@ -387,13 +404,8 @@ async function completeJob(jobId, rideType) {
     const food_cost = foodCostInput ? Number(foodCostInput.value) : 0;
     const done_notes = notesInput.value.trim();
 
-    if (kilometers < 0) {
-        alert("Kilometer dürfen nicht negativ sein.");
-        return;
-    }
-
-    if (invoice_amount < 0) {
-        alert("Rechnung darf nicht negativ sein.");
+    if (kilometers < 0 || invoice_amount < 0 || food_cost < 0) {
+        alert("Negative Werte sind nicht erlaubt.");
         return;
     }
 
@@ -469,8 +481,6 @@ async function completeJob(jobId, rideType) {
             invoice_amount,
             tip_amount,
             food_cost,
-            food_paid_by: "",
-            refund_amount: 0,
             billed_to,
             notes: done_notes || jobData.notes
         })
@@ -501,10 +511,6 @@ async function loadJobs() {
     await loadDoneJobs();
     await loadDispatchers();
     await loadDashboardStats();
-
-    if (currentUser && currentUser.role === "admin") {
-        await loadTipStats();
-    }
 }
 
 async function loadDashboardStats() {
@@ -521,12 +527,10 @@ async function loadDashboardStats() {
     const taken = data.filter(job => job.job_status === "Übernommen").length;
     const done = data.filter(job => job.job_status === "Erledigt").length;
 
-    if (document.getElementById("stat_open")) {
-        document.getElementById("stat_open").innerText = open;
-        document.getElementById("stat_taken").innerText = taken;
-        document.getElementById("stat_done").innerText = done;
-        document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
-    }
+    document.getElementById("stat_open").innerText = open;
+    document.getElementById("stat_taken").innerText = taken;
+    document.getElementById("stat_done").innerText = done;
+    document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
 }
 
 async function loadOpenJobs() {
@@ -659,49 +663,6 @@ async function loadDoneJobs() {
     box.innerHTML = "";
 
     data.forEach(job => {
-        const adminButtons = currentUser.role === "admin" ? `
-            <button class="small-btn" onclick="toggleEditDoneJob('${job.id}')">Bearbeiten</button>
-            <button class="small-btn danger-btn" onclick="deleteDoneJob('${job.id}')">Löschen</button>
-
-            <div id="edit_${job.id}" style="display:none; grid-column: 1 / -1; margin-top:15px;">
-                <div class="form-grid">
-                    <div class="field">
-                        <label>Kunde / Empfänger</label>
-                        <input type="text" id="edit_customer_${job.id}" value="${escapeAttr(job.customer_name || "")}">
-                    </div>
-
-                    <div class="field">
-                        <label>Ziel</label>
-                        <input type="text" id="edit_destination_${job.id}" value="${escapeAttr(job.destination || "")}">
-                    </div>
-
-                    <div class="field">
-                        <label>Kilometer</label>
-                        <input type="number" id="edit_km_${job.id}" value="${job.kilometers || 0}">
-                    </div>
-
-                    <div class="field">
-                        <label>Ausgestellte Rechnung</label>
-                        <input type="number" id="edit_invoice_${job.id}" value="${job.invoice_amount || 0}">
-                    </div>
-
-                    <div class="field">
-                        <label>Essenskosten</label>
-                        <input type="number" id="edit_food_${job.id}" value="${job.food_cost || 0}">
-                    </div>
-
-                    <div class="field">
-                        <label>Bemerkung</label>
-                        <input type="text" id="edit_notes_${job.id}" value="${escapeAttr(job.notes || "")}">
-                    </div>
-                </div>
-
-                <button onclick="saveDoneJobEdit('${job.id}', '${job.ride_type}')">
-                    Änderungen speichern
-                </button>
-            </div>
-        ` : "";
-
         box.innerHTML += `
             <div class="compact-ride">
                 <div>
@@ -717,8 +678,6 @@ async function loadDoneJobs() {
                     👤 ${escapeHtml(job.customer_name || "-")}<br>
                     📍 ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}
                 </div>
-
-                <div>${adminButtons}</div>
             </div>
         `;
     });
@@ -729,381 +688,6 @@ function toggleSection(id) {
     if (!box) return;
 
     box.style.display = box.style.display === "none" ? "block" : "none";
-}
-
-function toggleEditDoneJob(jobId) {
-    const box = document.getElementById(`edit_${jobId}`);
-    if (!box) return;
-
-    box.style.display = box.style.display === "none" ? "block" : "none";
-}
-
-function recalculateDoneJob(rideType, kilometers, invoiceAmount, foodCost) {
-    let fareAmount = kilometers * 5;
-    let tipAmount = 0;
-    let billedTo = "Kunde";
-
-    if (rideType === "Bambi-Tour") {
-        fareAmount = 0;
-        billedTo = "Kostenlos";
-        tipAmount = invoiceAmount;
-    }
-
-    if (rideType === "Normale Fahrt") {
-        tipAmount = invoiceAmount - fareAmount;
-    }
-
-    if (rideType === "Essenslieferung") {
-        tipAmount = invoiceAmount - foodCost - fareAmount;
-    }
-
-    if (rideType === "EMS") {
-        billedTo = "EMS";
-        tipAmount = invoiceAmount;
-    }
-
-    if (rideType === "Gebrauchtwagenhändler") {
-        billedTo = "Gebrauchtwagenhändler";
-        tipAmount = invoiceAmount;
-    }
-
-    return { fareAmount, tipAmount, billedTo };
-}
-
-async function saveDoneJobEdit(jobId, rideType) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
-    const customerName = document.getElementById(`edit_customer_${jobId}`).value.trim();
-    const destination = document.getElementById(`edit_destination_${jobId}`).value.trim();
-    const kilometers = Number(document.getElementById(`edit_km_${jobId}`).value);
-    const invoiceAmount = Number(document.getElementById(`edit_invoice_${jobId}`).value);
-    const foodCost = Number(document.getElementById(`edit_food_${jobId}`).value);
-    const notes = document.getElementById(`edit_notes_${jobId}`).value.trim();
-
-    if (!destination) {
-        alert("Bitte Ziel eintragen.");
-        return;
-    }
-
-    if (kilometers < 0 || invoiceAmount < 0 || foodCost < 0) {
-        alert("Negative Werte sind nicht erlaubt.");
-        return;
-    }
-
-    const result = recalculateDoneJob(rideType, kilometers, invoiceAmount, foodCost);
-
-    const { error } = await client
-        .from("taxi_jobs")
-        .update({
-            customer_name: customerName,
-            destination,
-            kilometers,
-            fare_amount: result.fareAmount,
-            invoice_amount: invoiceAmount,
-            tip_amount: result.tipAmount,
-            food_cost: foodCost,
-            billed_to: result.billedTo,
-            notes
-        })
-        .eq("id", jobId);
-
-    if (error) {
-        alert("Fahrt konnte nicht bearbeitet werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Fahrt wurde bearbeitet.");
-    loadJobs();
-}
-
-async function deleteDoneJob(jobId) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
-    const ok = confirm("Diese erledigte Fahrt wirklich löschen? Sie wird nur ausgeblendet, nicht endgültig entfernt.");
-
-    if (!ok) return;
-
-    const { error } = await client
-        .from("taxi_jobs")
-        .update({ job_status: "Gelöscht" })
-        .eq("id", jobId);
-
-    if (error) {
-        alert("Fahrt konnte nicht gelöscht werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Fahrt gelöscht.");
-    loadJobs();
-}
-
-async function createUser() {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung");
-        return;
-    }
-
-    const username = document.getElementById("new_username").value.trim();
-    const display_name = document.getElementById("new_display_name").value.trim();
-    const password = document.getElementById("new_password").value.trim();
-    const role = document.getElementById("new_role").value;
-
-    const { error } = await client
-        .from("taxi_users")
-        .insert([{ username, display_name, password, role, active: true }]);
-
-    if (error) {
-        alert("Benutzer konnte nicht erstellt werden.");
-        console.error(error);
-        return;
-    }
-
-    document.getElementById("new_username").value = "";
-    document.getElementById("new_display_name").value = "";
-    document.getElementById("new_password").value = "";
-
-    loadUsers();
-}
-
-async function loadUsers() {
-    if (!currentUser || currentUser.role !== "admin") return;
-
-    const usersList = document.getElementById("users_list");
-
-    const { data, error } = await client
-        .from("taxi_users")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    usersList.innerHTML = "";
-
-    data.forEach(user => {
-        usersList.innerHTML += `
-            <div class="ride-card">
-                <strong>${escapeHtml(user.display_name)}</strong><br>
-                Benutzer: ${escapeHtml(user.username)}<br>
-                Rolle: ${escapeHtml(user.role)}<br>
-                Aktiv: ${user.active ? "Ja" : "Nein"}
-
-                <br><br>
-
-                <button class="small-btn" onclick="toggleUserEdit('${user.id}')">
-                    Benutzer bearbeiten
-                </button>
-
-                <button class="small-btn danger-btn" onclick="deleteUser('${user.id}', '${escapeAttr(user.display_name)}')">
-                    Benutzer löschen
-                </button>
-
-                <div id="user_edit_${user.id}" style="display:none; margin-top:15px;">
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Benutzername</label>
-                            <input type="text" id="edit_username_${user.id}" value="${escapeAttr(user.username)}">
-                        </div>
-
-                        <div class="field">
-                            <label>Anzeigename</label>
-                            <input type="text" id="edit_display_${user.id}" value="${escapeAttr(user.display_name)}">
-                        </div>
-
-                        <div class="field">
-                            <label>Neues Passwort</label>
-                            <input type="text" id="edit_password_${user.id}" value="${escapeAttr(user.password)}">
-                        </div>
-
-                        <div class="field">
-                            <label>Rolle</label>
-                            <select id="edit_role_${user.id}">
-                                <option value="fahrer" ${user.role === "fahrer" ? "selected" : ""}>Fahrer</option>
-                                <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label>Aktiv</label>
-                            <select id="edit_active_${user.id}">
-                                <option value="true" ${user.active ? "selected" : ""}>Ja</option>
-                                <option value="false" ${!user.active ? "selected" : ""}>Nein</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button onclick="saveUserEdit('${user.id}')">
-                        Änderungen speichern
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-}
-
-function toggleUserEdit(userId) {
-    const box = document.getElementById(`user_edit_${userId}`);
-    if (!box) return;
-
-    box.style.display = box.style.display === "none" ? "block" : "none";
-}
-
-async function saveUserEdit(userId) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
-    const username = document.getElementById(`edit_username_${userId}`).value.trim();
-    const displayName = document.getElementById(`edit_display_${userId}`).value.trim();
-    const password = document.getElementById(`edit_password_${userId}`).value.trim();
-    const role = document.getElementById(`edit_role_${userId}`).value;
-    const active = document.getElementById(`edit_active_${userId}`).value === "true";
-
-    if (!username || !displayName || !password) {
-        alert("Benutzername, Anzeigename und Passwort dürfen nicht leer sein.");
-        return;
-    }
-
-    const { error } = await client
-        .from("taxi_users")
-        .update({
-            username,
-            display_name: displayName,
-            password,
-            role,
-            active
-        })
-        .eq("id", userId);
-
-    if (error) {
-        alert("Benutzer konnte nicht gespeichert werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Benutzer gespeichert.");
-    loadUsers();
-}
-
-async function deleteUser(userId, displayName) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
-    const ok = confirm(`Benutzer "${displayName}" wirklich komplett löschen?`);
-
-    if (!ok) return;
-
-    const { error } = await client
-        .from("taxi_users")
-        .delete()
-        .eq("id", userId);
-
-    if (error) {
-        alert("Benutzer konnte nicht gelöscht werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Benutzer gelöscht.");
-    loadUsers();
-}
-
-async function createCompany() {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung");
-        return;
-    }
-
-    const company_name = document.getElementById("new_company_name").value.trim();
-
-    if (!company_name) {
-        alert("Bitte Unternehmen eintragen.");
-        return;
-    }
-
-    const { error } = await client
-        .from("taxi_companies")
-        .insert([{ company_name, active: true }]);
-
-    if (error) {
-        alert("Unternehmen konnte nicht erstellt werden.");
-        console.error(error);
-        return;
-    }
-
-    document.getElementById("new_company_name").value = "";
-
-    await loadCompanies();
-    updateJobForm();
-}
-
-async function loadTipStats() {
-    if (!currentUser || currentUser.role !== "admin") return;
-
-    const box = document.getElementById("tips_stats");
-
-    const { data, error } = await client
-        .from("taxi_jobs")
-        .select("assigned_driver, tip_amount, fare_amount, invoice_amount, food_cost")
-        .eq("job_status", "Erledigt");
-
-    if (error) {
-        console.error(error);
-        box.innerHTML = "Fehler beim Laden der Trinkgeld-Auswertung.";
-        return;
-    }
-
-    const stats = {};
-
-    data.forEach(job => {
-        const driver = job.assigned_driver || "Unbekannt";
-
-        if (!stats[driver]) {
-            stats[driver] = {
-                tips: 0,
-                rides: 0,
-                fare: 0,
-                invoice: 0,
-                food: 0
-            };
-        }
-
-        stats[driver].tips += Number(job.tip_amount || 0);
-        stats[driver].rides += 1;
-        stats[driver].fare += Number(job.fare_amount || 0);
-        stats[driver].invoice += Number(job.invoice_amount || 0);
-        stats[driver].food += Number(job.food_cost || 0);
-    });
-
-    let html = "";
-
-    Object.keys(stats).forEach(driver => {
-        html += `
-            <div class="ride-card">
-                <strong>${escapeHtml(driver)}</strong><br>
-                🚕 Fahrten: ${stats[driver].rides}<br>
-                🎁 Trinkgeld: ${stats[driver].tips}$<br>
-                💰 Fahrtkosten/interne Abrechnung: ${stats[driver].fare}$<br>
-                🧾 Ausgestellte Rechnungen: ${stats[driver].invoice}$<br>
-                🍔 Essenskosten: ${stats[driver].food}$
-            </div>
-        `;
-    });
-
-    box.innerHTML = html || "Noch keine erledigten Fahrten vorhanden.";
 }
 
 function escapeHtml(value) {
@@ -1118,31 +702,5 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
-async function toggleDispatcherStatus() {
 
-    if (isActiveDispatcher()) {
-        await leaveDispatcher();
-    } else {
-        await takeDispatcher();
-    }
-
-    updateDispatcherButton();
-}
-function updateDispatcherButton() {
-
-    const btn = document.getElementById("dispatcherToggleBtn");
-
-    if (!btn) return;
-
-    if (isActiveDispatcher()) {
-
-        btn.innerText = "❌ Leitstelle verlassen";
-        btn.classList.add("danger-btn");
-
-    } else {
-
-        btn.innerText = "📡 Leitstelle übernehmen";
-        btn.classList.remove("danger-btn");
-    }
-}
 startApp();
