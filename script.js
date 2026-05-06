@@ -137,11 +137,11 @@ function renderDispatchers() {
     html += `<br><small>${activeDispatchers.length}/2 Plätze belegt</small>`;
     box.innerHTML = html;
 
-    if (canUseDispatcher() && isActiveDispatcher()) {
-        createBox.classList.remove("locked-box");
-    } else {
-        createBox.classList.add("locked-box");
-    }
+    if (isActiveDispatcher()) {
+    createBox.style.display = "block";
+} else {
+    createBox.style.display = "none";
+}
 }
 
 async function takeDispatcher() {
