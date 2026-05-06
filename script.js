@@ -6,6 +6,7 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let companies = [];
 let activeDispatchers = [];
+let realtimeStarted = false;
 
 async function loginUser() {
     const username = document.getElementById("login_username").value.trim();
@@ -48,12 +49,49 @@ async function startApp() {
     await loadCompanies();
     updateJobForm();
     await loadJobs();
-setupRealtime();
+
     if (currentUser.role === "admin") {
-    document.getElementById("adminPanel").style.display = "block";
-    loadUsers();
-    loadTipStats();
+        document.getElementById("adminPanel").style.display = "block";
+        loadUsers();
+        loadTipStats();
+    }
+
+    setupRealtime();
 }
+
+function setupRealtime() {
+    if (realtimeStarted) return;
+    realtimeStarted = true;
+
+    client
+        .channel("taxi-live-jobs")
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_jobs"
+            },
+            () => {
+                loadJobs();
+                if (currentUser && currentUser.role === "admin") {
+                    loadTipStats();
+                }
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_dispatchers"
+            },
+            () => {
+                loadDispatchers();
+                loadDashboardStats();
+            }
+        )
+        .subscribe();
 }
 
 function canUseDispatcher() {
@@ -84,6 +122,8 @@ function renderDispatchers() {
     const box = document.getElementById("dispatcher_status");
     const createBox = document.getElementById("createJobBox");
 
+    if (!box || !createBox) return;
+
     let html = "<strong>Aktive Leitstelle:</strong><br>";
 
     if (activeDispatchers.length === 0) {
@@ -95,7 +135,6 @@ function renderDispatchers() {
     }
 
     html += `<br><small>${activeDispatchers.length}/2 Plätze belegt</small>`;
-
     box.innerHTML = html;
 
     if (canUseDispatcher() && isActiveDispatcher()) {
@@ -106,11 +145,6 @@ function renderDispatchers() {
 }
 
 async function takeDispatcher() {
-    if (!canUseDispatcher()) {
-        alert("Nur Admin oder Leitstelle kann die Leitstelle übernehmen.");
-        return;
-    }
-
     await loadDispatchers();
 
     if (isActiveDispatcher()) {
@@ -138,14 +172,10 @@ async function takeDispatcher() {
     }
 
     await loadDispatchers();
+    await loadDashboardStats();
 }
 
 async function leaveDispatcher() {
-    if (!canUseDispatcher()) {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
     const { error } = await client
         .from("taxi_dispatchers")
         .update({ active: false })
@@ -159,6 +189,7 @@ async function leaveDispatcher() {
     }
 
     await loadDispatchers();
+    await loadDashboardStats();
 }
 
 async function loadCompanies() {
@@ -176,10 +207,12 @@ async function loadCompanies() {
     companies = data || [];
 
     const select = document.getElementById("job_company_name");
+    if (!select) return;
+
     select.innerHTML = "";
 
     companies.forEach(company => {
-        select.innerHTML += `<option>${company.company_name}</option>`;
+        select.innerHTML += `<option>${escapeHtml(company.company_name)}</option>`;
     });
 }
 
@@ -274,8 +307,6 @@ async function createJob() {
         console.error(error);
         return;
     }
-
-    alert("Auftrag erstellt.");
 
     document.getElementById("job_pickup_location").value = "";
     document.getElementById("job_destination").value = "";
@@ -459,7 +490,6 @@ async function completeJob(jobId, rideType) {
             }]);
     }
 
-    alert("Fahrt abgeschlossen.");
     loadJobs();
 }
 
@@ -469,6 +499,32 @@ async function loadJobs() {
     await loadDoneJobs();
     await loadDispatchers();
     await loadDashboardStats();
+
+    if (currentUser && currentUser.role === "admin") {
+        await loadTipStats();
+    }
+}
+
+async function loadDashboardStats() {
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("job_status");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const open = data.filter(job => job.job_status === "Offen").length;
+    const taken = data.filter(job => job.job_status === "Übernommen").length;
+    const done = data.filter(job => job.job_status === "Erledigt").length;
+
+    if (document.getElementById("stat_open")) {
+        document.getElementById("stat_open").innerText = open;
+        document.getElementById("stat_taken").innerText = taken;
+        document.getElementById("stat_done").innerText = done;
+        document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
+    }
 }
 
 async function loadOpenJobs() {
@@ -488,30 +544,17 @@ async function loadOpenJobs() {
     box.innerHTML = "";
 
     data.forEach(job => {
-box.innerHTML += `
-    <div class="compact-ride">
-        <div>
-            <strong>${job.assigned_driver}</strong><br>
-            ${job.ride_type}
-        </div>
-
-        <div>
-            🚕 ${job.kilometers || 0} KM
-        </div>
-
-        <div>
-            🎁 ${job.tip_amount || 0}$
-        </div>
-
-        <div>
-            🧾 ${job.invoice_amount || 0}$
-        </div>
-
-        <div>
-            👤 ${job.customer_name || "-"}
-        </div>
-    </div>
-`;
+        box.innerHTML += `
+            <div class="ride-card">
+                <strong>${escapeHtml(job.ride_type)}</strong><br>
+                📍 Abholung: ${escapeHtml(job.pickup_location || "-")}<br>
+                🎯 Ziel: ${escapeHtml(job.destination || "-")}<br>
+                👤 Kunde/Empfänger: ${escapeHtml(job.customer_name || "-")}<br>
+                🏢 Firma: ${escapeHtml(job.company_name || "-")}<br>
+                🚑 EMS: ${escapeHtml(job.ems_staff_name || "-")}<br>
+                📝 ${escapeHtml(job.notes || "-")}<br>
+                <button class="small-btn" onclick="takeJob('${job.id}')">Übernehmen</button>
+            </div>
         `;
     });
 }
@@ -543,21 +586,21 @@ async function loadMyJobs() {
 
         box.innerHTML += `
             <div class="ride-card">
-                <strong>${job.ride_type}</strong><br>
-                📍 Abholung: ${job.pickup_location || "-"}<br>
-                🏢 Firma: ${job.company_name || "-"}<br>
-                🚑 EMS: ${job.ems_staff_name || "-"}<br>
-                📝 ${job.notes || "-"}<br><br>
+                <strong>${escapeHtml(job.ride_type)}</strong><br>
+                📍 Abholung: ${escapeHtml(job.pickup_location || "-")}<br>
+                🏢 Firma: ${escapeHtml(job.company_name || "-")}<br>
+                🚑 EMS: ${escapeHtml(job.ems_staff_name || "-")}<br>
+                📝 ${escapeHtml(job.notes || "-")}<br><br>
 
                 <div class="form-grid">
                     <div class="field">
                         <label>Kunde / Empfänger</label>
-                        <input type="text" id="customer_${job.id}" value="${job.customer_name || ""}">
+                        <input type="text" id="customer_${job.id}" value="${escapeAttr(job.customer_name || "")}">
                     </div>
 
                     <div class="field">
                         <label>Ziel</label>
-                        <input type="text" id="destination_${job.id}" value="${job.destination || ""}">
+                        <input type="text" id="destination_${job.id}" value="${escapeAttr(job.destination || "")}">
                     </div>
 
                     <div class="field">
@@ -615,25 +658,19 @@ async function loadDoneJobs() {
 
     data.forEach(job => {
         const adminButtons = currentUser.role === "admin" ? `
-            <br><br>
-            <button class="small-btn" onclick="toggleEditDoneJob('${job.id}')">
-                Fahrt bearbeiten
-            </button>
+            <button class="small-btn" onclick="toggleEditDoneJob('${job.id}')">Bearbeiten</button>
+            <button class="small-btn danger-btn" onclick="deleteDoneJob('${job.id}')">Löschen</button>
 
-            <button class="small-btn danger-btn" onclick="deleteDoneJob('${job.id}')">
-                Fahrt löschen
-            </button>
-
-            <div id="edit_${job.id}" style="display:none; margin-top:15px;">
+            <div id="edit_${job.id}" style="display:none; grid-column: 1 / -1; margin-top:15px;">
                 <div class="form-grid">
                     <div class="field">
                         <label>Kunde / Empfänger</label>
-                        <input type="text" id="edit_customer_${job.id}" value="${job.customer_name || ""}">
+                        <input type="text" id="edit_customer_${job.id}" value="${escapeAttr(job.customer_name || "")}">
                     </div>
 
                     <div class="field">
                         <label>Ziel</label>
-                        <input type="text" id="edit_destination_${job.id}" value="${job.destination || ""}">
+                        <input type="text" id="edit_destination_${job.id}" value="${escapeAttr(job.destination || "")}">
                     </div>
 
                     <div class="field">
@@ -653,7 +690,7 @@ async function loadDoneJobs() {
 
                     <div class="field">
                         <label>Bemerkung</label>
-                        <input type="text" id="edit_notes_${job.id}" value="${job.notes || ""}">
+                        <input type="text" id="edit_notes_${job.id}" value="${escapeAttr(job.notes || "")}">
                     </div>
                 </div>
 
@@ -664,194 +701,37 @@ async function loadDoneJobs() {
         ` : "";
 
         box.innerHTML += `
-            <div class="ride-card">
-                <strong>${job.assigned_driver}</strong> (${job.ride_type})<br><br>
-                👤 Kunde/Empfänger: ${job.customer_name || "-"}<br>
-                📍 ${job.pickup_location || "-"} → ${job.destination || "-"}<br>
-                🚕 ${job.kilometers || 0} KM<br>
-                💰 Fahrtkosten / interne Abrechnung: ${job.fare_amount || 0}$<br>
-                🧾 Rechnung: ${job.invoice_amount || 0}$<br>
-                🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
-                🍔 Essenskosten: ${job.food_cost || 0}$<br>
-                🧾 Rechnung an: ${job.billed_to || "-"}
-                ${adminButtons}
-            </div>
-        `;
-    });
-}
-
-async function createUser() {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung");
-        return;
-    }
-
-    const username = document.getElementById("new_username").value.trim();
-    const display_name = document.getElementById("new_display_name").value.trim();
-    const password = document.getElementById("new_password").value.trim();
-    const role = document.getElementById("new_role").value;
-
-    const { error } = await client
-        .from("taxi_users")
-        .insert([{ username, display_name, password, role, active: true }]);
-
-    if (error) {
-        alert("Benutzer konnte nicht erstellt werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Benutzer erstellt.");
-
-    document.getElementById("new_username").value = "";
-    document.getElementById("new_display_name").value = "";
-    document.getElementById("new_password").value = "";
-
-    loadUsers();
-}
-
-async function loadUsers() {
-    if (!currentUser || currentUser.role !== "admin") return;
-
-    const usersList = document.getElementById("users_list");
-
-    const { data, error } = await client
-        .from("taxi_users")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    usersList.innerHTML = "";
-
-    data.forEach(user => {
-        usersList.innerHTML += `
-            <div class="ride-card">
-                <strong>${user.display_name}</strong><br>
-                Benutzer: ${user.username}<br>
-                Rolle: ${user.role}<br>
-                Aktiv: ${user.active ? "Ja" : "Nein"}
-
-                <br><br>
-
-                <button class="small-btn" onclick="toggleUserEdit('${user.id}')">
-                    Benutzer bearbeiten
-                </button>
-
-                <button class="small-btn danger-btn" onclick="deleteUser('${user.id}', '${user.display_name}')">
-                    Benutzer löschen
-                </button>
-
-                <div id="user_edit_${user.id}" style="display:none; margin-top:15px;">
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Benutzername</label>
-                            <input type="text" id="edit_username_${user.id}" value="${user.username}">
-                        </div>
-
-                        <div class="field">
-                            <label>Anzeigename</label>
-                            <input type="text" id="edit_display_${user.id}" value="${user.display_name}">
-                        </div>
-
-                        <div class="field">
-                            <label>Neues Passwort</label>
-                            <input type="text" id="edit_password_${user.id}" value="${user.password}">
-                        </div>
-
-                        <div class="field">
-                            <label>Rolle</label>
-                            <select id="edit_role_${user.id}">
-                                <option value="fahrer" ${user.role === "fahrer" ? "selected" : ""}>Fahrer</option>
-                                <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                            </select>
-                        </div>
-
-                        <div class="field">
-                            <label>Aktiv</label>
-                            <select id="edit_active_${user.id}">
-                                <option value="true" ${user.active ? "selected" : ""}>Ja</option>
-                                <option value="false" ${!user.active ? "selected" : ""}>Nein</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button onclick="saveUserEdit('${user.id}')">
-                        Änderungen speichern
-                    </button>
+            <div class="compact-ride">
+                <div>
+                    <strong>${escapeHtml(job.assigned_driver || "-")}</strong><br>
+                    ${escapeHtml(job.ride_type || "-")}
                 </div>
+
+                <div>🚕 ${job.kilometers || 0} KM</div>
+                <div>🎁 ${job.tip_amount || 0}$</div>
+                <div>🧾 ${job.invoice_amount || 0}$</div>
+
+                <div>
+                    👤 ${escapeHtml(job.customer_name || "-")}<br>
+                    📍 ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}
+                </div>
+
+                <div>${adminButtons}</div>
             </div>
         `;
     });
 }
 
-async function createCompany() {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung");
-        return;
-    }
+function toggleSection(id) {
+    const box = document.getElementById(id);
+    if (!box) return;
 
-    const company_name = document.getElementById("new_company_name").value.trim();
-
-    if (!company_name) {
-        alert("Bitte Unternehmen eintragen.");
-        return;
-    }
-
-    const { error } = await client
-        .from("taxi_companies")
-        .insert([{ company_name, active: true }]);
-
-    if (error) {
-        alert("Unternehmen konnte nicht erstellt werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Unternehmen hinzugefügt.");
-
-    document.getElementById("new_company_name").value = "";
-
-    await loadCompanies();
-    updateJobForm();
+    box.style.display = box.style.display === "none" ? "block" : "none";
 }
-async function deleteDoneJob(jobId) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
 
-    const ok = confirm("Diese erledigte Fahrt wirklich löschen? Sie wird nur ausgeblendet, nicht endgültig entfernt.");
-
-    if (!ok) {
-        return;
-    }
-
-    const { error } = await client
-        .from("taxi_jobs")
-        .update({
-            job_status: "Gelöscht"
-        })
-        .eq("id", jobId);
-
-    if (error) {
-        alert("Fahrt konnte nicht gelöscht werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Fahrt gelöscht.");
-    loadJobs();
-}
 function toggleEditDoneJob(jobId) {
     const box = document.getElementById(`edit_${jobId}`);
-
-    if (!box) {
-        return;
-    }
+    if (!box) return;
 
     box.style.display = box.style.display === "none" ? "block" : "none";
 }
@@ -885,11 +765,7 @@ function recalculateDoneJob(rideType, kilometers, invoiceAmount, foodCost) {
         tipAmount = invoiceAmount;
     }
 
-    return {
-        fareAmount,
-        tipAmount,
-        billedTo
-    };
+    return { fareAmount, tipAmount, billedTo };
 }
 
 async function saveDoneJobEdit(jobId, rideType) {
@@ -915,25 +791,20 @@ async function saveDoneJobEdit(jobId, rideType) {
         return;
     }
 
-    const result = recalculateDoneJob(
-        rideType,
-        kilometers,
-        invoiceAmount,
-        foodCost
-    );
+    const result = recalculateDoneJob(rideType, kilometers, invoiceAmount, foodCost);
 
     const { error } = await client
         .from("taxi_jobs")
         .update({
             customer_name: customerName,
-            destination: destination,
-            kilometers: kilometers,
+            destination,
+            kilometers,
             fare_amount: result.fareAmount,
             invoice_amount: invoiceAmount,
             tip_amount: result.tipAmount,
             food_cost: foodCost,
             billed_to: result.billedTo,
-            notes: notes
+            notes
         })
         .eq("id", jobId);
 
@@ -947,10 +818,238 @@ async function saveDoneJobEdit(jobId, rideType) {
     loadJobs();
 }
 
-async function loadTipStats() {
+async function deleteDoneJob(jobId) {
     if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
         return;
     }
+
+    const ok = confirm("Diese erledigte Fahrt wirklich löschen? Sie wird nur ausgeblendet, nicht endgültig entfernt.");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({ job_status: "Gelöscht" })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Fahrt konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Fahrt gelöscht.");
+    loadJobs();
+}
+
+async function createUser() {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung");
+        return;
+    }
+
+    const username = document.getElementById("new_username").value.trim();
+    const display_name = document.getElementById("new_display_name").value.trim();
+    const password = document.getElementById("new_password").value.trim();
+    const role = document.getElementById("new_role").value;
+
+    const { error } = await client
+        .from("taxi_users")
+        .insert([{ username, display_name, password, role, active: true }]);
+
+    if (error) {
+        alert("Benutzer konnte nicht erstellt werden.");
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("new_username").value = "";
+    document.getElementById("new_display_name").value = "";
+    document.getElementById("new_password").value = "";
+
+    loadUsers();
+}
+
+async function loadUsers() {
+    if (!currentUser || currentUser.role !== "admin") return;
+
+    const usersList = document.getElementById("users_list");
+
+    const { data, error } = await client
+        .from("taxi_users")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    usersList.innerHTML = "";
+
+    data.forEach(user => {
+        usersList.innerHTML += `
+            <div class="ride-card">
+                <strong>${escapeHtml(user.display_name)}</strong><br>
+                Benutzer: ${escapeHtml(user.username)}<br>
+                Rolle: ${escapeHtml(user.role)}<br>
+                Aktiv: ${user.active ? "Ja" : "Nein"}
+
+                <br><br>
+
+                <button class="small-btn" onclick="toggleUserEdit('${user.id}')">
+                    Benutzer bearbeiten
+                </button>
+
+                <button class="small-btn danger-btn" onclick="deleteUser('${user.id}', '${escapeAttr(user.display_name)}')">
+                    Benutzer löschen
+                </button>
+
+                <div id="user_edit_${user.id}" style="display:none; margin-top:15px;">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Benutzername</label>
+                            <input type="text" id="edit_username_${user.id}" value="${escapeAttr(user.username)}">
+                        </div>
+
+                        <div class="field">
+                            <label>Anzeigename</label>
+                            <input type="text" id="edit_display_${user.id}" value="${escapeAttr(user.display_name)}">
+                        </div>
+
+                        <div class="field">
+                            <label>Neues Passwort</label>
+                            <input type="text" id="edit_password_${user.id}" value="${escapeAttr(user.password)}">
+                        </div>
+
+                        <div class="field">
+                            <label>Rolle</label>
+                            <select id="edit_role_${user.id}">
+                                <option value="fahrer" ${user.role === "fahrer" ? "selected" : ""}>Fahrer</option>
+                                <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Aktiv</label>
+                            <select id="edit_active_${user.id}">
+                                <option value="true" ${user.active ? "selected" : ""}>Ja</option>
+                                <option value="false" ${!user.active ? "selected" : ""}>Nein</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="saveUserEdit('${user.id}')">
+                        Änderungen speichern
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function toggleUserEdit(userId) {
+    const box = document.getElementById(`user_edit_${userId}`);
+    if (!box) return;
+
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+async function saveUserEdit(userId) {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
+        return;
+    }
+
+    const username = document.getElementById(`edit_username_${userId}`).value.trim();
+    const displayName = document.getElementById(`edit_display_${userId}`).value.trim();
+    const password = document.getElementById(`edit_password_${userId}`).value.trim();
+    const role = document.getElementById(`edit_role_${userId}`).value;
+    const active = document.getElementById(`edit_active_${userId}`).value === "true";
+
+    if (!username || !displayName || !password) {
+        alert("Benutzername, Anzeigename und Passwort dürfen nicht leer sein.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_users")
+        .update({
+            username,
+            display_name: displayName,
+            password,
+            role,
+            active
+        })
+        .eq("id", userId);
+
+    if (error) {
+        alert("Benutzer konnte nicht gespeichert werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Benutzer gespeichert.");
+    loadUsers();
+}
+
+async function deleteUser(userId, displayName) {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung.");
+        return;
+    }
+
+    const ok = confirm(`Benutzer "${displayName}" wirklich komplett löschen?`);
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_users")
+        .delete()
+        .eq("id", userId);
+
+    if (error) {
+        alert("Benutzer konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Benutzer gelöscht.");
+    loadUsers();
+}
+
+async function createCompany() {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung");
+        return;
+    }
+
+    const company_name = document.getElementById("new_company_name").value.trim();
+
+    if (!company_name) {
+        alert("Bitte Unternehmen eintragen.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_companies")
+        .insert([{ company_name, active: true }]);
+
+    if (error) {
+        alert("Unternehmen konnte nicht erstellt werden.");
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("new_company_name").value = "";
+
+    await loadCompanies();
+    updateJobForm();
+}
+
+async function loadTipStats() {
+    if (!currentUser || currentUser.role !== "admin") return;
 
     const box = document.getElementById("tips_stats");
 
@@ -992,7 +1091,7 @@ async function loadTipStats() {
     Object.keys(stats).forEach(driver => {
         html += `
             <div class="ride-card">
-                <strong>${driver}</strong><br>
+                <strong>${escapeHtml(driver)}</strong><br>
                 🚕 Fahrten: ${stats[driver].rides}<br>
                 🎁 Trinkgeld: ${stats[driver].tips}$<br>
                 💰 Fahrtkosten/interne Abrechnung: ${stats[driver].fare}$<br>
@@ -1005,139 +1104,17 @@ async function loadTipStats() {
     box.innerHTML = html || "Noch keine erledigten Fahrten vorhanden.";
 }
 
-async function loadDashboardStats() {
-    const { data, error } = await client
-        .from("taxi_jobs")
-        .select("job_status");
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    const open = data.filter(job => job.job_status === "Offen").length;
-    const taken = data.filter(job => job.job_status === "Übernommen").length;
-    const done = data.filter(job => job.job_status === "Erledigt").length;
-
-    document.getElementById("stat_open").innerText = open;
-    document.getElementById("stat_taken").innerText = taken;
-    document.getElementById("stat_done").innerText = done;
-    document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
-function setupRealtime() {
-
-    client
-        .channel('taxi-live-jobs')
-
-        .on(
-            'postgres_changes',
-            {
-                event: '*',
-                schema: 'public',
-                table: 'taxi_jobs'
-            },
-            payload => {
-                console.log('Live Update taxi_jobs', payload);
-                loadJobs();
-            }
-        )
-
-        .on(
-            'postgres_changes',
-            {
-                event: '*',
-                schema: 'public',
-                table: 'taxi_dispatchers'
-            },
-            payload => {
-                console.log('Live Update taxi_dispatchers', payload);
-                loadDispatchers();
-                loadDashboardStats();
-            }
-        )
-
-        .subscribe();
+function escapeAttr(value) {
+    return escapeHtml(value);
 }
 
-function toggleUserEdit(userId) {
-    const box = document.getElementById(`user_edit_${userId}`);
-
-    if (!box) return;
-
-    box.style.display = box.style.display === "none" ? "block" : "none";
-}
-
-async function saveUserEdit(userId) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
-    const username = document.getElementById(`edit_username_${userId}`).value.trim();
-    const displayName = document.getElementById(`edit_display_${userId}`).value.trim();
-    const password = document.getElementById(`edit_password_${userId}`).value.trim();
-    const role = document.getElementById(`edit_role_${userId}`).value;
-    const active = document.getElementById(`edit_active_${userId}`).value === "true";
-
-    if (!username || !displayName || !password) {
-        alert("Benutzername, Anzeigename und Passwort dürfen nicht leer sein.");
-        return;
-    }
-
-    const { error } = await client
-        .from("taxi_users")
-        .update({
-            username: username,
-            display_name: displayName,
-            password: password,
-            role: role,
-            active: active
-        })
-        .eq("id", userId);
-
-    if (error) {
-        alert("Benutzer konnte nicht gespeichert werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Benutzer gespeichert.");
-    loadUsers();
-}
-
-async function deleteUser(userId, displayName) {
-    if (!currentUser || currentUser.role !== "admin") {
-        alert("Keine Berechtigung.");
-        return;
-    }
-
-    const ok = confirm(`Benutzer "${displayName}" wirklich komplett löschen?`);
-
-    if (!ok) return;
-
-    const { error } = await client
-        .from("taxi_users")
-        .delete()
-        .eq("id", userId);
-
-    if (error) {
-        alert("Benutzer konnte nicht gelöscht werden.");
-        console.error(error);
-        return;
-    }
-
-    alert("Benutzer gelöscht.");
-    loadUsers();
-}
-function toggleSection(id) {
-    const box = document.getElementById(id);
-
-    if (!box) return;
-
-    box.style.display =
-        box.style.display === "none"
-            ? "block"
-            : "none";
-}
 startApp();
