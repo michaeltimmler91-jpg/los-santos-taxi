@@ -103,3 +103,12 @@ button:hover {
     }
 
 }
+.preview-box {
+    padding: 12px;
+    border-radius: 10px;
+    background: #111827;
+    border: 1px solid #4b5563;
+    color: #facc15;
+    font-weight: bold;
+    min-height: 20px;
+}
