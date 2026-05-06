@@ -1,16 +1,14 @@
 const SUPABASE_URL = "https://unkfqoplynwabulnzpar.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_AkIVrLBsgIV2jYJ5gGsBmw_f7P62KTK";
 
-const client = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
+let companies = [];
 
 async function loginUser() {
-    const username = document.getElementById("login_username").value;
-    const password = document.getElementById("login_password").value;
+    const username = document.getElementById("login_username").value.trim();
+    const password = document.getElementById("login_password").value.trim();
 
     const { data, error } = await client
         .from("taxi_users")
@@ -34,23 +32,21 @@ function logoutUser() {
     location.reload();
 }
 
-function startApp() {
+async function startApp() {
     const savedUser = localStorage.getItem("taxiUser");
 
-    if (!savedUser) {
-        return;
-    }
+    if (!savedUser) return;
 
     currentUser = JSON.parse(savedUser);
 
     document.getElementById("loginBox").style.display = "none";
     document.getElementById("appBox").style.display = "block";
-
     document.getElementById("currentUserName").innerText = currentUser.display_name;
     document.getElementById("currentUserRole").innerText = currentUser.role;
-    document.getElementById("driver_name").value = currentUser.display_name;
 
-    loadRides();
+    await loadCompanies();
+    updateJobForm();
+    await loadJobs();
 
     if (currentUser.role === "admin") {
         document.getElementById("adminPanel").style.display = "block";
@@ -58,10 +54,52 @@ function startApp() {
     }
 }
 
-async function checkBambiTour(playerName) {
-    if (!playerName) {
-        return false;
+async function loadCompanies() {
+    const { data, error } = await client
+        .from("taxi_companies")
+        .select("*")
+        .eq("active", true)
+        .order("company_name", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        return;
     }
+
+    companies = data || [];
+
+    const select = document.getElementById("job_company_name");
+    select.innerHTML = "";
+
+    companies.forEach(company => {
+        select.innerHTML += `<option>${company.company_name}</option>`;
+    });
+}
+
+function updateJobForm() {
+    const rideType = document.getElementById("job_ride_type").value;
+
+    document.getElementById("companyField").style.display =
+        rideType === "Essenslieferung" ? "flex" : "none";
+
+    document.getElementById("emsField").style.display =
+        rideType === "EMS" ? "flex" : "none";
+
+    if (rideType === "Essenslieferung") {
+        setPickupFromCompany();
+    }
+}
+
+function setPickupFromCompany() {
+    const companyName = document.getElementById("job_company_name").value;
+
+    if (companyName) {
+        document.getElementById("job_pickup_location").value = companyName;
+    }
+}
+
+async function checkBambiTour(playerName) {
+    if (!playerName) return false;
 
     const { data, error } = await client
         .from("taxi_bambi_tours")
@@ -77,30 +115,22 @@ async function checkBambiTour(playerName) {
     return !!data;
 }
 
-async function saveRide() {
-    const driver_name = currentUser.display_name;
-    const customer_name = document.getElementById("customer_name").value.trim();
-    const ride_type = document.getElementById("ride_type").value;
-    const start_location = document.getElementById("start_location").value;
-    const end_location = document.getElementById("end_location").value;
-    const kilometers = Number(document.getElementById("kilometers").value);
-    const tip_amount = Number(document.getElementById("tip_amount").value);
-    const food_advance = Number(document.getElementById("food_advance").value);
-    const advance_source = document.getElementById("advance_source").value;
-    const notes = document.getElementById("notes").value;
+async function createJob() {
+    const ride_type = document.getElementById("job_ride_type").value;
+    const pickup_location = document.getElementById("job_pickup_location").value.trim();
+    const destination = document.getElementById("job_destination").value.trim();
+    const customer_name = document.getElementById("job_customer_name").value.trim();
+    const company_name = document.getElementById("job_company_name").value;
+    const ems_staff_name = document.getElementById("job_ems_staff_name").value.trim();
+    const notes = document.getElementById("job_notes").value.trim();
 
-    if (!customer_name) {
-        alert("Bitte Kunde/Spieler eintragen.");
+    if (!pickup_location) {
+        alert("Bitte Abholort eintragen.");
         return;
     }
 
-    if (!ride_type) {
-        alert("Bitte Fahrtart auswählen.");
-        return;
-    }
-
-    if (ride_type !== "Bambi-Tour" && kilometers <= 0) {
-        alert("Bitte Kilometer eintragen.");
+    if (ride_type === "Bambi-Tour" && !customer_name) {
+        alert("Bei Bambi-Touren muss der Spielername eingetragen werden.");
         return;
     }
 
@@ -113,136 +143,329 @@ async function saveRide() {
         }
     }
 
-    let fare_amount = 0;
-    let billed_to = "Kunde";
-
-    if (
-        ride_type === "Normale Fahrt" ||
-        ride_type === "Essenslieferung"
-    ) {
-        fare_amount = kilometers * 5;
-    }
-
-    if (ride_type === "EMS") {
-        fare_amount = kilometers * 5;
-        billed_to = "EMS";
-    }
-
-    if (ride_type === "Gebrauchtwagenhändler") {
-        fare_amount = kilometers * 5;
-        billed_to = "Gebrauchtwagenhändler";
-    }
-
-    if (ride_type === "Bambi-Tour") {
-        fare_amount = 0;
-        billed_to = "Kostenlos";
-    }
-
     const { error } = await client
-        .from("taxi_rides")
-        .insert([
-            {
-                driver_name,
-                customer_name,
-                ride_type,
-                start_location,
-                end_location,
-                kilometers,
-                fare_amount,
-                tip_amount,
-                food_advance,
-                advance_source,
-                billed_to,
-                notes
-            }
-        ]);
+        .from("taxi_jobs")
+        .insert([{
+            created_by: currentUser.display_name,
+            job_status: "Offen",
+            ride_type,
+            pickup_location,
+            destination,
+            customer_name,
+            company_name: ride_type === "Essenslieferung" ? company_name : null,
+            ems_staff_name: ride_type === "EMS" ? ems_staff_name : null,
+            notes
+        }]);
 
     if (error) {
-        alert("Fehler beim Speichern");
+        alert("Auftrag konnte nicht erstellt werden.");
         console.error(error);
         return;
     }
 
-    if (ride_type === "Bambi-Tour") {
-        const { error: bambiError } = await client
-            .from("taxi_bambi_tours")
-            .insert([
-                {
-                    player_name: customer_name,
-                    driver_name,
-                    notes
-                }
-            ]);
+    alert("Auftrag erstellt.");
 
-        if (bambiError) {
-            console.error(bambiError);
-            alert("Fahrt gespeichert, aber Bambi-Liste konnte nicht aktualisiert werden.");
+    document.getElementById("job_pickup_location").value = "";
+    document.getElementById("job_destination").value = "";
+    document.getElementById("job_customer_name").value = "";
+    document.getElementById("job_ems_staff_name").value = "";
+    document.getElementById("job_notes").value = "";
+
+    updateJobForm();
+    loadJobs();
+}
+
+async function takeJob(jobId) {
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Übernommen",
+            assigned_driver: currentUser.display_name,
+            assigned_at: new Date().toISOString()
+        })
+        .eq("id", jobId)
+        .eq("job_status", "Offen");
+
+    if (error) {
+        alert("Auftrag konnte nicht übernommen werden.");
+        console.error(error);
+        return;
+    }
+
+    loadJobs();
+}
+
+async function completeJob(jobId, rideType) {
+    const kmInput = document.getElementById(`km_${jobId}`);
+    const invoiceInput = document.getElementById(`invoice_${jobId}`);
+    const foodCostInput = document.getElementById(`food_${jobId}`);
+    const foodPaidByInput = document.getElementById(`foodpaid_${jobId}`);
+    const notesInput = document.getElementById(`done_notes_${jobId}`);
+
+    const kilometers = Number(kmInput.value);
+    const invoice_amount = Number(invoiceInput.value);
+    const food_cost = foodCostInput ? Number(foodCostInput.value) : 0;
+    const food_paid_by = foodPaidByInput ? foodPaidByInput.value : "";
+    const done_notes = notesInput.value.trim();
+
+    if (kilometers < 0) {
+        alert("Kilometer dürfen nicht negativ sein.");
+        return;
+    }
+
+    if (invoice_amount < 0) {
+        alert("Rechnung darf nicht negativ sein.");
+        return;
+    }
+
+    const fare_amount = kilometers * 5;
+    let tip_amount = 0;
+    let refund_amount = 0;
+    let billed_to = "Kunde";
+
+    if (rideType === "Normale Fahrt") {
+        tip_amount = invoice_amount - fare_amount;
+    }
+
+    if (rideType === "Essenslieferung") {
+        if (!food_paid_by) {
+            alert("Bitte auswählen, wer die Essens-Auslage bezahlt hat.");
+            return;
+        }
+
+        if (food_paid_by === "Schließfach") {
+            tip_amount = invoice_amount - food_cost - fare_amount;
+            refund_amount = 0;
+        }
+
+        if (food_paid_by === "Eigene Tasche") {
+            tip_amount = invoice_amount - fare_amount;
+            refund_amount = food_cost;
         }
     }
 
-    alert("Fahrt gespeichert");
+    if (rideType === "EMS") {
+        billed_to = "EMS";
+        tip_amount = invoice_amount;
+    }
 
-    document.getElementById("customer_name").value = "";
-    document.getElementById("start_location").value = "";
-    document.getElementById("end_location").value = "";
-    document.getElementById("kilometers").value = "";
-    document.getElementById("tip_amount").value = "";
-    document.getElementById("food_advance").value = "";
-    document.getElementById("notes").value = "";
+    if (rideType === "Gebrauchtwagenhändler") {
+        billed_to = "Gebrauchtwagenhändler";
+        tip_amount = invoice_amount;
+    }
 
-    loadRides();
+    if (rideType === "Bambi-Tour") {
+        billed_to = "Kostenlos";
+        tip_amount = invoice_amount;
+    }
+
+    if (tip_amount < 0) {
+        const ok = confirm("Achtung: Das errechnete Trinkgeld ist negativ. Trotzdem speichern?");
+        if (!ok) return;
+    }
+
+    const { data: jobData, error: jobLoadError } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("id", jobId)
+        .single();
+
+    if (jobLoadError) {
+        alert("Auftrag konnte nicht geladen werden.");
+        console.error(jobLoadError);
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Erledigt",
+            completed_at: new Date().toISOString(),
+            kilometers,
+            fare_amount,
+            invoice_amount,
+            tip_amount,
+            food_cost,
+            food_paid_by,
+            refund_amount,
+            billed_to,
+            notes: done_notes || jobData.notes
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Fahrt konnte nicht abgeschlossen werden.");
+        console.error(error);
+        return;
+    }
+
+    await client
+        .from("taxi_rides")
+        .insert([{
+            driver_name: currentUser.display_name,
+            customer_name: jobData.customer_name,
+            ride_type: jobData.ride_type,
+            start_location: jobData.pickup_location,
+            end_location: jobData.destination,
+            kilometers,
+            fare_amount,
+            tip_amount,
+            food_advance: food_cost,
+            advance_source: food_paid_by,
+            billed_to,
+            notes: done_notes || jobData.notes
+        }]);
+
+    if (rideType === "Bambi-Tour" && jobData.customer_name) {
+        await client
+            .from("taxi_bambi_tours")
+            .insert([{
+                player_name: jobData.customer_name,
+                driver_name: currentUser.display_name,
+                notes: done_notes || jobData.notes
+            }]);
+    }
+
+    alert("Fahrt abgeschlossen.");
+    loadJobs();
 }
 
-async function loadRides() {
-    const ridesList = document.getElementById("rides_list");
+async function loadJobs() {
+    await loadOpenJobs();
+    await loadMyJobs();
+    await loadDoneJobs();
+}
+
+async function loadOpenJobs() {
+    const box = document.getElementById("open_jobs_list");
 
     const { data, error } = await client
-        .from("taxi_rides")
+        .from("taxi_jobs")
         .select("*")
-        .order("created_at", { ascending: false })
-        .limit(25);
+        .eq("job_status", "Offen")
+        .order("created_at", { ascending: false });
 
     if (error) {
         console.error(error);
         return;
     }
 
-    ridesList.innerHTML = "";
+    box.innerHTML = "";
 
-    data.forEach(ride => {
-        ridesList.innerHTML += `
+    data.forEach(job => {
+        box.innerHTML += `
             <div class="ride-card">
-                <strong>${ride.driver_name}</strong>
-                (${ride.ride_type})
+                <strong>${job.ride_type}</strong><br>
+                📍 Abholung: ${job.pickup_location || "-"}<br>
+                🎯 Ziel: ${job.destination || "-"}<br>
+                👤 Kunde: ${job.customer_name || "-"}<br>
+                🏢 Firma: ${job.company_name || "-"}<br>
+                🚑 EMS: ${job.ems_staff_name || "-"}<br>
+                📝 ${job.notes || "-"}<br>
+                <button class="small-btn" onclick="takeJob('${job.id}')">Übernehmen</button>
+            </div>
+        `;
+    });
+}
 
-                <br><br>
+async function loadMyJobs() {
+    const box = document.getElementById("my_jobs_list");
 
-                👤 ${ride.customer_name || "-"}
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("job_status", "Übernommen")
+        .eq("assigned_driver", currentUser.display_name)
+        .order("assigned_at", { ascending: false });
 
-                <br>
+    if (error) {
+        console.error(error);
+        return;
+    }
 
-                📍 ${ride.start_location || "-"}
-                → ${ride.end_location || "-"}
+    box.innerHTML = "";
 
-                <br>
+    data.forEach(job => {
+        const foodFields = job.ride_type === "Essenslieferung" ? `
+            <div class="field">
+                <label>Essenskosten</label>
+                <input type="number" id="food_${job.id}" value="0">
+            </div>
 
-                🚕 ${ride.kilometers || 0} KM
+            <div class="field">
+                <label>Auslage bezahlt durch</label>
+                <select id="foodpaid_${job.id}">
+                    <option value="">Bitte wählen</option>
+                    <option>Schließfach</option>
+                    <option>Eigene Tasche</option>
+                </select>
+            </div>
+        ` : "";
 
-                <br>
+        box.innerHTML += `
+            <div class="ride-card">
+                <strong>${job.ride_type}</strong><br>
+                📍 Abholung: ${job.pickup_location || "-"}<br>
+                🎯 Ziel: ${job.destination || "-"}<br>
+                👤 Kunde: ${job.customer_name || "-"}<br>
+                🏢 Firma: ${job.company_name || "-"}<br>
+                🚑 EMS: ${job.ems_staff_name || "-"}<br>
+                📝 ${job.notes || "-"}<br><br>
 
-                💰 ${ride.fare_amount || 0}$
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Kilometer</label>
+                        <input type="number" id="km_${job.id}" value="0">
+                    </div>
 
-                <br>
+                    <div class="field">
+                        <label>Ausgestellte Rechnung</label>
+                        <input type="number" id="invoice_${job.id}" value="0">
+                    </div>
 
-                🎁 ${ride.tip_amount || 0}$ Trinkgeld
+                    ${foodFields}
 
-                <br>
+                    <div class="field">
+                        <label>Abschluss-Bemerkung</label>
+                        <input type="text" id="done_notes_${job.id}">
+                    </div>
+                </div>
 
-                🧾 Rechnung an: ${ride.billed_to || "-"}
+                <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
+            </div>
+        `;
+    });
+}
 
-                <br>
+async function loadDoneJobs() {
+    const box = document.getElementById("done_jobs_list");
 
-                📝 ${ride.notes || "-"}
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("job_status", "Erledigt")
+        .order("completed_at", { ascending: false })
+        .limit(20);
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    box.innerHTML = "";
+
+    data.forEach(job => {
+        box.innerHTML += `
+            <div class="ride-card">
+                <strong>${job.assigned_driver}</strong> (${job.ride_type})<br><br>
+                📍 ${job.pickup_location || "-"} → ${job.destination || "-"}<br>
+                🚕 ${job.kilometers || 0} KM<br>
+                💰 Fahrtkosten: ${job.fare_amount || 0}$<br>
+                🧾 Rechnung: ${job.invoice_amount || 0}$<br>
+                🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
+                🍔 Essenskosten: ${job.food_cost || 0}$<br>
+                🔁 Rückzahlung offen: ${job.refund_amount || 0}$<br>
+                🧾 Rechnung an: ${job.billed_to || "-"}
             </div>
         `;
     });
@@ -254,30 +477,22 @@ async function createUser() {
         return;
     }
 
-    const username = document.getElementById("new_username").value;
-    const display_name = document.getElementById("new_display_name").value;
-    const password = document.getElementById("new_password").value;
+    const username = document.getElementById("new_username").value.trim();
+    const display_name = document.getElementById("new_display_name").value.trim();
+    const password = document.getElementById("new_password").value.trim();
     const role = document.getElementById("new_role").value;
 
     const { error } = await client
         .from("taxi_users")
-        .insert([
-            {
-                username,
-                display_name,
-                password,
-                role,
-                active: true
-            }
-        ]);
+        .insert([{ username, display_name, password, role, active: true }]);
 
     if (error) {
-        alert("Benutzer konnte nicht erstellt werden");
+        alert("Benutzer konnte nicht erstellt werden.");
         console.error(error);
         return;
     }
 
-    alert("Benutzer erstellt");
+    alert("Benutzer erstellt.");
 
     document.getElementById("new_username").value = "";
     document.getElementById("new_display_name").value = "";
@@ -287,9 +502,7 @@ async function createUser() {
 }
 
 async function loadUsers() {
-    if (!currentUser || currentUser.role !== "admin") {
-        return;
-    }
+    if (!currentUser || currentUser.role !== "admin") return;
 
     const usersList = document.getElementById("users_list");
 
@@ -308,16 +521,44 @@ async function loadUsers() {
     data.forEach(user => {
         usersList.innerHTML += `
             <div class="ride-card">
-                <strong>${user.display_name}</strong>
-                <br>
-                Benutzer: ${user.username}
-                <br>
-                Rolle: ${user.role}
-                <br>
+                <strong>${user.display_name}</strong><br>
+                Benutzer: ${user.username}<br>
+                Rolle: ${user.role}<br>
                 Aktiv: ${user.active ? "Ja" : "Nein"}
             </div>
         `;
     });
+}
+
+async function createCompany() {
+    if (!currentUser || currentUser.role !== "admin") {
+        alert("Keine Berechtigung");
+        return;
+    }
+
+    const company_name = document.getElementById("new_company_name").value.trim();
+
+    if (!company_name) {
+        alert("Bitte Unternehmen eintragen.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_companies")
+        .insert([{ company_name, active: true }]);
+
+    if (error) {
+        alert("Unternehmen konnte nicht erstellt werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Unternehmen hinzugefügt.");
+
+    document.getElementById("new_company_name").value = "";
+
+    await loadCompanies();
+    updateJobForm();
 }
 
 startApp();
