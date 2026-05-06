@@ -10,165 +10,162 @@
 </head>
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <div class="header">
-            <h1>🚕 Los Santos Taxi</h1>
-            <p>Leitstelle & Fahrtenbuch</p>
-        </div>
+    <div class="header">
+        <h1>🚕 Los Santos Taxi</h1>
+        <p>Leitstelle & Auftragsverwaltung</p>
+    </div>
 
-        <!-- LOGIN -->
-        <div class="card" id="loginBox">
-            <h2>Login</h2>
-
-            <div class="field">
-                <label>Benutzername</label>
-                <input type="text" id="login_username">
-            </div>
-
-            <div class="field">
-                <label>Passwort</label>
-                <input type="password" id="login_password">
-            </div>
-
-            <button onclick="loginUser()">Einloggen</button>
-        </div>
-
-        <!-- APP -->
-        <div id="appBox" style="display:none;">
-
-            <div class="card userbar">
-                <div>
-                    Eingeloggt als: <strong id="currentUserName"></strong>
-                    <br>
-                    Rolle: <span id="currentUserRole"></span>
-                </div>
-
-                <button class="small-btn" onclick="logoutUser()">Logout</button>
-            </div>
-
-            <div class="card">
-
-                <h2>Neue Fahrt</h2>
-
-                <div class="form-grid">
-
-                    <div class="field">
-                        <label>Fahrer</label>
-                        <input type="text" id="driver_name" readonly>
-                    </div>
-
-                    <div class="field">
-                        <label>Kunde</label>
-                        <input type="text" id="customer_name">
-                    </div>
-
-                    <div class="field">
-                        <label>Fahrtart</label>
-                        <select id="ride_type">
-                            <option>Normale Fahrt</option>
-                            <option>Essenslieferung</option>
-                            <option>EMS</option>
-                            <option>Gebrauchtwagenhändler</option>
-                            <option>Bambi-Tour</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>Von</label>
-                        <input type="text" id="start_location">
-                    </div>
-
-                    <div class="field">
-                        <label>Nach</label>
-                        <input type="text" id="end_location">
-                    </div>
-
-                    <div class="field">
-                        <label>Kilometer</label>
-                        <input type="number" id="kilometers">
-                    </div>
-
-                    <div class="field">
-                        <label>Trinkgeld</label>
-                        <input type="number" id="tip_amount">
-                    </div>
-
-                    <div class="field">
-                        <label>Essen-Auslage</label>
-                        <input type="number" id="food_advance">
-                    </div>
-
-                    <div class="field">
-                        <label>Auslage über</label>
-                        <select id="advance_source">
-                            <option value="">Keine</option>
-                            <option>Schließfach</option>
-                            <option>Trinkgeldauszahlung</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>Bemerkung</label>
-                        <input type="text" id="notes">
-                    </div>
-
-                </div>
-
-                <button onclick="saveRide()">Fahrt speichern</button>
-
-            </div>
-
-            <div class="card">
-                <h2>Letzte Fahrten</h2>
-                <div id="rides_list"></div>
-            </div>
-<div class="card" id="adminPanel" style="display:none;">
-
-    <h2>Adminbereich</h2>
-
-    <div class="form-grid">
+    <div class="card" id="loginBox">
+        <h2>Login</h2>
 
         <div class="field">
             <label>Benutzername</label>
-            <input type="text" id="new_username">
-        </div>
-
-        <div class="field">
-            <label>Anzeigename</label>
-            <input type="text" id="new_display_name">
+            <input type="text" id="login_username">
         </div>
 
         <div class="field">
             <label>Passwort</label>
-            <input type="text" id="new_password">
+            <input type="password" id="login_password">
         </div>
 
-        <div class="field">
-            <label>Rolle</label>
+        <button type="button" onclick="loginUser()">Einloggen</button>
+    </div>
 
-            <select id="new_role">
-                <option value="fahrer">Fahrer</option>
-                <option value="admin">Admin</option>
-            </select>
+    <div id="appBox" style="display:none;">
+
+        <div class="card userbar">
+            <div>
+                Eingeloggt als: <strong id="currentUserName"></strong><br>
+                Rolle: <span id="currentUserRole"></span>
+            </div>
+
+            <button class="small-btn" onclick="logoutUser()">Logout</button>
+        </div>
+
+        <div class="card">
+            <h2>📞 Leitstelle: Auftrag erstellen</h2>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Fahrtart</label>
+                    <select id="job_ride_type" onchange="updateJobForm()">
+                        <option>Normale Fahrt</option>
+                        <option>Essenslieferung</option>
+                        <option>EMS</option>
+                        <option>Gebrauchtwagenhändler</option>
+                        <option>Bambi-Tour</option>
+                    </select>
+                </div>
+
+                <div class="field" id="companyField" style="display:none;">
+                    <label>Unternehmen</label>
+                    <select id="job_company_name" onchange="setPickupFromCompany()"></select>
+                </div>
+
+                <div class="field" id="emsField" style="display:none;">
+                    <label>EMS-Mitarbeiter</label>
+                    <input type="text" id="job_ems_staff_name" placeholder="Name eintragen">
+                </div>
+
+                <div class="field">
+                    <label>Abholort</label>
+                    <input type="text" id="job_pickup_location">
+                </div>
+
+                <div class="field">
+                    <label>Ziel</label>
+                    <input type="text" id="job_destination">
+                </div>
+
+                <div class="field">
+                    <label>Kunde / Spieler</label>
+                    <input type="text" id="job_customer_name">
+                </div>
+
+                <div class="field">
+                    <label>Bemerkung</label>
+                    <input type="text" id="job_notes">
+                </div>
+
+            </div>
+
+            <button onclick="createJob()">Auftrag erstellen</button>
+        </div>
+
+        <div class="card">
+            <h2>🟢 Offene Aufträge</h2>
+            <div id="open_jobs_list"></div>
+        </div>
+
+        <div class="card">
+            <h2>🚕 Meine übernommenen Aufträge</h2>
+            <div id="my_jobs_list"></div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Erledigte Fahrten</h2>
+            <div id="done_jobs_list"></div>
+        </div>
+
+        <div class="card" id="adminPanel" style="display:none;">
+            <h2>Adminbereich</h2>
+
+            <h3>Benutzer erstellen</h3>
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Benutzername</label>
+                    <input type="text" id="new_username">
+                </div>
+
+                <div class="field">
+                    <label>Anzeigename</label>
+                    <input type="text" id="new_display_name">
+                </div>
+
+                <div class="field">
+                    <label>Passwort</label>
+                    <input type="text" id="new_password">
+                </div>
+
+                <div class="field">
+                    <label>Rolle</label>
+                    <select id="new_role">
+                        <option value="fahrer">Fahrer</option>
+                        <option value="leitstelle">Leitstelle</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button onclick="createUser()">Benutzer erstellen</button>
+
+            <h3>Liefer-Unternehmen hinzufügen</h3>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>Unternehmen</label>
+                    <input type="text" id="new_company_name">
+                </div>
+            </div>
+
+            <button onclick="createCompany()">Unternehmen hinzufügen</button>
+
+            <br><br>
+
+            <div id="users_list"></div>
         </div>
 
     </div>
-
-    <button onclick="createUser()">
-        Benutzer erstellen
-    </button>
-
-    <br><br>
-
-    <div id="users_list"></div>
 
 </div>
-        </div>
 
-    </div>
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
