@@ -1,223 +1,299 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Los Santos Taxi Leitstelle</title>
+<!-- DASHBOARD -->
+<div class="dashboard-layout">
 
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+    <!-- LINKE SEITE -->
+    <div class="dashboard-main">
 
-<div class="container">
+        <!-- STATS -->
+        <div class="stats-grid">
 
-    <div class="top-header">
-        <div></div>
-
-        <div class="header">
-            <h1>🚕 Los Santos Taxi</h1>
-            <p>Leitstelle & Auftragsverwaltung</p>
-        </div>
-
-        <div class="login-info" id="topLoginInfo" style="display:none;">
-            <div>
-                Eingeloggt als<br>
-                <strong id="currentUserName"></strong>
+            <div class="stat-card">
+                <div class="stat-title">Offene Aufträge</div>
+                <div class="stat-value" id="stat_open">0</div>
             </div>
 
-            <a href="admin.html" id="adminLink" style="display:none;">
-                <button class="small-btn">Adminbereich</button>
-            </a>
+            <div class="stat-card">
+                <div class="stat-title">Übernommen</div>
+                <div class="stat-value" id="stat_taken">0</div>
+            </div>
 
-            <button class="small-btn" onclick="logoutUser()">Logout</button>
+            <div class="stat-card">
+                <div class="stat-title">Erledigt</div>
+                <div class="stat-value" id="stat_done">0</div>
+            </div>
+
         </div>
+
+        <!-- OFFENE AUFTRÄGE -->
+        <div class="section-card">
+
+            <div class="section-header" onclick="toggleSection('open_jobs_list')">
+                <h2>🟢 Offene Aufträge</h2>
+                <span>▼</span>
+            </div>
+
+            <div id="open_jobs_list"></div>
+
+        </div>
+
+        <!-- MEINE AUFTRÄGE -->
+        <div class="section-card">
+
+            <div class="section-header" onclick="toggleSection('my_jobs_list')">
+                <h2>🚕 Meine übernommenen Aufträge</h2>
+                <span>▼</span>
+            </div>
+
+            <div id="my_jobs_list"></div>
+
+        </div>
+
+        <!-- AUFTRAG ERSTELLEN -->
+        <div
+            class="section-card"
+            id="createJobBox"
+            style="display:none;"
+        >
+
+            <div class="section-header" onclick="toggleSection('create_job_form')">
+                <h2>📞 Leitstelle: Auftrag erstellen</h2>
+                <span>▼</span>
+            </div>
+
+            <div id="create_job_form">
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label>Fahrtart</label>
+
+                        <select
+                            id="job_ride_type"
+                            onchange="updateJobForm()"
+                        >
+                            <option>Normale Fahrt</option>
+                            <option>Essenslieferung</option>
+                            <option>EMS</option>
+                            <option>Bambi-Tour</option>
+                            <option>Gebrauchtwagenhändler</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Abholort</label>
+                        <input type="text" id="job_pickup_location">
+                    </div>
+
+                    <div class="field">
+                        <label>Ziel</label>
+                        <input type="text" id="job_destination">
+                    </div>
+
+                    <div class="field">
+                        <label>Kunde / Spieler / Empfänger</label>
+                        <input type="text" id="job_customer_name">
+                    </div>
+
+                    <div class="field">
+                        <label>Bemerkung</label>
+                        <input type="text" id="job_notes">
+                    </div>
+
+                    <div
+                        class="field"
+                        id="companyField"
+                        style="display:none;"
+                    >
+                        <label>Unternehmen</label>
+
+                        <select
+                            id="job_company_name"
+                            onchange="setPickupFromCompany()"
+                        ></select>
+                    </div>
+
+                    <div
+                        class="field"
+                        id="emsField"
+                        style="display:none;"
+                    >
+                        <label>EMS Mitarbeiter</label>
+                        <input type="text" id="job_ems_staff_name">
+                    </div>
+
+                </div>
+
+                <button onclick="createJob()">
+                    Auftrag erstellen
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- ERLEDIGTE -->
+        <div class="section-card">
+
+            <div class="section-header" onclick="toggleSection('done_jobs_list')">
+                <h2>✅ Erledigte Fahrten</h2>
+                <span>▼</span>
+            </div>
+
+            <div
+                id="done_jobs_list"
+                style="display:none;"
+            ></div>
+
+        </div>
+
     </div>
 
-    <div class="card" id="loginBox">
-        <h2>Login</h2>
+    <!-- SIDEBAR -->
+    <div class="dashboard-sidebar">
 
-        <div class="field">
-            <label>Benutzername</label>
-            <input type="text" id="login_username">
-        </div>
+        <!-- USER -->
+        <div class="sidebar-card">
 
-        <div class="field">
-            <label>Passwort</label>
-            <input type="password" id="login_password">
-        </div>
-
-        <button type="button" onclick="loginUser()">Einloggen</button>
-    </div>
-
-    <div id="appBox" style="display:none;">
-
-        <span id="currentUserRole" style="display:none;"></span>
-
-        <div class="top-dashboard">
-
-            <div class="stats-grid compact-stats">
-                <div class="stat-card">
-                    <h3>Offene Aufträge</h3>
-                    <div class="number" id="stat_open">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <h3>Übernommen</h3>
-                    <div class="number" id="stat_taken">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <h3>Erledigt</h3>
-                    <div class="number" id="stat_done">0</div>
-                </div>
-
-                <div class="stat-card">
-                    <h3>Leitstelle</h3>
-                    <div class="number" id="stat_dispatchers">0/2</div>
-                </div>
+            <div class="sidebar-title">
+                👤 Eingeloggt als
             </div>
 
-            <div class="card mini-dispatcher" id="dispatcherBox">
-                <div id="dispatcher_status"></div>
+            <div class="user-box">
 
-                <div class="dispatcher-buttons">
-                    <button class="small-btn" id="dispatcherToggleBtn" onclick="toggleDispatcherStatus()">
-                        📡 Leitstelle übernehmen
-                    </button>
-                </div>
-            </div>
-            <div class="card mini-dispatcher">
                 <div>
-                    <strong>🚕 Fahrerstatus</strong><br>
-                    <span id="driver_status_text">Status: Offline</span>
-                    <br><br>
-                    <div id="active_drivers_list"></div>
+                    <strong id="currentUserName">-</strong><br>
+                    <small id="currentUserRole">-</small>
                 </div>
 
-                <div class="dispatcher-buttons">
-                    <button class="small-btn" onclick="setDriverStatus('Im Dienst')">🟢 Dienst</button>
-                    <button class="small-btn" onclick="setDriverStatus('Pause')">🟡 Pause</button>
-                    <button class="small-btn danger-btn" onclick="setDriverStatus('Offline')">🔴 Offline</button>
+                <div class="user-buttons">
+
+                    <a
+                        href="admin.html"
+                        id="adminLink"
+                        style="display:none;"
+                    >
+                        <button class="small-btn">
+                            Admin
+                        </button>
+                    </a>
+
+                    <button
+                        class="small-btn danger-btn"
+                        onclick="logoutUser()"
+                    >
+                        Logout
+                    </button>
+
                 </div>
+
             </div>
+
         </div>
-<div class="card mini-dispatcher">
-    <div>
-        <strong>🔔 Auftragssound</strong><br>
-        <span id="sound_status_text">Sound: An</span>
+
+        <!-- LEITSTELLE -->
+        <div class="sidebar-card">
+
+            <div class="sidebar-title">
+                📡 Aktive Leitstelle
+            </div>
+
+            <div id="dispatcher_status"></div>
+
+            <button
+                id="dispatcherToggleBtn"
+                class="small-btn"
+                onclick="toggleDispatcherStatus()"
+                style="margin-top:15px;"
+            >
+                Leitstelle übernehmen
+            </button>
+
+        </div>
+
+        <!-- FAHRERSTATUS -->
+        <div class="sidebar-card">
+
+            <div class="sidebar-title">
+                🚕 Fahrerstatus
+            </div>
+
+            <div id="driver_status_text">
+                Status: Offline
+            </div>
+
+            <div
+                id="active_drivers_list"
+                style="margin-top:12px;"
+            ></div>
+
+            <div class="status-buttons">
+
+                <button
+                    class="small-btn"
+                    onclick="setDriverStatus('Im Dienst')"
+                >
+                    🟢 Dienst
+                </button>
+
+                <button
+                    class="small-btn"
+                    onclick="setDriverStatus('Pause')"
+                >
+                    🟡 Pause
+                </button>
+
+                <button
+                    class="small-btn danger-btn"
+                    onclick="setDriverStatus('Offline')"
+                >
+                    🔴 Offline
+                </button>
+
+            </div>
+
+        </div>
+
+        <!-- SOUND -->
+        <div class="sidebar-card">
+
+            <div class="sidebar-title">
+                🔔 Auftragssound
+            </div>
+
+            <div id="sound_status_text">
+                Sound: An
+            </div>
+
+            <div class="sound-controls">
+
+                <select
+                    id="sound_select"
+                    onchange="saveSoundSettings()"
+                >
+                    <option value="bing.mp3">Bing</option>
+                    <option value="ruelps.mp3">Rülps</option>
+                    <option value="tuturu.mp3">Tuturu</option>
+                </select>
+
+                <button
+                    class="small-btn"
+                    onclick="toggleSound()"
+                    id="soundToggleBtn"
+                >
+                    Sound aus
+                </button>
+
+                <button
+                    class="small-btn"
+                    onclick="testSound()"
+                >
+                    Test
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class="dispatcher-buttons">
-        <select id="sound_select" onchange="saveSoundSettings()">
-            <option value="bing.mp3">Bing</option>
-            <option value="ruelps.mp3">Rülps</option>
-            <option value="tuturu.mp3">Tuturu</option>
-        </select>
-
-        <button class="small-btn" onclick="toggleSound()" id="soundToggleBtn">
-            Sound aus
-        </button>
-
-        <button class="small-btn" onclick="testSound()">
-            Test
-        </button>
-    </div>
 </div>
-        <div class="card" id="createJobBox" style="display:none;">
-            <h2>📞 Leitstelle: Auftrag erstellen</h2>
-
-            <div class="form-grid">
-
-                <div class="field">
-                    <label>Fahrtart</label>
-                    <select id="job_ride_type" onchange="updateJobForm()">
-                        <option>Normale Fahrt</option>
-                        <option>Essenslieferung</option>
-                        <option>EMS</option>
-                        <option>Gebrauchtwagenhändler</option>
-                        <option>Bambi-Tour</option>
-                    </select>
-                </div>
-
-                <div class="field" id="companyField" style="display:none;">
-                    <label>Unternehmen</label>
-                    <select id="job_company_name" onchange="setPickupFromCompany()"></select>
-                </div>
-
-                <div class="field" id="emsField" style="display:none;">
-                    <label>EMS-Mitarbeiter</label>
-                    <input type="text" id="job_ems_staff_name" placeholder="Name eintragen">
-                </div>
-
-                <div class="field">
-                    <label>Abholort</label>
-                    <input type="text" id="job_pickup_location">
-                </div>
-
-                <div class="field">
-                    <label>Ziel</label>
-                    <input type="text" id="job_destination">
-                </div>
-
-                <div class="field">
-                    <label>Kunde / Spieler / Empfänger</label>
-                    <input type="text" id="job_customer_name">
-                </div>
-
-                <div class="field">
-                    <label>Bemerkung</label>
-                    <input type="text" id="job_notes">
-                </div>
-
-            </div>
-
-            <button onclick="createJob()">Auftrag erstellen</button>
-        </div>
-
-        <div class="main-sections">
-
-            <div class="card">
-                <div class="section-header" onclick="toggleSection('open_jobs_wrapper')">
-                    <h2>🟢 Offene Aufträge</h2>
-                    <span>▼</span>
-                </div>
-
-                <div id="open_jobs_wrapper">
-                    <div id="open_jobs_list"></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="section-header" onclick="toggleSection('my_jobs_wrapper')">
-                    <h2>🚕 Meine übernommenen Aufträge</h2>
-                    <span>▼</span>
-                </div>
-
-                <div id="my_jobs_wrapper">
-                    <div id="my_jobs_list"></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="section-header" onclick="toggleSection('done_jobs_wrapper')">
-                    <h2>✅ Erledigte Fahrten</h2>
-                    <span>▼</span>
-                </div>
-
-                <div id="done_jobs_wrapper">
-                    <div id="done_jobs_list"></div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<script src="script.js"></script>
-<audio id="newJobSound" src="bing.mp3" preload="auto"></audio>
-    <div id="toastContainer"></div>
-</body>
-</html>
