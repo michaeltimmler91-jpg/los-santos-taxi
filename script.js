@@ -56,21 +56,11 @@ async function startApp() {
     await loadCompanies();
     updateJobForm();
     await loadJobs();
-    await loadDriverStatus();
+
     setupRealtime();
+    loadSoundSettings();
 }
-function playNewJobSound() {
 
-    const sound = document.getElementById("newJobSound");
-
-    if (!sound) return;
-
-    sound.currentTime = 0;
-
-    sound.play().catch(() => {
-        console.log("Sound konnte nicht abgespielt werden.");
-    });
-}
 function setupRealtime() {
     if (realtimeStarted) return;
     realtimeStarted = true;
@@ -78,46 +68,46 @@ function setupRealtime() {
     client
         .channel("taxi-live-jobs")
         .on(
-    "postgres_changes",
-    {
-        event: "*",
-        schema: "public",
-        table: "taxi_driver_status"
-    },
-    () => {
-        loadDriverStatus();
-    }
-)
-        .on(
             "postgres_changes",
             {
                 event: "*",
                 schema: "public",
                 table: "taxi_jobs"
             },
-            () => {
+            (payload) => {
+                if (
+                    payload.eventType === "INSERT" &&
+                    payload.new.job_status === "Offen"
+                ) {
+                    playNewJobSound();
+                }
+
                 loadJobs();
             }
         )
-       .on(
-    "postgres_changes",
-    {
-        event: "*",
-        schema: "public",
-        table: "taxi_jobs"
-    },
-    (payload) => {
-
-        if (
-            payload.eventType === "INSERT" &&
-            payload.new.job_status === "Offen"
-        ) {
-            playNewJobSound();
-        }
-
-        loadJobs();
-    }
-)
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_dispatchers"
+            },
+            () => {
+                loadDispatchers();
+                loadDashboardStats();
+            }
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_driver_status"
+            },
+            () => {
+                loadDriverStatus();
+            }
+        )
         .subscribe();
 }
 
@@ -239,6 +229,71 @@ async function leaveDispatcher() {
 
     await loadDispatchers();
     await loadDashboardStats();
+}
+
+async function setDriverStatus(status) {
+    const { error } = await client
+        .from("taxi_driver_status")
+        .upsert({
+            username: currentUser.username,
+            display_name: currentUser.display_name,
+            status: status,
+            updated_at: new Date().toISOString()
+        }, {
+            onConflict: "username"
+        });
+
+    if (error) {
+        alert("Status konnte nicht gespeichert werden.");
+        console.error(error);
+        return;
+    }
+
+    loadDriverStatus();
+}
+
+async function loadDriverStatus() {
+    const { data, error } = await client
+        .from("taxi_driver_status")
+        .select("*")
+        .order("display_name", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const own = data.find(d => d.username === currentUser.username);
+    const text = document.getElementById("driver_status_text");
+
+    if (text) {
+        text.innerText = `Status: ${own ? own.status : "Offline"}`;
+    }
+
+    const activeBox = document.getElementById("active_drivers_list");
+
+    if (!activeBox) return;
+
+    const activeDrivers = data.filter(d => d.status === "Im Dienst");
+    const pausedDrivers = data.filter(d => d.status === "Pause");
+
+    let html = "";
+
+    if (activeDrivers.length > 0) {
+        html += "<strong>Im Dienst:</strong><br>";
+        activeDrivers.forEach(driver => {
+            html += `🟢 ${escapeHtml(driver.display_name)}<br>`;
+        });
+    }
+
+    if (pausedDrivers.length > 0) {
+        html += "<br><strong>Pause:</strong><br>";
+        pausedDrivers.forEach(driver => {
+            html += `🟡 ${escapeHtml(driver.display_name)}<br>`;
+        });
+    }
+
+    activeBox.innerHTML = html || "Keine Fahrer im Dienst.";
 }
 
 async function loadCompanies() {
@@ -384,6 +439,7 @@ async function takeJob(jobId) {
         return;
     }
 
+    await setDriverStatus("Im Dienst");
     loadJobs();
 }
 
@@ -535,11 +591,57 @@ async function completeJob(jobId, rideType) {
     loadJobs();
 }
 
+async function releaseJob(jobId) {
+    const ok = confirm("Auftrag wirklich wieder für andere Fahrer freigeben?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Offen",
+            assigned_driver: null,
+            assigned_at: null
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Auftrag konnte nicht freigegeben werden.");
+        console.error(error);
+        return;
+    }
+
+    loadJobs();
+}
+
+async function markNoShow(jobId) {
+    const ok = confirm("Fahrgast wirklich als nicht angetroffen markieren?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Nicht angetroffen",
+            completed_at: new Date().toISOString()
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Auftrag konnte nicht markiert werden.");
+        console.error(error);
+        return;
+    }
+
+    loadJobs();
+}
+
 async function loadJobs() {
     await loadOpenJobs();
     await loadMyJobs();
     await loadDoneJobs();
     await loadDispatchers();
+    await loadDriverStatus();
     await loadDashboardStats();
 }
 
@@ -670,11 +772,11 @@ async function loadMyJobs() {
                 <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
 
                 <button class="small-btn" onclick="releaseJob('${job.id}')">
-                Auftrag freigeben
+                    Auftrag freigeben
                 </button>
 
                 <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">
-                Fahrgast nicht angetroffen
+                    Fahrgast nicht angetroffen
                 </button>
             </div>
         `;
@@ -721,6 +823,69 @@ async function loadDoneJobs() {
     });
 }
 
+function loadSoundSettings() {
+    const enabled = localStorage.getItem("taxiSoundEnabled");
+    const soundFile = localStorage.getItem("taxiSoundFile");
+
+    const select = document.getElementById("sound_select");
+    const btn = document.getElementById("soundToggleBtn");
+    const text = document.getElementById("sound_status_text");
+    const audio = document.getElementById("newJobSound");
+
+    const soundEnabled = enabled === null ? true : enabled === "true";
+    const selectedSound = soundFile || "bing.mp3";
+
+    if (select) select.value = selectedSound;
+    if (audio) audio.src = selectedSound;
+
+    if (btn) btn.innerText = soundEnabled ? "Sound aus" : "Sound an";
+    if (text) text.innerText = soundEnabled ? "Sound: An" : "Sound: Aus";
+}
+
+function saveSoundSettings() {
+    const select = document.getElementById("sound_select");
+    const audio = document.getElementById("newJobSound");
+
+    if (!select || !audio) return;
+
+    localStorage.setItem("taxiSoundFile", select.value);
+    audio.src = select.value;
+}
+
+function toggleSound() {
+    const current = localStorage.getItem("taxiSoundEnabled");
+    const enabled = current === null ? true : current === "true";
+
+    localStorage.setItem("taxiSoundEnabled", String(!enabled));
+
+    loadSoundSettings();
+}
+
+function testSound() {
+    playNewJobSound(true);
+}
+
+function playNewJobSound(force = false) {
+    const enabled = localStorage.getItem("taxiSoundEnabled");
+    const soundEnabled = enabled === null ? true : enabled === "true";
+
+    if (!soundEnabled && !force) {
+        return;
+    }
+
+    const sound = document.getElementById("newJobSound");
+
+    if (!sound) return;
+
+    const selectedSound = localStorage.getItem("taxiSoundFile") || "bing.mp3";
+    sound.src = selectedSound;
+    sound.currentTime = 0;
+
+    sound.play().catch(() => {
+        console.log("Sound konnte nicht abgespielt werden.");
+    });
+}
+
 function toggleSection(id) {
     const box = document.getElementById(id);
     if (!box) return;
@@ -740,112 +905,5 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
-async function releaseJob(jobId) {
-    const ok = confirm("Auftrag wirklich wieder für andere Fahrer freigeben?");
 
-    if (!ok) return;
-
-    const { error } = await client
-        .from("taxi_jobs")
-        .update({
-            job_status: "Offen",
-            assigned_driver: null,
-            assigned_at: null
-        })
-        .eq("id", jobId);
-
-    if (error) {
-        alert("Auftrag konnte nicht freigegeben werden.");
-        console.error(error);
-        return;
-    }
-
-    loadJobs();
-}
-
-async function markNoShow(jobId) {
-    const ok = confirm("Fahrgast wirklich als nicht angetroffen markieren?");
-
-    if (!ok) return;
-
-    const { error } = await client
-        .from("taxi_jobs")
-        .update({
-            job_status: "Nicht angetroffen",
-            completed_at: new Date().toISOString()
-        })
-        .eq("id", jobId);
-
-    if (error) {
-        alert("Auftrag konnte nicht markiert werden.");
-        console.error(error);
-        return;
-    }
-
-    loadJobs();
-}
 startApp();
-async function setDriverStatus(status) {
-    const { error } = await client
-        .from("taxi_driver_status")
-        .upsert({
-            username: currentUser.username,
-            display_name: currentUser.display_name,
-            status: status,
-            updated_at: new Date().toISOString()
-        }, {
-            onConflict: "username"
-        });
-
-    if (error) {
-        alert("Status konnte nicht gespeichert werden.");
-        console.error(error);
-        return;
-    }
-
-    loadDriverStatus();
-}
-
-async function loadDriverStatus() {
-    const { data, error } = await client
-        .from("taxi_driver_status")
-        .select("*")
-        .order("display_name", { ascending: true });
-
-    if (error) {
-        console.error(error);
-        return;
-    }
-
-    const own = data.find(d => d.username === currentUser.username);
-    const text = document.getElementById("driver_status_text");
-
-    if (text) {
-        text.innerText = `Status: ${own ? own.status : "Offline"}`;
-    }
-
-    const activeBox = document.getElementById("active_drivers_list");
-
-    if (!activeBox) return;
-
-    const activeDrivers = data.filter(d => d.status === "Im Dienst");
-    const pausedDrivers = data.filter(d => d.status === "Pause");
-
-    let html = "";
-
-    if (activeDrivers.length > 0) {
-        html += "<strong>Im Dienst:</strong><br>";
-        activeDrivers.forEach(driver => {
-            html += `🟢 ${escapeHtml(driver.display_name)}<br>`;
-        });
-    }
-
-    if (pausedDrivers.length > 0) {
-        html += "<br><strong>Pause:</strong><br>";
-        pausedDrivers.forEach(driver => {
-            html += `🟡 ${escapeHtml(driver.display_name)}<br>`;
-        });
-    }
-
-    activeBox.innerHTML = html || "Keine Fahrer im Dienst.";
-}
