@@ -571,3 +571,166 @@ button:hover {
         text-align: left;
     }
 }
+/* =========================
+   ADMIN TABS
+========================= */
+
+.admin-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+.admin-tab-btn {
+    background: rgba(15,25,45,0.92);
+    color: #dbe7ff;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 16px;
+    padding: 14px 22px;
+
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.admin-tab-btn:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(250,204,21,0.3);
+
+    box-shadow:
+        0 0 18px rgba(250,204,21,0.12);
+}
+
+.admin-tab-btn.active {
+    background: #facc15;
+    color: black;
+
+    border-color: #facc15;
+
+    box-shadow:
+        0 0 20px rgba(250,204,21,0.25);
+}
+
+.admin-tab-content {
+    animation: fadeAdminTab 0.25s ease;
+}
+
+@keyframes fadeAdminTab {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =========================
+   ADMIN LISTEN SCHÖNER
+========================= */
+
+.admin-card {
+    background: rgba(15,25,45,0.9);
+
+    border-left: 5px solid #facc15;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    margin-bottom: 16px;
+
+    line-height: 1.7;
+
+    transition: 0.2s;
+}
+
+.admin-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 18px rgba(250,204,21,0.08);
+}
+
+.admin-card strong {
+    color: #facc15;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+/* =========================
+   ADMIN KPI GLOW
+========================= */
+
+.admin-kpi {
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-kpi::before {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    background:
+        radial-gradient(circle,
+            rgba(250,204,21,0.15) 0%,
+            transparent 70%);
+
+    top: -60px;
+    right: -60px;
+
+    pointer-events: none;
+}
+
+/* =========================
+   SCROLLBARS
+========================= */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.03);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(250,204,21,0.35);
+    border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(250,204,21,0.55);
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 850px) {
+
+    .admin-tabs {
+        flex-direction: column;
+    }
+
+    .admin-tab-btn {
+        width: 100%;
+    }
+
+}
