@@ -63,6 +63,7 @@ async function startApp() {
 
     setupRealtime();
     loadSoundSettings();
+    startIdleWatcher();
 }
 
 function setupRealtime() {
@@ -911,5 +912,68 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+let idleTimer = null;
+let idleConfirmTimer = null;
 
+const IDLE_LIMIT_MS = 5 * 60 * 1000; // Test: 5 Minuten
+const IDLE_CONFIRM_MS = 60 * 1000;   // 60 Sekunden zum Bestätigen
+
+function startIdleWatcher() {
+    const events = ["mousemove", "keydown", "click", "touchstart"];
+
+    events.forEach(eventName => {
+        document.addEventListener(eventName, resetIdleTimer);
+    });
+
+    resetIdleTimer();
+}
+
+function resetIdleTimer() {
+    clearTimeout(idleTimer);
+
+    idleTimer = setTimeout(() => {
+        showIdleWarning();
+    }, IDLE_LIMIT_MS);
+}
+
+function showIdleWarning() {
+    const modal = document.getElementById("idleModal");
+
+    if (modal) {
+        modal.style.display = "flex";
+    }
+
+    clearTimeout(idleConfirmTimer);
+
+    idleConfirmTimer = setTimeout(async () => {
+        await setUserOfflineBecauseIdle();
+    }, IDLE_CONFIRM_MS);
+}
+
+function confirmStillActive() {
+    const modal = document.getElementById("idleModal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+
+    clearTimeout(idleConfirmTimer);
+    resetIdleTimer();
+}
+
+async function setUserOfflineBecauseIdle() {
+    const modal = document.getElementById("idleModal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+
+    await setDriverStatus("Offline");
+
+    if (isActiveDispatcher()) {
+        await leaveDispatcher();
+    }
+
+    alert("Du wurdest wegen Inaktivität auf Offline gesetzt.");
+}
 startApp();
