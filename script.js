@@ -68,30 +68,28 @@ function setupRealtime() {
     client
         .channel("taxi-live-jobs")
         .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "taxi_jobs"
-            },
-            (payload) => {
-               if (
-    payload.eventType === "INSERT" &&
-    payload.new.job_status === "Offen"
-) {
+    "postgres_changes",
+    {
+        event: "*",
+        schema: "public",
+        table: "taxi_jobs"
+    },
+    (payload) => {
+        if (
+            payload.eventType === "INSERT" &&
+            payload.new.job_status === "Offen"
+        ) {
+            playNewJobSound();
 
-    playNewJobSound();
+            showToast(
+                "📞 Neuer Auftrag",
+                `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
+            );
+        }
 
-    showToast(
-        "📞 Neuer Auftrag",
-        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
-    );
-}
-                }
-
-                loadJobs();
-            }
-        )
+        loadJobs();
+    }
+)
         .on(
             "postgres_changes",
             {
