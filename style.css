@@ -428,3 +428,306 @@ button:hover {
         transform: translateX(0);
     }
 }
+/* =========================
+   MODERN DASHBOARD LAYOUT
+========================= */
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 28px;
+    margin-top: 25px;
+    align-items: start;
+}
+
+.dashboard-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar-card {
+    background: rgba(5, 15, 35, 0.92);
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35),
+        inset 0 0 20px rgba(255,255,255,0.015);
+
+    backdrop-filter: blur(8px);
+}
+
+.sidebar-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #facc15;
+    margin-bottom: 14px;
+}
+
+/* =========================
+   USER BOX
+========================= */
+
+.user-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+
+.stat-card {
+    background: linear-gradient(
+        145deg,
+        rgba(10,20,45,0.96),
+        rgba(5,10,25,0.96)
+    );
+
+    border-radius: 22px;
+
+    padding: 28px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    text-align: center;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35),
+        inset 0 0 18px rgba(255,255,255,0.02);
+
+    transition: 0.25s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(250,204,21,0.3);
+}
+
+.stat-title {
+    color: #cbd5e1;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.stat-value {
+    font-size: 52px;
+    font-weight: bold;
+    color: #facc15;
+    line-height: 1;
+}
+
+/* =========================
+   SECTION CARDS
+========================= */
+
+.section-card {
+    background: rgba(5, 15, 35, 0.92);
+
+    border-radius: 24px;
+
+    padding: 22px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35),
+        inset 0 0 18px rgba(255,255,255,0.015);
+
+    backdrop-filter: blur(8px);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    cursor: pointer;
+
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    color: #facc15;
+    font-size: 30px;
+    margin: 0;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field label {
+    color: #d1d5db;
+    font-size: 14px;
+}
+
+input,
+select {
+    background: rgba(15,25,45,0.95);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    color: white;
+
+    font-size: 15px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: rgba(250,204,21,0.5);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    background: #facc15;
+    color: black;
+
+    border: none;
+
+    border-radius: 14px;
+
+    padding: 14px 20px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.small-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+}
+
+.danger-btn {
+    background: #ef4444;
+    color: white;
+}
+
+/* =========================
+   STATUS BUTTONS
+========================= */
+
+.status-buttons,
+.sound-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+/* =========================
+   RIDE CARDS
+========================= */
+
+.ride-card {
+    background: rgba(15,25,45,0.9);
+
+    border: 1px solid rgba(255,255,255,0.05);
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    margin-bottom: 18px;
+
+    line-height: 1.6;
+}
+
+/* =========================
+   PREVIEW BOX
+========================= */
+
+.preview-box {
+    background: rgba(8,15,30,0.95);
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    color: #facc15;
+
+    font-weight: bold;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1200px) {
+
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-header h2 {
+        font-size: 22px;
+    }
+
+    .stat-value {
+        font-size: 42px;
+    }
+
+}
