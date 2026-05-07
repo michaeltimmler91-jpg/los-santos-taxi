@@ -66,37 +66,29 @@ function setupRealtime() {
     realtimeStarted = true;
 
     client
-        .channel("taxi-live-jobs")
-        .on(
-    "postgres_changes",
-    {
-        event: "*",
-        schema: "public",
-        table: "taxi_jobs"
-    },
-    (payload) => {
-        if (
-            payload.eventType === "INSERT" &&
-            payload.new.job_status === "Offen"
-        ) {
-            playNewJobSound();
-
-            showToast(
-                "📞 Neuer Auftrag",
-                `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
-            );
-        }
-
-        loadJobs();
-    }
-)
+        .channel("taxi-live")
         .on(
             "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "taxi_dispatchers"
-            },
+            { event: "*", schema: "public", table: "taxi_jobs" },
+            (payload) => {
+                if (
+                    payload.eventType === "INSERT" &&
+                    payload.new.job_status === "Offen"
+                ) {
+                    playNewJobSound();
+
+                    showToast(
+                        "📞 Neuer Auftrag",
+                        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
+                    );
+                }
+
+                loadJobs();
+            }
+        )
+        .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "taxi_dispatchers" },
             () => {
                 loadDispatchers();
                 loadDashboardStats();
@@ -104,11 +96,7 @@ function setupRealtime() {
         )
         .on(
             "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "taxi_driver_status"
-            },
+            { event: "*", schema: "public", table: "taxi_driver_status" },
             () => {
                 loadDriverStatus();
             }
@@ -142,7 +130,7 @@ function renderDispatchers() {
 
     if (!box || !createBox) return;
 
-    let html = "<strong>Aktive Leitstelle:</strong><br>";
+    let html = "";
 
     if (activeDispatchers.length === 0) {
         html += "Keine Leitstelle aktiv.";
@@ -285,7 +273,7 @@ async function loadDriverStatus() {
     let html = "";
 
     if (activeDrivers.length > 0) {
-        html += "<strong>Im Dienst:</strong><br>";
+        html += "<br><strong>Im Dienst:</strong><br>";
         activeDrivers.forEach(driver => {
             html += `🟢 ${escapeHtml(driver.display_name)}<br>`;
         });
@@ -298,7 +286,7 @@ async function loadDriverStatus() {
         });
     }
 
-    activeBox.innerHTML = html || "Keine Fahrer im Dienst.";
+    activeBox.innerHTML = html || "<br>Keine Fahrer im Dienst.";
 }
 
 async function loadCompanies() {
@@ -598,7 +586,6 @@ async function completeJob(jobId, rideType) {
 
 async function releaseJob(jobId) {
     const ok = confirm("Auftrag wirklich wieder für andere Fahrer freigeben?");
-
     if (!ok) return;
 
     const { error } = await client
@@ -621,7 +608,6 @@ async function releaseJob(jobId) {
 
 async function markNoShow(jobId) {
     const ok = confirm("Fahrgast wirklich als nicht angetroffen markieren?");
-
     if (!ok) return;
 
     const { error } = await client
@@ -660,14 +646,14 @@ async function loadDashboardStats() {
         return;
     }
 
-    const open = data.filter(job => job.job_status === "Offen").length;
-    const taken = data.filter(job => job.job_status === "Übernommen").length;
-    const done = data.filter(job => job.job_status === "Erledigt").length;
+    document.getElementById("stat_open").innerText =
+        data.filter(job => job.job_status === "Offen").length;
 
-    document.getElementById("stat_open").innerText = open;
-    document.getElementById("stat_taken").innerText = taken;
-    document.getElementById("stat_done").innerText = done;
-    document.getElementById("stat_dispatchers").innerText = `${activeDispatchers.length}/2`;
+    document.getElementById("stat_taken").innerText =
+        data.filter(job => job.job_status === "Übernommen").length;
+
+    document.getElementById("stat_done").innerText =
+        data.filter(job => job.job_status === "Erledigt").length;
 }
 
 async function loadOpenJobs() {
@@ -775,14 +761,8 @@ async function loadMyJobs() {
                 </div>
 
                 <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
-
-                <button class="small-btn" onclick="releaseJob('${job.id}')">
-                    Auftrag freigeben
-                </button>
-
-                <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">
-                    Fahrgast nicht angetroffen
-                </button>
+                <button class="small-btn" onclick="releaseJob('${job.id}')">Auftrag freigeben</button>
+                <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">Fahrgast nicht angetroffen</button>
             </div>
         `;
 
@@ -874,24 +854,37 @@ function playNewJobSound(force = false) {
     const enabled = localStorage.getItem("taxiSoundEnabled");
     const soundEnabled = enabled === null ? true : enabled === "true";
 
-    if (!soundEnabled && !force) {
-        return;
-    }
+    if (!soundEnabled && !force) return;
 
     const sound = document.getElementById("newJobSound");
-
     if (!sound) return;
 
     const selectedSound = localStorage.getItem("taxiSoundFile") || "bing.mp3";
-    if (selectedSound === "OFF") {
-    return;
-    }
     sound.src = selectedSound;
     sound.currentTime = 0;
 
     sound.play().catch(() => {
         console.log("Sound konnte nicht abgespielt werden.");
     });
+}
+
+function showToast(title, message) {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = "toast";
+
+    toast.innerHTML = `
+        <div class="toast-title">${escapeHtml(title)}</div>
+        <div class="toast-message">${escapeHtml(message)}</div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 4500);
 }
 
 function toggleSection(id) {
@@ -913,24 +906,5 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
-function showToast(title, message) {
 
-    const container = document.getElementById("toastContainer");
-
-    if (!container) return;
-
-    const toast = document.createElement("div");
-    toast.className = "toast";
-
-    toast.innerHTML = `
-        <div class="toast-title">${title}</div>
-        <div class="toast-message">${message}</div>
-    `;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.remove();
-    }, 4500);
-}
 startApp();
