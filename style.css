@@ -376,3 +376,32 @@ button:hover {
         margin-right: 0;
     }
 }
+.idle-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.idle-box {
+    background: rgba(5,15,35,0.98);
+    border: 1px solid rgba(250,204,21,0.35);
+    border-radius: 22px;
+    padding: 30px;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 0 35px rgba(0,0,0,0.5);
+}
+
+.idle-box h2 {
+    color: #facc15;
+    margin-bottom: 15px;
+}
+
+.idle-box p {
+    color: #d1d5db;
+    margin-bottom: 20px;
+}
