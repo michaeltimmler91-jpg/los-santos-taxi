@@ -52,7 +52,11 @@ async function startApp() {
     }
 
     await loadDispatchers();
-    await loadDriverStatus();
+    if (status === "Offline" && isActiveDispatcher()) {
+    await leaveDispatcher();
+    }
+
+    loadDriverStatus();
     await loadCompanies();
     updateJobForm();
     await loadJobs();
