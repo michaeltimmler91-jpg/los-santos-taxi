@@ -8,6 +8,12 @@ let companies = [];
 let activeDispatchers = [];
 let realtimeStarted = false;
 
+let idleTimer = null;
+let idleConfirmTimer = null;
+
+const IDLE_LIMIT_MS = 5 * 60 * 1000; // Test: 5 Minuten
+const IDLE_CONFIRM_MS = 60 * 1000;   // 60 Sekunden zum Bestätigen
+
 async function loginUser() {
     const username = document.getElementById("login_username").value.trim();
     const password = document.getElementById("login_password").value.trim();
@@ -52,11 +58,7 @@ async function startApp() {
     }
 
     await loadDispatchers();
-    if (status === "Offline" && isActiveDispatcher()) {
-    await leaveDispatcher();
-    }
-
-    loadDriverStatus();
+    await loadDriverStatus();
     await loadCompanies();
     updateJobForm();
     await loadJobs();
@@ -77,17 +79,17 @@ function setupRealtime() {
             { event: "*", schema: "public", table: "taxi_jobs" },
             (payload) => {
                 if (
-    payload.eventType === "INSERT" &&
-    payload.new &&
-    payload.new.job_status === "Offen"
-) {
-    playNewJobSound(true);
+                    payload.eventType === "INSERT" &&
+                    payload.new &&
+                    payload.new.job_status === "Offen"
+                ) {
+                    playNewJobSound(true);
 
-    showToast(
-        "📞 Neuer Auftrag",
-        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
-    );
-}
+                    showToast(
+                        "📞 Neuer Auftrag",
+                        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
+                    );
+                }
 
                 loadJobs();
             }
@@ -231,6 +233,10 @@ async function leaveDispatcher() {
 }
 
 async function setDriverStatus(status) {
+    if (status === "Offline" && isActiveDispatcher()) {
+        await leaveDispatcher();
+    }
+
     const { error } = await client
         .from("taxi_driver_status")
         .upsert({
@@ -248,7 +254,9 @@ async function setDriverStatus(status) {
         return;
     }
 
-    loadDriverStatus();
+    await loadDispatchers();
+    await loadDriverStatus();
+    await loadDashboardStats();
 }
 
 async function loadDriverStatus() {
@@ -900,24 +908,6 @@ function toggleSection(id) {
     box.style.display = box.style.display === "none" ? "block" : "none";
 }
 
-function escapeHtml(value) {
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
-
-function escapeAttr(value) {
-    return escapeHtml(value);
-}
-let idleTimer = null;
-let idleConfirmTimer = null;
-
-const IDLE_LIMIT_MS = 5 * 60 * 1000; // Test: 5 Minuten
-const IDLE_CONFIRM_MS = 60 * 1000;   // 60 Sekunden zum Bestätigen
-
 function startIdleWatcher() {
     const events = ["mousemove", "keydown", "click", "touchstart"];
 
@@ -970,10 +960,20 @@ async function setUserOfflineBecauseIdle() {
 
     await setDriverStatus("Offline");
 
-    if (isActiveDispatcher()) {
-        await leaveDispatcher();
-    }
-
     alert("Du wurdest wegen Inaktivität auf Offline gesetzt.");
 }
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+    return escapeHtml(value);
+}
+
 startApp();
