@@ -75,11 +75,18 @@ function setupRealtime() {
                 table: "taxi_jobs"
             },
             (payload) => {
-                if (
-                    payload.eventType === "INSERT" &&
-                    payload.new.job_status === "Offen"
-                ) {
-                    playNewJobSound();
+               if (
+    payload.eventType === "INSERT" &&
+    payload.new.job_status === "Offen"
+) {
+
+    playNewJobSound();
+
+    showToast(
+        "📞 Neuer Auftrag",
+        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
+    );
+}
                 }
 
                 loadJobs();
@@ -908,5 +915,24 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+function showToast(title, message) {
 
+    const container = document.getElementById("toastContainer");
+
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = "toast";
+
+    toast.innerHTML = `
+        <div class="toast-title">${title}</div>
+        <div class="toast-message">${message}</div>
+    `;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 4500);
+}
 startApp();
