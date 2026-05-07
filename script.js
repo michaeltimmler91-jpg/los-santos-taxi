@@ -709,7 +709,7 @@ async function loadOpenJobs() {
 
     data.forEach(job => {
         box.innerHTML += `
-            <div class="ride-card">
+            <div class="admin-card">
                 <strong>${escapeHtml(job.ride_type)}</strong><br>
                 📍 Abholung: ${escapeHtml(job.pickup_location || "-")}<br>
                 🎯 Ziel: ${escapeHtml(job.destination || "-")}<br>
@@ -717,7 +717,7 @@ async function loadOpenJobs() {
                 🏢 Firma: ${escapeHtml(job.company_name || "-")}<br>
                 🚑 EMS: ${escapeHtml(job.ems_staff_name || "-")}<br>
                 📝 ${escapeHtml(job.notes || "-")}<br>
-                <button class="small-btn" onclick="takeJob('${job.id}')">Übernehmen</button>
+                <div class="admin-actions"> <button class="small-btn" onclick="takeJob('${job.id}')">Übernehmen</button> </div>
             </div>
         `;
     });
@@ -749,7 +749,7 @@ async function loadMyJobs() {
         ` : "";
 
         box.innerHTML += `
-            <div class="ride-card">
+            <div class="admin-card">
                 <strong>${escapeHtml(job.ride_type)}</strong><br>
                 📍 Abholung: ${escapeHtml(job.pickup_location || "-")}<br>
                 🏢 Firma: ${escapeHtml(job.company_name || "-")}<br>
@@ -795,9 +795,9 @@ async function loadMyJobs() {
                     </div>
                 </div>
 
-                <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
-                <button class="small-btn" onclick="releaseJob('${job.id}')">Auftrag freigeben</button>
-                <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">Fahrgast nicht angetroffen</button>
+                <div class="admin-actions"> <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button> </div
+                <div class="admin-actions"> <button class="small-btn" onclick="releaseJob('${job.id}')">Auftrag freigeben</button> </div>
+                <div class="admin-actions"> <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">Fahrgast nicht angetroffen</button> </div>
             </div>
         `;
 
