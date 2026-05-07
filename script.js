@@ -72,16 +72,17 @@ function setupRealtime() {
             { event: "*", schema: "public", table: "taxi_jobs" },
             (payload) => {
                 if (
-                    payload.eventType === "INSERT" &&
-                    payload.new.job_status === "Offen"
-                ) {
-                    playNewJobSound();
+    payload.eventType === "INSERT" &&
+    payload.new &&
+    payload.new.job_status === "Offen"
+) {
+    playNewJobSound(true);
 
-                    showToast(
-                        "📞 Neuer Auftrag",
-                        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
-                    );
-                }
+    showToast(
+        "📞 Neuer Auftrag",
+        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
+    );
+}
 
                 loadJobs();
             }
