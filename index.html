@@ -87,7 +87,20 @@
                     </button>
                 </div>
             </div>
+            <div class="card mini-dispatcher">
+                <div>
+                    <strong>🚕 Fahrerstatus</strong><br>
+                    <span id="driver_status_text">Status: Offline</span>
+                    <br><br>
+                    <div id="active_drivers_list"></div>
+                </div>
 
+                <div class="dispatcher-buttons">
+                    <button class="small-btn" onclick="setDriverStatus('Im Dienst')">🟢 Dienst</button>
+                    <button class="small-btn" onclick="setDriverStatus('Pause')">🟡 Pause</button>
+                    <button class="small-btn danger-btn" onclick="setDriverStatus('Offline')">🔴 Offline</button>
+                </div>
+            </div>
         </div>
 
         <div class="card" id="createJobBox" style="display:none;">
