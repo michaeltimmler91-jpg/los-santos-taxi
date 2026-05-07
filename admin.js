@@ -541,4 +541,24 @@ async function loadAdminStats() {
     document.getElementById("adminStatOpenJobs").innerText = openJobs;
     document.getElementById("adminStatTips").innerText = `${totalTips}$`;
 }
+function showAdminTab(tabId) {
+
+    document.querySelectorAll(".admin-tab-content")
+        .forEach(tab => {
+            tab.style.display = "none";
+        });
+
+    document.querySelectorAll(".admin-tab-btn")
+        .forEach(btn => {
+            btn.classList.remove("active");
+        });
+
+    const target = document.getElementById(tabId);
+
+    if (target) {
+        target.style.display = "block";
+    }
+
+    event.target.classList.add("active");
+}
 startAdmin();
