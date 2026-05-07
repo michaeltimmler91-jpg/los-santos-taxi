@@ -102,7 +102,28 @@
                 </div>
             </div>
         </div>
+<div class="card mini-dispatcher">
+    <div>
+        <strong>🔔 Auftragssound</strong><br>
+        <span id="sound_status_text">Sound: An</span>
+    </div>
 
+    <div class="dispatcher-buttons">
+        <select id="sound_select" onchange="saveSoundSettings()">
+            <option value="bing.mp3">Bing</option>
+            <option value="bell.mp3">Bell</option>
+            <option value="funk.mp3">Funk</option>
+        </select>
+
+        <button class="small-btn" onclick="toggleSound()" id="soundToggleBtn">
+            Sound aus
+        </button>
+
+        <button class="small-btn" onclick="testSound()">
+            Test
+        </button>
+    </div>
+</div>
         <div class="card" id="createJobBox" style="display:none;">
             <h2>📞 Leitstelle: Auftrag erstellen</h2>
 
