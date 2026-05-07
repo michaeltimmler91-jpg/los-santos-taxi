@@ -12,30 +12,31 @@
 
 <div class="container">
 
-    <div class="top-header">
+    <div class="admin-topbar">
+
         <div>
             <a href="index.html">
-                <button class="small-btn">⬅ Zur Leitstelle</button>
+                <button class="small-btn">← Zur Leitstelle</button>
             </a>
         </div>
 
-        <div class="header">
+        <div class="admin-title">
             <h1>👑 Taxi Adminbereich</h1>
             <p>Benutzer, Firmen, Fahrten & Trinkgeld</p>
         </div>
 
-        <div class="login-info" id="adminLoginInfo">
-            <div>
-                Eingeloggt als<br>
-                <strong id="adminUserName">-</strong>
-            </div>
-            <button class="small-btn" onclick="logoutAdmin()">Logout</button>
+        <div class="admin-userbox">
+            Eingeloggt als<br>
+            <strong id="adminUserName">-</strong><br>
+            <button class="small-btn danger-btn" onclick="logoutAdmin()">Logout</button>
         </div>
+
     </div>
 
-    <div id="adminAccessDenied" class="card" style="display:none;">
+    <div id="adminAccessDenied" class="admin-section" style="display:none;">
         <h2>Kein Zugriff</h2>
         <p>Du bist kein Admin.</p>
+
         <a href="index.html">
             <button>Zurück zur Leitstelle</button>
         </a>
@@ -43,67 +44,103 @@
 
     <div id="adminApp" style="display:none;">
 
-        <div class="card">
-            <h2>🎁 Trinkgeld-Auswertung</h2>
-            <div id="tips_stats"></div>
-        </div>
+        <div class="admin-dashboard-grid">
 
-        <div class="card">
-            <h2>👥 Benutzer erstellen</h2>
-
-            <div class="form-grid">
-                <div class="field">
-                    <label>Benutzername</label>
-                    <input type="text" id="new_username">
-                </div>
-
-                <div class="field">
-                    <label>Anzeigename</label>
-                    <input type="text" id="new_display_name">
-                </div>
-
-                <div class="field">
-                    <label>Passwort</label>
-                    <input type="text" id="new_password">
-                </div>
-
-                <div class="field">
-                    <label>Rolle</label>
-                    <select id="new_role">
-                        <option value="fahrer">Fahrer</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
+            <div class="admin-kpi">
+                <div class="admin-kpi-label">Fahrer</div>
+                <div class="admin-kpi-value" id="adminStatDrivers">0</div>
             </div>
 
-            <button onclick="createUser()">Benutzer erstellen</button>
-        </div>
-
-        <div class="card">
-            <h2>👥 Benutzerverwaltung</h2>
-            <div id="users_list"></div>
-        </div>
-
-        <div class="card">
-            <h2>🏢 Liefer-Unternehmen</h2>
-
-            <div class="form-grid">
-                <div class="field">
-                    <label>Neues Unternehmen</label>
-                    <input type="text" id="new_company_name">
-                </div>
+            <div class="admin-kpi">
+                <div class="admin-kpi-label">Firmen</div>
+                <div class="admin-kpi-value" id="adminStatCompanies">0</div>
             </div>
 
-            <button onclick="createCompany()">Unternehmen hinzufügen</button>
+            <div class="admin-kpi">
+                <div class="admin-kpi-label">Offene Aufträge</div>
+                <div class="admin-kpi-value" id="adminStatOpenJobs">0</div>
+            </div>
 
-            <br><br>
+            <div class="admin-kpi">
+                <div class="admin-kpi-label">Trinkgeld Gesamt</div>
+                <div class="admin-kpi-value" id="adminStatTips">0$</div>
+            </div>
 
-            <div id="companies_list"></div>
         </div>
 
-        <div class="card">
-            <h2>✅ Erledigte Fahrten bearbeiten/löschen</h2>
-            <div id="admin_done_jobs"></div>
+        <div class="admin-layout">
+
+            <div>
+
+                <div class="admin-section">
+                    <h2>🎁 Trinkgeld-Auswertung</h2>
+                    <div id="tips_stats"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>✅ Erledigte Fahrten bearbeiten/löschen</h2>
+                    <div id="admin_done_jobs"></div>
+                </div>
+
+            </div>
+
+            <div>
+
+                <div class="admin-section">
+                    <h2>👥 Benutzer erstellen</h2>
+
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Benutzername</label>
+                            <input type="text" id="new_username">
+                        </div>
+
+                        <div class="field">
+                            <label>Anzeigename</label>
+                            <input type="text" id="new_display_name">
+                        </div>
+
+                        <div class="field">
+                            <label>Passwort</label>
+                            <input type="text" id="new_password">
+                        </div>
+
+                        <div class="field">
+                            <label>Rolle</label>
+                            <select id="new_role">
+                                <option value="fahrer">Fahrer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="createUser()">Benutzer erstellen</button>
+                </div>
+
+                <div class="admin-section">
+                    <h2>👥 Benutzerverwaltung</h2>
+                    <div id="users_list"></div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>🏢 Liefer-Unternehmen</h2>
+
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Neues Unternehmen</label>
+                            <input type="text" id="new_company_name">
+                        </div>
+                    </div>
+
+                    <button onclick="createCompany()">Unternehmen hinzufügen</button>
+
+                    <br><br>
+
+                    <div id="companies_list"></div>
+                </div>
+
+            </div>
+
         </div>
 
     </div>
