@@ -161,11 +161,28 @@ function renderDispatchers() {
 }
 
 async function toggleDispatcherStatus() {
-    if (isActiveDispatcher()) {
-        await leaveDispatcher();
-    } else {
-        await takeDispatcher();
-    }
+    const ownStatusText =
+    document.getElementById("driver_status_text")?.innerText || "";
+
+const isAvailableForDispatcher =
+    ownStatusText.includes("Im Dienst") ||
+    ownStatusText.includes("Pause");
+
+if (isActiveDispatcher()) {
+    createBox.style.display = "block";
+} else {
+    createBox.style.display = "none";
+}
+
+const dispatcherBtn = document.getElementById("dispatcherToggleBtn");
+
+if (!dispatcherBtn) return;
+
+if (!isAvailableForDispatcher && !isActiveDispatcher()) {
+    dispatcherBtn.style.display = "none";
+} else {
+    dispatcherBtn.style.display = "inline-block";
+}
 
     updateDispatcherButton();
 }
