@@ -878,6 +878,9 @@ function playNewJobSound(force = false) {
     if (!sound) return;
 
     const selectedSound = localStorage.getItem("taxiSoundFile") || "bing.mp3";
+    if (selectedSound === "OFF") {
+    return;
+    }
     sound.src = selectedSound;
     sound.currentTime = 0;
 
