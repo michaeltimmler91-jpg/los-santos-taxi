@@ -52,10 +52,11 @@ async function startApp() {
     }
 
     await loadDispatchers();
+    await loadDriverStatus();
     await loadCompanies();
     updateJobForm();
     await loadJobs();
-
+    await loadDriverStatus();
     setupRealtime();
 }
 function playNewJobSound() {
@@ -76,6 +77,17 @@ function setupRealtime() {
 
     client
         .channel("taxi-live-jobs")
+        .on(
+    "postgres_changes",
+    {
+        event: "*",
+        schema: "public",
+        table: "taxi_driver_status"
+    },
+    () => {
+        loadDriverStatus();
+    }
+)
         .on(
             "postgres_changes",
             {
@@ -773,3 +785,67 @@ async function markNoShow(jobId) {
     loadJobs();
 }
 startApp();
+async function setDriverStatus(status) {
+    const { error } = await client
+        .from("taxi_driver_status")
+        .upsert({
+            username: currentUser.username,
+            display_name: currentUser.display_name,
+            status: status,
+            updated_at: new Date().toISOString()
+        }, {
+            onConflict: "username"
+        });
+
+    if (error) {
+        alert("Status konnte nicht gespeichert werden.");
+        console.error(error);
+        return;
+    }
+
+    loadDriverStatus();
+}
+
+async function loadDriverStatus() {
+    const { data, error } = await client
+        .from("taxi_driver_status")
+        .select("*")
+        .order("display_name", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const own = data.find(d => d.username === currentUser.username);
+    const text = document.getElementById("driver_status_text");
+
+    if (text) {
+        text.innerText = `Status: ${own ? own.status : "Offline"}`;
+    }
+
+    const activeBox = document.getElementById("active_drivers_list");
+
+    if (!activeBox) return;
+
+    const activeDrivers = data.filter(d => d.status === "Im Dienst");
+    const pausedDrivers = data.filter(d => d.status === "Pause");
+
+    let html = "";
+
+    if (activeDrivers.length > 0) {
+        html += "<strong>Im Dienst:</strong><br>";
+        activeDrivers.forEach(driver => {
+            html += `🟢 ${escapeHtml(driver.display_name)}<br>`;
+        });
+    }
+
+    if (pausedDrivers.length > 0) {
+        html += "<br><strong>Pause:</strong><br>";
+        pausedDrivers.forEach(driver => {
+            html += `🟡 ${escapeHtml(driver.display_name)}<br>`;
+        });
+    }
+
+    activeBox.innerHTML = html || "Keine Fahrer im Dienst.";
+}
