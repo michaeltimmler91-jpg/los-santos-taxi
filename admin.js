@@ -27,6 +27,7 @@ function startAdmin() {
     loadUsers();
     loadCompanies();
     loadAdminDoneJobs();
+    loadAdminStats();
 }
 
 function logoutAdmin() {
@@ -514,5 +515,30 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+async function loadAdminStats() {
+    const { data: users } = await client
+        .from("taxi_users")
+        .select("*");
 
+    const { data: companies } = await client
+        .from("taxi_companies")
+        .select("*");
+
+    const { data: jobs } = await client
+        .from("taxi_jobs")
+        .select("*");
+
+    const drivers = (users || []).filter(user => user.role === "fahrer").length;
+    const companyCount = (companies || []).length;
+    const openJobs = (jobs || []).filter(job => job.job_status === "Offen").length;
+
+    const totalTips = (jobs || [])
+        .filter(job => job.job_status === "Erledigt")
+        .reduce((sum, job) => sum + Number(job.tip_amount || 0), 0);
+
+    document.getElementById("adminStatDrivers").innerText = drivers;
+    document.getElementById("adminStatCompanies").innerText = companyCount;
+    document.getElementById("adminStatOpenJobs").innerText = openJobs;
+    document.getElementById("adminStatTips").innerText = `${totalTips}$`;
+}
 startAdmin();
