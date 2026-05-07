@@ -6,13 +6,14 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let currentUser = null;
 let companies = [];
 let activeDispatchers = [];
+let currentDriverStatus = "Offline";
 let realtimeStarted = false;
 
 let idleTimer = null;
 let idleConfirmTimer = null;
 
-const IDLE_LIMIT_MS = 5 * 60 * 1000; // Test: 5 Minuten
-const IDLE_CONFIRM_MS = 60 * 1000;   // 60 Sekunden zum Bestätigen
+const IDLE_LIMIT_MS = 5 * 60 * 1000;
+const IDLE_CONFIRM_MS = 60 * 1000;
 
 async function loginUser() {
     const username = document.getElementById("login_username").value.trim();
@@ -116,6 +117,10 @@ function isActiveDispatcher() {
     return activeDispatchers.some(d => d.username === currentUser.username);
 }
 
+function canTakeDispatcher() {
+    return currentDriverStatus === "Im Dienst" || currentDriverStatus === "Pause";
+}
+
 async function loadDispatchers() {
     const { data, error } = await client
         .from("taxi_dispatchers")
@@ -135,8 +140,9 @@ async function loadDispatchers() {
 function renderDispatchers() {
     const box = document.getElementById("dispatcher_status");
     const createBox = document.getElementById("createJobBox");
+    const dispatcherBtn = document.getElementById("dispatcherToggleBtn");
 
-    if (!box || !createBox) return;
+    if (!box || !createBox || !dispatcherBtn) return;
 
     let html = "";
 
@@ -157,39 +163,27 @@ function renderDispatchers() {
         createBox.style.display = "none";
     }
 
+    if (!canTakeDispatcher() && !isActiveDispatcher()) {
+        dispatcherBtn.style.display = "none";
+    } else {
+        dispatcherBtn.style.display = "inline-block";
+    }
+
     updateDispatcherButton();
 }
 
 async function toggleDispatcherStatus() {
-    const ownStatusText =
-    document.getElementById("driver_status_text")?.innerText || "";
-
-const isAvailableForDispatcher =
-    ownStatusText.includes("Im Dienst") ||
-    ownStatusText.includes("Pause");
-
-if (isActiveDispatcher()) {
-    createBox.style.display = "block";
-} else {
-    createBox.style.display = "none";
-}
-
-const dispatcherBtn = document.getElementById("dispatcherToggleBtn");
-
-if (!dispatcherBtn) return;
-
-if (!isAvailableForDispatcher && !isActiveDispatcher()) {
-    dispatcherBtn.style.display = "none";
-} else {
-    dispatcherBtn.style.display = "inline-block";
-}
+    if (isActiveDispatcher()) {
+        await leaveDispatcher();
+    } else {
+        await takeDispatcher();
+    }
 
     updateDispatcherButton();
 }
 
 function updateDispatcherButton() {
     const btn = document.getElementById("dispatcherToggleBtn");
-
     if (!btn) return;
 
     if (isActiveDispatcher()) {
@@ -202,7 +196,13 @@ function updateDispatcherButton() {
 }
 
 async function takeDispatcher() {
+    await loadDriverStatus();
     await loadDispatchers();
+
+    if (!canTakeDispatcher()) {
+        alert("Du musst auf Dienst oder Pause stehen, um die Leitstelle zu übernehmen.");
+        return;
+    }
 
     if (isActiveDispatcher()) {
         alert("Du bist bereits aktive Leitstelle.");
@@ -271,6 +271,8 @@ async function setDriverStatus(status) {
         return;
     }
 
+    currentDriverStatus = status;
+
     await loadDispatchers();
     await loadDriverStatus();
     await loadDashboardStats();
@@ -288,14 +290,14 @@ async function loadDriverStatus() {
     }
 
     const own = data.find(d => d.username === currentUser.username);
-    const text = document.getElementById("driver_status_text");
+    currentDriverStatus = own ? own.status : "Offline";
 
+    const text = document.getElementById("driver_status_text");
     if (text) {
-        text.innerText = `Status: ${own ? own.status : "Offline"}`;
+        text.innerText = `Status: ${currentDriverStatus}`;
     }
 
     const activeBox = document.getElementById("active_drivers_list");
-
     if (!activeBox) return;
 
     const activeDrivers = data.filter(d => d.status === "Im Dienst");
@@ -318,6 +320,8 @@ async function loadDriverStatus() {
     }
 
     activeBox.innerHTML = html || "<br>Keine Fahrer im Dienst.";
+
+    renderDispatchers();
 }
 
 async function loadCompanies() {
