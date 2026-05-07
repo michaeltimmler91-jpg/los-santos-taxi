@@ -656,6 +656,14 @@ async function loadMyJobs() {
                 </div>
 
                 <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
+
+                <button class="small-btn" onclick="releaseJob('${job.id}')">
+                Auftrag freigeben
+                </button>
+
+                <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">
+                Fahrgast nicht angetroffen
+                </button>
             </div>
         `;
 
@@ -720,5 +728,48 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+async function releaseJob(jobId) {
+    const ok = confirm("Auftrag wirklich wieder für andere Fahrer freigeben?");
 
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Offen",
+            assigned_driver: null,
+            assigned_at: null
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Auftrag konnte nicht freigegeben werden.");
+        console.error(error);
+        return;
+    }
+
+    loadJobs();
+}
+
+async function markNoShow(jobId) {
+    const ok = confirm("Fahrgast wirklich als nicht angetroffen markieren?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Nicht angetroffen",
+            completed_at: new Date().toISOString()
+        })
+        .eq("id", jobId);
+
+    if (error) {
+        alert("Auftrag konnte nicht markiert werden.");
+        console.error(error);
+        return;
+    }
+
+    loadJobs();
+}
 startApp();
