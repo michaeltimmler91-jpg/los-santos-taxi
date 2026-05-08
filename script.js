@@ -860,6 +860,11 @@ function loadSoundSettings() {
 
     if (btn) btn.innerText = soundEnabled ? "Sound aus" : "Sound an";
     if (text) text.innerText = soundEnabled ? "Sound: An" : "Sound: Aus";
+    const volume = localStorage.getItem("taxiSoundVolume") || "1";
+    const volumeInput = document.getElementById("sound_volume");
+
+    if (volumeInput) volumeInput.value = volume;
+    if (audio) audio.volume = Number(volume);
 }
 
 function saveSoundSettings() {
@@ -870,6 +875,12 @@ function saveSoundSettings() {
 
     localStorage.setItem("taxiSoundFile", select.value);
     audio.src = select.value;
+    const volumeInput = document.getElementById("sound_volume");
+
+    if (volumeInput) {
+    localStorage.setItem("taxiSoundVolume", volumeInput.value);
+    audio.volume = Number(volumeInput.value);
+    }
 }
 
 function toggleSound() {
@@ -897,7 +908,10 @@ function playNewJobSound(force = false) {
     const selectedSound = localStorage.getItem("taxiSoundFile") || "bing.mp3";
     sound.src = selectedSound;
     sound.currentTime = 0;
-
+    
+    const volume = localStorage.getItem("taxiSoundVolume") || "1";
+    sound.volume = Number(volume);
+    
     sound.play().catch(() => {
         console.log("Sound konnte nicht abgespielt werden.");
     });
