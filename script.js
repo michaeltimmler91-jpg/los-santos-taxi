@@ -958,11 +958,29 @@ function showToast(title, message) {
     }, 4500);
 }
 
-function toggleSection(id) {
-    const box = document.getElementById(id);
-    if (!box) return;
+function toggleSection(contentId, arrowId) {
 
-    box.style.display = box.style.display === "none" ? "block" : "none";
+    const content =
+        document.getElementById(contentId);
+
+    const arrow =
+        document.getElementById(arrowId);
+
+    if (!content || !arrow) return;
+
+    const isHidden =
+        content.style.display === "none";
+
+    if (isHidden) {
+
+        content.style.display = "block";
+        arrow.innerText = "▼";
+    }
+    else {
+
+        content.style.display = "none";
+        arrow.innerText = "▶";
+    }
 }
 
 function startIdleWatcher() {
