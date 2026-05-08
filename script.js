@@ -865,6 +865,11 @@ function loadSoundSettings() {
 
     if (volumeInput) volumeInput.value = volume;
     if (audio) audio.volume = Number(volume);
+    const volumeText = document.getElementById("sound_volume_text");
+
+    if (volumeText) {
+    volumeText.innerText = `${Math.round(Number(volume) * 100)}%`;
+    }
 }
 
 function saveSoundSettings() {
@@ -880,6 +885,11 @@ function saveSoundSettings() {
     if (volumeInput) {
     localStorage.setItem("taxiSoundVolume", volumeInput.value);
     audio.volume = Number(volumeInput.value);
+    }
+    const volumeText = document.getElementById("sound_volume_text");
+
+    if (volumeInput && volumeText) {
+    volumeText.innerText = `${Math.round(Number(volumeInput.value) * 100)}%`;
     }
 }
 
