@@ -174,25 +174,34 @@
                     </button>
                 </div>
 
-                <div class="sidebar-card">
-                    <div class="sidebar-title">🚦 Fahrerstatus</div>
+                <<div class="sidebar-card">
+    <div class="sidebar-title">🚦 Fahrerstatus</div>
 
-                    <div id="driver_status_text">Status: Offline</div>
+    <div id="driver_status_text">
+        Status: Offline
+    </div>
 
-                    <div class="status-buttons">
-                        <button onclick="setDriverStatus('Im Dienst')">🟢 Dienst</button>
-                        <button onclick="setDriverStatus('Pause')">🟡 Pause</button>
-                        <button class="danger-btn" onclick="setDriverStatus('Offline')">🔴 Offline</button>
-                    </div>
-                </div>
+    <div class="status-buttons">
+        <button onclick="setDriverStatus('Im Dienst')">
+            🟢 Dienst
+        </button>
 
-                <div class="sidebar-card">
-                    <div class="sidebar-title">👥 Fahrerübersicht</div>
+        <button onclick="setDriverStatus('Pause')">
+            🟡 Pause
+        </button>
 
-                    <div id="active_drivers_list">
-                        Keine Fahrer im Dienst.
-                    </div>
-                </div>
+        <button
+            class="danger-btn"
+            onclick="setDriverStatus('Offline')"
+        >
+            🔴 Offline
+        </button>
+    </div>
+
+    <div id="active_drivers_list">
+        Keine Fahrer im Dienst.
+    </div>
+</div>
 
                 <div class="sidebar-card sound-card">
                     <div class="sound-head">
