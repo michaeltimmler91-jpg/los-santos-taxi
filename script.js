@@ -525,9 +525,15 @@ function calculatePreview(jobId, rideType) {
         tip = invoice - fare;
     }
 
-    if (rideType === "Essenslieferung") {
+if (rideType === "Essenslieferung") {
+    const foodPaidBy = document.getElementById(`food_paid_by_${jobId}`)?.value || "firma";
+
+    if (foodPaidBy === "fahrer") {
+        tip = invoice - fare;
+    } else {
         tip = invoice - foodCost - fare;
     }
+}
 
     if (rideType === "EMS" || rideType === "Gebrauchtwagenhändler") {
         tip = invoice;
@@ -637,9 +643,10 @@ async function completeJob(jobId, rideType) {
             invoice_amount,
             tip_amount,
             food_cost,
+            food_paid_by: document.getElementById(`food_paid_by_${jobId}`)?.value || "firma",
             billed_to,
             notes: done_notes || jobData.notes
-        })
+            })
         .eq("id", jobId);
 
     if (error) {
