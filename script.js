@@ -869,7 +869,7 @@ async function loadMyJobs() {
                 </div>
 
                 <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
-                <button class="small-btn" onclick="releaseJob('${job.id}')">Auftrag freigeben</button>
+                <button class="small-btn secondary-btn" onclick="releaseJob('${job.id}')">Auftrag freigeben</button>
                 <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">Fahrgast nicht angetroffen</button>
             </div>
         `;
