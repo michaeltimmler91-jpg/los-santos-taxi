@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taxi Firmenauftrag</title>
 
-    <link rel="stylesheet" href="style.css?v=15">
+    <link rel="stylesheet" href="style.css?v=16">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -21,17 +21,19 @@
                 <div class="sub-title">Los Santos Taxi • Firmenservice</div>
             </div>
         </div>
-
-       
     </div>
 
     <div class="card" style="max-width:800px;margin:auto;">
 
         <h2>🍔 Auftrag an Taxi senden</h2>
 
+        <div id="fixed_company_box" class="admin-card" style="display:none;">
+            Firma: <strong id="fixed_company_name">-</strong>
+        </div>
+
         <div class="form-grid">
 
-            <div class="field">
+            <div class="field" id="company_select_field">
                 <label>Unternehmen</label>
                 <select id="company_name"></select>
             </div>
@@ -73,7 +75,7 @@
 
 </div>
 
-<script src="firma.js?v=15"></script>
+<script src="firma.js?v=16"></script>
 
 </body>
 </html>
