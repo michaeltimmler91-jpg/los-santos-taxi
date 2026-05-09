@@ -42,7 +42,7 @@ function showAdminTab(tabId) {
         tab.style.display = "none";
     });
 
-    document.querySelectorAll(".admin-tab-btn").forEach(btn => {
+    document.querySelectorAll(".admin-nav-btn").forEach(btn => {
         btn.classList.remove("active");
     });
 
