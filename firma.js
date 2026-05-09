@@ -254,10 +254,33 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+async function loadDriverCount() {
+    const formCard = document.getElementById("company_form_card");
+    const noDriverBox = document.getElementById("no_driver_box");
 
-loadCompanies();
-loadLastCompanyJobs();
+    if (!formCard || !noDriverBox) return;
 
+    const { data, error } = await client
+        .from("taxi_driver_status")
+        .select("*")
+        .eq("status", "Im Dienst");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    const count = data?.length || 0;
+
+    if (count <= 0) {
+        formCard.style.display = "none";
+        noDriverBox.style.display = "block";
+        return;
+    }
+
+    formCard.style.display = "block";
+    noDriverBox.style.display = "none";
+}
 async function loadLastCompanyJobs() {
 
     const box = document.getElementById("company_last_jobs");
@@ -362,3 +385,7 @@ async function loadLastCompanyJobs() {
 
     }).join("");
 }
+
+loadCompanies();
+loadLastCompanyJobs();
+
