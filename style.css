@@ -1741,3 +1741,197 @@ button:disabled:hover {
             0 0 0 rgba(239,68,68,0);
     }
 }
+/* =========================
+   COMPANY THEMES
+========================= */
+
+body[data-company-theme="yellow"] {
+    --company-color: #facc15;
+    --company-glow: rgba(250,204,21,0.22);
+}
+
+body[data-company-theme="orange"] {
+    --company-color: #fb923c;
+    --company-glow: rgba(251,146,60,0.24);
+}
+
+body[data-company-theme="red"] {
+    --company-color: #ef4444;
+    --company-glow: rgba(239,68,68,0.24);
+}
+
+body[data-company-theme="darkred"] {
+    --company-color: #991b1b;
+    --company-glow: rgba(153,27,27,0.28);
+}
+
+body[data-company-theme="blue"] {
+    --company-color: #60a5fa;
+    --company-glow: rgba(96,165,250,0.24);
+}
+
+body[data-company-theme="darkblue"] {
+    --company-color: #2563eb;
+    --company-glow: rgba(37,99,235,0.26);
+}
+
+body[data-company-theme="cyan"] {
+    --company-color: #22d3ee;
+    --company-glow: rgba(34,211,238,0.24);
+}
+
+body[data-company-theme="turquoise"] {
+    --company-color: #2dd4bf;
+    --company-glow: rgba(45,212,191,0.24);
+}
+
+body[data-company-theme="green"] {
+    --company-color: #4ade80;
+    --company-glow: rgba(74,222,128,0.24);
+}
+
+body[data-company-theme="lime"] {
+    --company-color: #a3e635;
+    --company-glow: rgba(163,230,53,0.24);
+}
+
+body[data-company-theme="darkgreen"] {
+    --company-color: #15803d;
+    --company-glow: rgba(21,128,61,0.28);
+}
+
+body[data-company-theme="purple"] {
+    --company-color: #a78bfa;
+    --company-glow: rgba(167,139,250,0.24);
+}
+
+body[data-company-theme="violet"] {
+    --company-color: #8b5cf6;
+    --company-glow: rgba(139,92,246,0.25);
+}
+
+body[data-company-theme="pink"] {
+    --company-color: #f472b6;
+    --company-glow: rgba(244,114,182,0.25);
+}
+
+body[data-company-theme="magenta"] {
+    --company-color: #e879f9;
+    --company-glow: rgba(232,121,249,0.25);
+}
+
+body[data-company-theme="white"] {
+    --company-color: #f8fafc;
+    --company-glow: rgba(248,250,252,0.20);
+}
+
+body[data-company-theme="silver"] {
+    --company-color: #cbd5e1;
+    --company-glow: rgba(203,213,225,0.22);
+}
+
+body[data-company-theme="gray"] {
+    --company-color: #94a3b8;
+    --company-glow: rgba(148,163,184,0.22);
+}
+
+body[data-company-theme="black"] {
+    --company-color: #e5e7eb;
+    --company-glow: rgba(255,255,255,0.16);
+}
+
+body[data-company-theme="gold"] {
+    --company-color: #fbbf24;
+    --company-glow: rgba(251,191,36,0.30);
+}
+
+body[data-company-theme="bronze"] {
+    --company-color: #b45309;
+    --company-glow: rgba(180,83,9,0.28);
+}
+
+body[data-company-theme="fire"] {
+    --company-color: #f97316;
+    --company-glow: rgba(249,115,22,0.32);
+}
+
+body[data-company-theme="ice"] {
+    --company-color: #67e8f9;
+    --company-glow: rgba(103,232,249,0.28);
+}
+
+body[data-company-theme="neon"] {
+    --company-color: #39ff14;
+    --company-glow: rgba(57,255,20,0.30);
+}
+
+body[data-company-theme="rainbow"] {
+    --company-color: #f472b6;
+    --company-glow: rgba(244,114,182,0.28);
+}
+
+/* Firmenportal nutzt Firmenfarbe */
+
+body[data-company-theme] .main-title,
+body[data-company-theme] .card h2,
+body[data-company-theme] .admin-card strong,
+body[data-company-theme] .ride-type-badge,
+body[data-company-theme] .tip-driver {
+    color: var(--company-color);
+}
+
+body[data-company-theme] button,
+body[data-company-theme] .admin-tab-btn.active {
+    background: var(--company-color);
+    box-shadow: 0 0 18px var(--company-glow);
+}
+
+body[data-company-theme] .logo-icon,
+body[data-company-theme] .card,
+body[data-company-theme] .admin-card,
+body[data-company-theme] .ride-card {
+    border-color: var(--company-glow);
+}
+
+body[data-company-theme] .ride-card,
+body[data-company-theme] .admin-card {
+    border-left-color: var(--company-color);
+}
+
+body[data-company-theme] .ride-type-badge {
+    background: var(--company-glow);
+    border-color: var(--company-glow);
+}
+
+/* Spezial: Rainbow */
+
+body[data-company-theme="rainbow"] .main-title,
+body[data-company-theme="rainbow"] .card h2,
+body[data-company-theme="rainbow"] .admin-card strong {
+    background: linear-gradient(
+        90deg,
+        #ef4444,
+        #f97316,
+        #facc15,
+        #22c55e,
+        #38bdf8,
+        #a78bfa,
+        #f472b6
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+body[data-company-theme="rainbow"] button {
+    background: linear-gradient(
+        90deg,
+        #ef4444,
+        #f97316,
+        #facc15,
+        #22c55e,
+        #38bdf8,
+        #a78bfa,
+        #f472b6
+    );
+}
