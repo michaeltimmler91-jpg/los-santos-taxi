@@ -43,7 +43,9 @@
             <button onclick="showAdminTab('tab_tips')" class="admin-nav-btn">
                 🎁 Trinkgeld
             </button>
-
+            <button onclick="showAdminTab('tab_dealer')" class="admin-nav-btn">
+                🚗 Händler
+            </button>
         </nav>
 
         <div class="admin-sidebar-footer">
@@ -253,6 +255,22 @@
 
             </div>
 
+            <div class="admin-tab-content" id="tab_dealer" style="display:none;">
+
+    <div class="admin-section">
+        <h2>🚗 Gebrauchtwagenhändler-Abrechnung</h2>
+
+        <div id="dealer_stats"></div>
+
+        <br>
+
+        <button class="danger-btn" onclick="payDealerMonth()">
+            💰 Monat abrechnen / zurücksetzen
+        </button>
+    </div>
+
+</div>
+            
             <!-- TRINKGELD -->
 
             <div class="admin-tab-content" id="tab_tips" style="display:none;">
