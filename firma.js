@@ -6,6 +6,7 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let companies = [];
 let fixedCompanyName = null;
 let currentJobId = null;
+let liveChannel = null;
 
 function getCompanyFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -77,24 +78,15 @@ async function sendCompanyJob() {
     resultBox.innerHTML = "";
 
     if (
-    !companyName ||
-    !code ||
-    !customerName ||
-    !destination ||
-    foodCost <= 0
-) {
+        !companyName ||
+        !code ||
+        !customerName ||
+        !destination ||
+        foodCost <= 0
+    ) {
         resultBox.innerHTML = `
             <div class="admin-card">
                 ❌ Bitte Code, Empfänger, Ziel und Essenskosten eintragen.
-            </div>
-        `;
-        return;
-    }
-
-    if (foodCost < 0) {
-        resultBox.innerHTML = `
-            <div class="admin-card">
-                ❌ Essenskosten dürfen nicht negativ sein.
             </div>
         `;
         return;
@@ -135,10 +127,10 @@ async function sendCompanyJob() {
             food_cost: foodCost,
             food_paid_by: "firma",
             notes: notes
-            }]);
-            .select()
-            .single();
-    
+        }])
+        .select()
+        .single();
+
     if (error) {
         console.error(error);
 
@@ -150,11 +142,11 @@ async function sendCompanyJob() {
         return;
     }
 
-currentJobId = data.id;
+    currentJobId = data.id;
 
-startLiveTracking();
-updateLiveStatus(data);
-    
+    startLiveTracking();
+    updateLiveStatus(data);
+
     resultBox.innerHTML = `
         <div class="admin-card">
             ✅ Auftrag wurde an das Taxi gesendet.
@@ -166,6 +158,73 @@ updateLiveStatus(data);
     document.getElementById("destination").value = "";
     document.getElementById("food_cost").value = "0";
     document.getElementById("notes").value = "";
+}
+
+function updateLiveStatus(job) {
+    const box = document.getElementById("live_job_status");
+
+    if (!box) return;
+
+    box.style.display = "block";
+
+    let statusHtml = "";
+
+    if (job.job_status === "Offen") {
+        statusHtml = `
+            <div class="status-badge status-pause">
+                🟡 Auftrag offen
+            </div>
+        `;
+    }
+
+    if (job.job_status === "Übernommen") {
+        statusHtml = `
+            <div class="status-badge status-online">
+                🚕 Fahrer unterwegs: ${escapeHtml(job.assigned_driver || "-")}
+            </div>
+        `;
+    }
+
+    if (job.job_status === "Erledigt") {
+        statusHtml = `
+            <div class="status-badge status-online">
+                ✅ Lieferung abgeschlossen
+            </div>
+        `;
+    }
+
+    box.innerHTML = `
+        <strong>Live-Status</strong>
+        <br><br>
+        ${statusHtml}
+    `;
+}
+
+function startLiveTracking() {
+    if (!currentJobId) return;
+
+    if (liveChannel) {
+        client.removeChannel(liveChannel);
+    }
+
+    liveChannel = client
+        .channel(`firma-job-live-${currentJobId}`)
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_jobs"
+            },
+            payload => {
+                if (!payload.new) return;
+
+                if (payload.new.id === currentJobId) {
+                    updateLiveStatus(payload.new);
+                }
+            }
+        )
+        .subscribe();
 }
 
 function escapeHtml(value) {
@@ -182,74 +241,3 @@ function escapeAttr(value) {
 }
 
 loadCompanies();
-function updateLiveStatus(job) {
-
-    const box = document.getElementById("live_job_status");
-
-    if (!box) return;
-
-    box.style.display = "block";
-
-    let statusHtml = "";
-
-    if (job.job_status === "Offen") {
-
-        statusHtml = `
-            <div class="status-badge status-pause">
-                🟡 Auftrag offen
-            </div>
-        `;
-    }
-
-    if (job.job_status === "Übernommen") {
-
-        statusHtml = `
-            <div class="status-badge status-online">
-                🚕 Fahrer unterwegs: ${escapeHtml(job.assigned_driver || "-")}
-            </div>
-        `;
-    }
-
-    if (job.job_status === "Erledigt") {
-
-        statusHtml = `
-            <div class="status-badge status-online">
-                ✅ Lieferung abgeschlossen
-            </div>
-        `;
-    }
-
-    box.innerHTML = `
-        <strong>Live-Status</strong>
-        <br><br>
-
-        ${statusHtml}
-    `;
-}
-
-function startLiveTracking() {
-
-    if (!currentJobId) return;
-
-    client
-        .channel("firma-job-live")
-
-        .on(
-            "postgres_changes",
-            {
-                event: "*",
-                schema: "public",
-                table: "taxi_jobs"
-            },
-            payload => {
-
-                if (!payload.new) return;
-
-                if (payload.new.id === currentJobId) {
-                    updateLiveStatus(payload.new);
-                }
-            }
-        )
-
-        .subscribe();
-}
