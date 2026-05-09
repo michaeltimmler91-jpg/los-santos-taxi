@@ -930,7 +930,7 @@ function playNewJobSound(force = false) {
     const volume = localStorage.getItem("taxiSoundVolume") || "1";
 
     sound.src = selectedSound;
-    sound.volume = Number(volume);
+    sound.volume = Number(volume) * 0.15;
     sound.currentTime = 0;
 
     sound.play().catch(() => {
