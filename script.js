@@ -802,12 +802,32 @@ async function loadMyJobs() {
         ` : "";
 
         box.innerHTML += `
-            <div class="ride-card">
-                <strong>${escapeHtml(job.ride_type)}</strong><br>
-                📍 Abholung: ${escapeHtml(job.pickup_location || "-")}<br>
-                🏢 Firma: ${escapeHtml(job.company_name || "-")}<br>
-                🚑 EMS: ${escapeHtml(job.ems_staff_name || "-")}<br>
-                📝 ${escapeHtml(job.notes || "-")}<br><br>
+            <div class="ride-card ride-card-modern">
+    <div class="ride-top">
+        <span class="ride-type-badge">${escapeHtml(job.ride_type)}</span>
+        <span class="ride-status-badge taken">Übernommen</span>
+    </div>
+
+    <div class="ride-route">
+        <div>
+            <small>Abholung</small>
+            <strong>${escapeHtml(job.pickup_location || "-")}</strong>
+        </div>
+
+        <div class="ride-arrow">→</div>
+
+        <div>
+            <small>Ziel</small>
+            <strong>${escapeHtml(job.destination || "-")}</strong>
+        </div>
+    </div>
+
+    <div class="ride-info-grid">
+        <div>🏢 ${escapeHtml(job.company_name || "-")}</div>
+        <div>🚑 ${escapeHtml(job.ems_staff_name || "-")}</div>
+        <div>👤 ${escapeHtml(job.customer_name || "-")}</div>
+        <div>📝 ${escapeHtml(job.notes || "-")}</div>
+    </div>
 
                 <div class="form-grid">
                     <div class="field">
