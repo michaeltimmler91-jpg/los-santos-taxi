@@ -806,12 +806,33 @@ async function loadMyJobs() {
     box.innerHTML = "";
 
     data.forEach(job => {
-        const foodFields = job.ride_type === "Essenslieferung" ? `
-            <div class="field">
-                <label>Essenskosten</label>
-                <input type="number" id="food_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
-            </div>
-        ` : "";
+       const foodFields = job.ride_type === "Essenslieferung" ? `
+    <div class="field">
+        <label>Essenskosten</label>
+        <input
+            type="number"
+            id="food_${job.id}"
+            value="${job.food_cost || 0}"
+            oninput="calculatePreview('${job.id}', '${job.ride_type}')"
+        >
+    </div>
+
+    <div class="field">
+        <label>Essengeld bezahlt durch</label>
+        <select
+            id="food_paid_by_${job.id}"
+            onchange="calculatePreview('${job.id}', '${job.ride_type}')"
+        >
+            <option value="firma" ${job.food_paid_by !== "fahrer" ? "selected" : ""}>
+                Firma / Schließfach
+            </option>
+
+            <option value="fahrer" ${job.food_paid_by === "fahrer" ? "selected" : ""}>
+                Fahrer privat
+            </option>
+        </select>
+    </div>
+` : "";
 
         box.innerHTML += `
             <div class="ride-card ride-card-modern">
