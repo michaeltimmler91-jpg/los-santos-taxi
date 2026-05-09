@@ -21,7 +21,7 @@ function getCompanyFromUrl() {
 async function loadCompanies() {
     const select = document.getElementById("company_name");
 
-    fixedCompanyName = getCompanyFromUrl();
+    const companyUrlData = getCompanyFromUrl();
 
     const { data, error } = await client
         .from("taxi_companies")
@@ -37,28 +37,43 @@ async function loadCompanies() {
 
     companies = data || [];
 
-    if (fixedCompanyName) {
-        const fixedCompany = companies.find(
-            company => company.company_name.toLowerCase() === fixedCompanyName.toLowerCase()
-        );
+    let fixedCompany = null;
 
-        if (fixedCompany) {
-            document.getElementById("company_select_field").style.display = "none";
-            document.getElementById("fixed_company_box").style.display = "block";
-            document.getElementById("fixed_company_name").innerText = fixedCompany.company_name;
+if (companyUrlData.id) {
 
-            select.innerHTML = `
-                <option value="${escapeAttr(fixedCompany.company_name)}">
-                    ${escapeHtml(fixedCompany.company_name)}
-                </option>
-            `;
+    fixedCompany = companies.find(
+        company => String(company.id) === String(companyUrlData.id)
+    );
+}
 
-            return;
-        }
+if (!fixedCompany && companyUrlData.firma) {
 
-        document.getElementById("fixed_company_box").style.display = "block";
-        document.getElementById("fixed_company_name").innerText = "Firma nicht gefunden";
-    }
+    fixedCompany = companies.find(
+        company =>
+            company.company_name.toLowerCase() ===
+            companyUrlData.firma.toLowerCase()
+    );
+}
+
+if (fixedCompany) {
+
+    fixedCompanyName = fixedCompany.company_name;
+
+    document.getElementById("company_select_field").style.display = "none";
+
+    document.getElementById("fixed_company_box").style.display = "block";
+
+    document.getElementById("fixed_company_name").innerText =
+        fixedCompany.company_name;
+
+    select.innerHTML = `
+        <option value="${escapeAttr(fixedCompany.company_name)}">
+            ${escapeHtml(fixedCompany.company_name)}
+        </option>
+    `;
+
+    return;
+}
 
     select.innerHTML = "";
 
