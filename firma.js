@@ -75,10 +75,16 @@ async function sendCompanyJob() {
 
     resultBox.innerHTML = "";
 
-    if (!companyName || !code || !customerName || !destination) {
+    if (
+    !companyName ||
+    !code ||
+    !customerName ||
+    !destination ||
+    foodCost <= 0
+) {
         resultBox.innerHTML = `
             <div class="admin-card">
-                ❌ Bitte Code, Empfänger und Ziel eintragen.
+                ❌ Bitte Code, Empfänger, Ziel und Essenskosten eintragen.
             </div>
         `;
         return;
