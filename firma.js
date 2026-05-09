@@ -267,7 +267,7 @@ async function loadLastCompanyJobs() {
         .eq("ride_type", "Essenslieferung")
         .neq("job_status", "Gelöscht")
         .order("created_at", { ascending: false })
-        .limit(10);
+        .limit(5);
 
     if (error) {
         console.error(error);
