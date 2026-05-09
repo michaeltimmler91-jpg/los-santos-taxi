@@ -79,7 +79,24 @@
     class="card"
     style="margin-top:24px;"
 >
-    <h2>📦 Letzte Aufträge</h2>
+    <div
+    style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:12px;
+        margin-bottom:18px;
+    "
+>
+    <h2 style="margin:0;">📦 Letzte Aufträge</h2>
+
+    <button
+        class="small-btn secondary-btn"
+        onclick="loadLastCompanyJobs()"
+    >
+        🔄 Aktualisieren
+    </button>
+</div>
 
     <div id="company_last_jobs">
         Lädt...
