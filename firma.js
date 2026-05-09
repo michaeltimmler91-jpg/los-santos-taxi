@@ -7,6 +7,7 @@ let companies = [];
 let fixedCompanyName = null;
 let currentJobId = null;
 let liveChannel = null;
+let currentThemeColor = "yellow";
 
 function getCompanyFromUrl() {
 
@@ -56,7 +57,11 @@ if (!fixedCompany && companyUrlData.firma) {
 }
 
 if (fixedCompany) {
+    
+currentThemeColor =
+    fixedCompany.theme_color || "yellow";
 
+applyCompanyTheme(currentThemeColor);
     fixedCompanyName = fixedCompany.company_name;
 
     document.getElementById("company_select_field").style.display = "none";
@@ -413,6 +418,12 @@ async function startCompanyPortal() {
 
     setInterval(loadDriverCount, 15000);
 }
+function applyCompanyTheme(color) {
 
+    document.body.setAttribute(
+        "data-company-theme",
+        color
+    );
+}
 startCompanyPortal();
 
