@@ -248,24 +248,98 @@ async function loadCompanies() {
     box.innerHTML = "";
 
     data.forEach(company => {
+
+        const companyLink =
+            `https://los-santos-taxi.michaeltimmler91.workers.dev/firma.html?firma=${encodeURIComponent(company.company_name)}`;
+
         box.innerHTML += `
             <div class="admin-card">
-                <strong>${escapeHtml(company.company_name)}</strong><br>
-                🔑 Firmen-Code: <strong>${escapeHtml(company.company_code || "Kein Code gesetzt")}</strong>
 
-                <div class="admin-actions">
-                    <button class="small-btn" onclick="editCompany('${company.id}', '${escapeAttr(company.company_name)}')">
-                        Namen ändern
-                    </button>
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:20px;
+                        align-items:flex-start;
+                        flex-wrap:wrap;
+                    "
+                >
 
-                    <button class="small-btn" onclick="editCompanyCode('${company.id}', '${escapeAttr(company.company_code || "")}')">
-                        Code ändern
-                    </button>
+                    <div>
 
-                    <button class="small-btn danger-btn" onclick="deleteCompany('${company.id}')">
-                        Löschen
-                    </button>
+                        <strong>
+                            ${escapeHtml(company.company_name)}
+                        </strong>
+
+                        <br>
+
+                        🎨 Farbe:
+                        <strong>
+                            ${escapeHtml(company.theme_color || "yellow")}
+                        </strong>
+
+                        <br>
+
+                        🔑 Firmen-Code:
+                        <strong>
+                            ${escapeHtml(company.company_code || "Kein Code gesetzt")}
+                        </strong>
+
+                        <br><br>
+
+                        🔗 Firmenlink:
+
+                        <br>
+
+                        <input
+                            type="text"
+                            readonly
+                            value="${companyLink}"
+                        >
+
+                    </div>
+
+                    <div class="admin-actions">
+
+                        <button
+                            class="small-btn"
+                            onclick="copyCompanyLink('${escapeAttr(companyLink)}')"
+                        >
+                            📋 Link kopieren
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="editCompany('${company.id}', '${escapeAttr(company.company_name)}')"
+                        >
+                            Namen ändern
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="editCompanyCode('${company.id}', '${escapeAttr(company.company_code || "")}')"
+                        >
+                            Code ändern
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="editCompanyColor('${company.id}', '${escapeAttr(company.theme_color || "yellow")}')"
+                        >
+                            Farbe ändern
+                        </button>
+
+                        <button
+                            class="small-btn danger-btn"
+                            onclick="deleteCompany('${company.id}')"
+                        >
+                            Löschen
+                        </button>
+
+                    </div>
+
                 </div>
+
             </div>
         `;
     });
