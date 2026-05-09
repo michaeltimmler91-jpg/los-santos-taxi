@@ -121,6 +121,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 22px;
+    position: sticky;
+    top: 20px;
 }
 
 .card,
