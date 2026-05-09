@@ -1,3 +1,910 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+
+    background:
+        linear-gradient(
+            rgba(8,12,20,0.94),
+            rgba(8,12,20,0.94)
+        ),
+        url('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?q=80&w=1920&auto=format&fit=crop');
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    color: white;
+    min-height: 100vh;
+}
+
+.container {
+    width: 95%;
+    max-width: 1600px;
+    margin: auto;
+    padding: 28px 0;
+}
+
+/* =========================
+   HEADER
+   TIP PAYOUT CARDS
+========================= */
+
+.modern-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 35px;
+    padding: 10px 0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+.tip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+}
+
+.logo-icon {
+    width: 70px;
+    height: 70px;
+
+    border-radius: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 38px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(250,204,21,0.22),
+            rgba(250,204,21,0.06)
+        );
+
+    border: 1px solid rgba(250,204,21,0.25);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35);
+}
+
+.main-title {
+    font-size: 46px;
+    font-weight: 900;
+
+    color: #facc15;
+
+    line-height: 1;
+}
+
+.sub-title {
+    color: #cbd5e1;
+    margin-top: 8px;
+    font-size: 18px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.header-user {
+    text-align: right;
+}
+
+.header-user-label {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.header-user-name {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card,
+.section-card,
+.sidebar-card,
+.stat-card {
+    background: rgba(5, 15, 35, 0.92);
+.tip-card {
+    background: linear-gradient(
+        145deg,
+        rgba(15,25,45,0.96),
+        rgba(5,15,35,0.96)
+    );
+
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 5px solid #facc15;
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+
+    backdrop-filter: blur(8px);
+}
+
+.card h2 {
+    color: #facc15;
+    margin-bottom: 18px;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+
+    gap: 28px;
+    align-items: start;
+}
+
+.dashboard-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.dashboard-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar-title {
+    font-size: 20px;
+    font-weight: bold;
+
+    color: #facc15;
+
+    margin-bottom: 14px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 22px;
+}
+
+.stat-card {
+    text-align: center;
+    transition: 0.25s;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+
+    border-color:
+        rgba(250,204,21,0.3);
+}
+
+.stat-title {
+    color: #cbd5e1;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.stat-value {
+    font-size: 52px;
+    font-weight: bold;
+
+    color: #facc15;
+
+    line-height: 1;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.section-header h2 {
+.tip-driver {
+    color: #facc15;
+    font-size: 28px;
+    margin: 0;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 18px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.field label {
+    color: #d1d5db;
+    font-size: 14px;
+}
+
+input,
+select {
+    background: rgba(15,25,45,0.95);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    color: white;
+    font-size: 15px;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+
+    border-color:
+        rgba(250,204,21,0.5);
+
+    box-shadow:
+        0 0 12px rgba(250,204,21,0.18);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    background: #facc15;
+    color: black;
+
+    border: none;
+
+    border-radius: 14px;
+
+    padding: 14px 20px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+    margin-top: 14px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 0 18px rgba(250,204,21,0.25);
+}
+
+.small-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+
+    margin-right: 8px;
+}
+
+.danger-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.danger-btn:hover {
+    background: #f87171;
+}
+
+.status-buttons,
+.sound-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    margin-top: 18px;
+}
+
+/* =========================
+   RIDES
+========================= */
+
+.ride-card {
+    background: rgba(15,25,45,0.9);
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+
+    border-left: 5px solid #facc15;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    margin-bottom: 18px;
+
+    line-height: 1.6;
+    font-size: 22px;
+    font-weight: 900;
+    margin-bottom: 16px;
+}
+
+.ride-card strong {
+.tip-open {
+    font-size: 36px;
+    font-weight: 900;
+    color: #facc15;
+    font-size: 18px;
+}
+
+.compact-ride {
+    display: grid;
+
+    grid-template-columns:
+        160px 100px 100px 100px auto;
+
+    gap: 14px;
+
+    align-items: center;
+
+    background: rgba(15,25,45,0.9);
+
+    border-left: 4px solid #facc15;
+
+    border-radius: 16px;
+
+    padding: 14px;
+
+    margin-bottom: 10px;
+}
+
+.compact-ride strong {
+    color: #facc15;
+}
+
+.preview-box {
+    background: rgba(8,15,30,0.95);
+
+    border-radius: 14px;
+
+    padding: 14px;
+
+    color: #facc15;
+    font-weight: bold;
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+}
+
+/* =========================
+   TEXT
+========================= */
+
+#active_drivers_list,
+#dispatcher_status {
+    color: #d1d5db;
+    line-height: 1.6;
+}
+
+/* =========================
+   TOASTS
+========================= */
+
+#toastContainer {
+    position: fixed;
+
+    top: 20px;
+    right: 20px;
+
+    z-index: 99999;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.toast {
+    min-width: 280px;
+    max-width: 360px;
+
+    background: rgba(5, 15, 35, 0.96);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-left: 5px solid #facc15;
+
+    padding: 16px;
+
+    border-radius: 14px;
+
+    color: white;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.4);
+
+    animation: toastIn 0.35s ease;
+}
+
+.toast-title {
+    font-weight: bold;
+    color: #facc15;
+    margin-bottom: 6px;
+}
+
+.toast-message {
+    font-size: 14px;
+    color: #d1d5db;
+}
+
+@keyframes toastIn {
+
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* =========================
+   SOUND CARD
+========================= */
+
+.sound-card {
+    padding: 22px;
+.tip-label {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.sound-head {
+.tip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+.sound-head .sidebar-title {
+    margin-bottom: 0;
+}
+
+.sound-state {
+    color: #86efac;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.sound-row {
+    display: grid;
+
+    grid-template-columns:
+        1fr auto auto;
+
+    gap: 10px;
+
+    align-items: center;
+}
+
+.sound-row select {
+    height: 44px;
+    padding: 0 14px;
+}
+
+.sound-row button {
+    margin-top: 0;
+    height: 44px;
+    white-space: nowrap;
+}
+
+.sound-volume-box {
+    margin-top: 20px;
+}
+
+.sound-volume-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    color: #d1d5db;
+
+    margin-bottom: 10px;
+}
+
+.sound-volume-label strong {
+    color: #facc15;
+}
+
+#sound_volume {
+    width: 100%;
+    padding: 0;
+    height: 6px;
+
+    accent-color: #facc15;
+}
+
+/* =========================
+   IDLE
+========================= */
+
+.idle-modal {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.75);
+
+    z-index: 999999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.idle-box {
+    background: rgba(5,15,35,0.98);
+
+    border:
+        1px solid rgba(250,204,21,0.35);
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    max-width: 420px;
+
+    text-align: center;
+
+    box-shadow:
+        0 0 35px rgba(0,0,0,0.5);
+}
+
+.idle-box h2 {
+    color: #facc15;
+    margin-bottom: 15px;
+}
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+
+.idle-box p {
+    color: #d1d5db;
+    margin-bottom: 20px;
+}
+
+/* =========================
+   ADMIN
+========================= */
+
+.admin-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 24px;
+
+    background: rgba(5, 15, 35, 0.94);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: 24px;
+
+    padding: 22px 26px;
+
+    margin-bottom: 28px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+
+    backdrop-filter: blur(10px);
+
+    position: sticky;
+    top: 15px;
+
+    z-index: 50;
+}
+
+.admin-title {
+    text-align: center;
+}
+
+.admin-title h1 {
+    margin: 0;
+    color: #facc15;
+    font-size: 38px;
+}
+
+.admin-title p {
+    color: #cbd5e1;
+    margin-top: 6px;
+}
+
+.admin-userbox {
+    text-align: right;
+}
+
+.admin-dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 22px;
+
+    margin-bottom: 28px;
+}
+
+.admin-kpi {
+    background: rgba(5, 15, 35, 0.92);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: 22px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-kpi::before {
+    content: "";
+
+    position: absolute;
+
+    width: 180px;
+    height: 180px;
+
+    background:
+        radial-gradient(circle,
+            rgba(250,204,21,0.15) 0%,
+            transparent 70%);
+
+    top: -60px;
+    right: -60px;
+}
+
+.admin-kpi-label {
+    color: #cbd5e1;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.admin-kpi-value {
+    color: #facc15;
+    font-size: 42px;
+    font-weight: 900;
+}
+
+.admin-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+
+    gap: 28px;
+    align-items: start;
+}
+
+.admin-section {
+    background: rgba(5, 15, 35, 0.92);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: 24px;
+
+    padding: 26px;
+
+    margin-bottom: 28px;
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+
+    backdrop-filter: blur(8px);
+}
+
+.admin-section h2 {
+    color: #facc15;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.admin-card {
+    background: rgba(15,25,45,0.9);
+
+    border-left: 5px solid #facc15;
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    margin-bottom: 16px;
+
+    line-height: 1.7;
+}
+
+.admin-card strong {
+    color: #facc15;
+}
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    margin-top: 14px;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    margin-bottom: 28px;
+}
+
+.admin-tab-btn {
+    background: rgba(15,25,45,0.92);
+
+    color: #dbe7ff;
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-radius: 16px;
+
+    padding: 14px 22px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.admin-tab-btn.active {
+    background: #facc15;
+    color: black;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.03);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(250,204,21,0.35);
+    border-radius: 20px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 1200px) {
+
+    .dashboard-layout,
+    .admin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+.tip-row strong {
+    color: white;
+}
+
+@media (max-width: 850px) {
+
+    .modern-header,
+    .admin-topbar {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .header-right {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .main-title {
+        font-size: 34px;
+    }
+
+    .stats-grid,
+    .admin-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compact-ride {
+        grid-template-columns: 1fr;
+    }
+
+    .sound-row {
+        grid-template-columns: 1fr;
+    }
+
+    button,
+    .small-btn {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .admin-tabs {
+        flex-direction: column;
+    }
+
+    .admin-tab-btn {
+        width: 100%;
+    }
+
+    .admin-userbox {
+        text-align: left;
+    }
+.tip-actions {
+    margin-top: 16px;
+}
+
 /* =========================
    TIP PAYOUT CARDS
 ========================= */
