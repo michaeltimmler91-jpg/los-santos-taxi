@@ -406,9 +406,13 @@ async function loadLastCompanyJobs() {
     }).join("");
 }
 
-loadCompanies();
-loadLastCompanyJobs();
-loadDriverCount();
+async function startCompanyPortal() {
+    await loadCompanies();
+    await loadLastCompanyJobs();
+    await loadDriverCount();
 
-setInterval(loadDriverCount, 15000);
+    setInterval(loadDriverCount, 15000);
+}
+
+startCompanyPortal();
 
