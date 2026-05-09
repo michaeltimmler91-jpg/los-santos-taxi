@@ -437,7 +437,7 @@ async function loadAdminDoneJobs() {
     const { data, error } = await client
         .from("taxi_jobs")
         .select("*")
-        .eq("job_status", "Erledigt")
+        .in("job_status", ["Erledigt", "Nicht angetroffen"])
         .order("completed_at", { ascending: false })
         .limit(50);
 
