@@ -27,6 +27,7 @@ async function startAdmin() {
     await loadUsers();
     await loadCompanies();
     await loadTipsStats();
+    await loadDealerStats();
     await loadAdminDoneJobs();
 
     loadDashboardOverview();
@@ -759,5 +760,92 @@ function copyCompanyLink(link) {
     navigator.clipboard.writeText(link);
 
     alert("Firmenlink kopiert.");
+}
+async function loadDealerStats() {
+    const box = document.getElementById("dealer_stats");
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("ride_type", "Gebrauchtwagenhändler")
+        .eq("job_status", "Erledigt")
+        .neq("dealer_paid", true)
+        .order("completed_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine offenen Händlerfahrten vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    const total = data.reduce((sum, job) => {
+        return sum + Number(job.invoice_amount || 0);
+    }, 0);
+
+    let html = `
+        <div class="admin-card">
+            <strong>Offene Monatssumme</strong><br><br>
+            <span style="font-size:42px;color:#facc15;font-weight:900;">
+                ${total}$
+            </span>
+            <br><br>
+            🚗 Offene Fahrten: ${data.length}
+        </div>
+    `;
+
+    data.forEach(job => {
+        html += `
+            <div class="admin-card">
+                <strong>${escapeHtml(job.assigned_driver || "-")}</strong><br><br>
+
+                👤 Kunde: ${escapeHtml(job.customer_name || "-")}<br>
+                📍 Strecke: ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}<br>
+                🚕 KM: ${job.kilometers || 0}<br>
+                🧾 Rechnung: ${job.invoice_amount || 0}$<br>
+                📝 Notiz: ${escapeHtml(job.notes || "-")}
+            </div>
+        `;
+    });
+
+    box.innerHTML = html;
+}
+
+async function payDealerMonth() {
+    const ok = confirm(
+        "Alle offenen Gebrauchtwagenhändler-Fahrten wirklich als bezahlt markieren?"
+    );
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            dealer_paid: true
+        })
+        .eq("ride_type", "Gebrauchtwagenhändler")
+        .eq("job_status", "Erledigt")
+        .neq("dealer_paid", true);
+
+    if (error) {
+        console.error(error);
+        alert("Abrechnung konnte nicht zurückgesetzt werden.");
+        return;
+    }
+
+    alert("Händlerabrechnung wurde zurückgesetzt.");
+
+    await loadDealerStats();
+    await loadAdminStats();
 }
 startAdmin();
