@@ -4,9 +4,17 @@ const SUPABASE_ANON_KEY = "sb_publishable_AkIVrLBsgIV2jYJ5gGsBmw_f7P62KTK";
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let companies = [];
+let fixedCompanyName = null;
+
+function getCompanyFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("firma");
+}
 
 async function loadCompanies() {
     const select = document.getElementById("company_name");
+
+    fixedCompanyName = getCompanyFromUrl();
 
     const { data, error } = await client
         .from("taxi_companies")
@@ -21,6 +29,29 @@ async function loadCompanies() {
     }
 
     companies = data || [];
+
+    if (fixedCompanyName) {
+        const fixedCompany = companies.find(
+            company => company.company_name.toLowerCase() === fixedCompanyName.toLowerCase()
+        );
+
+        if (fixedCompany) {
+            document.getElementById("company_select_field").style.display = "none";
+            document.getElementById("fixed_company_box").style.display = "block";
+            document.getElementById("fixed_company_name").innerText = fixedCompany.company_name;
+
+            select.innerHTML = `
+                <option value="${escapeAttr(fixedCompany.company_name)}">
+                    ${escapeHtml(fixedCompany.company_name)}
+                </option>
+            `;
+
+            return;
+        }
+
+        document.getElementById("fixed_company_box").style.display = "block";
+        document.getElementById("fixed_company_name").innerText = "Firma nicht gefunden";
+    }
 
     select.innerHTML = "";
 
@@ -47,7 +78,7 @@ async function sendCompanyJob() {
     if (!companyName || !code || !customerName || !destination) {
         resultBox.innerHTML = `
             <div class="admin-card">
-                ❌ Bitte Unternehmen, Code, Empfänger und Ziel eintragen.
+                ❌ Bitte Code, Empfänger und Ziel eintragen.
             </div>
         `;
         return;
