@@ -307,7 +307,24 @@ async function loadDriverStatus() {
 
     const text = document.getElementById("driver_status_text");
     if (text) {
-        text.innerText = `Status: ${currentDriverStatus}`;
+        let badgeClass = "status-offline";
+let badgeText = "🔴 Offline";
+
+if (currentDriverStatus === "Im Dienst") {
+    badgeClass = "status-online";
+    badgeText = "🟢 Im Dienst";
+}
+
+if (currentDriverStatus === "Pause") {
+    badgeClass = "status-pause";
+    badgeText = "🟡 Pause";
+}
+
+text.innerHTML = `
+    <div class="status-badge ${badgeClass}">
+        ${badgeText}
+    </div>
+`;
     }
 
     const activeBox = document.getElementById("active_drivers_list");
