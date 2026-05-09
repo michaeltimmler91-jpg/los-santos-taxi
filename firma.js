@@ -148,10 +148,25 @@ async function sendCompanyJob() {
     updateLiveStatus(data);
 
     resultBox.innerHTML = `
-        <div class="admin-card">
-            ✅ Auftrag wurde an das Taxi gesendet.
+    <div class="admin-card success-card">
+        <div style="font-size:48px;margin-bottom:12px;">
+            ✅
         </div>
-    `;
+
+        <strong style="font-size:24px;">
+            Auftrag erfolgreich gesendet
+        </strong>
+
+        <br><br>
+
+        Das Taxi wurde informiert.
+    </div>
+`;
+
+document.getElementById("company_form_card")
+    .scrollIntoView({
+        behavior: "smooth"
+    });
 
     document.getElementById("company_code").value = "";
     document.getElementById("customer_name").value = "";
