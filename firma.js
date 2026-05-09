@@ -265,6 +265,7 @@ async function loadLastCompanyJobs() {
         .select("*")
         .eq("company_name", companyName)
         .eq("ride_type", "Essenslieferung")
+        .neq("job_status", "Gelöscht")
         .order("created_at", { ascending: false })
         .limit(10);
 
