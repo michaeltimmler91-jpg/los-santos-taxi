@@ -249,8 +249,7 @@ async function loadCompanies() {
 
     data.forEach(company => {
 
-        const companyLink =
-            `https://los-santos-taxi.michaeltimmler91.workers.dev/firma.html?firma=${encodeURIComponent(company.company_name)}`;
+        const companyLink = `https://los-santos-taxi.michaeltimmler91.workers.dev/firma.html?id=${company.id}`;
 
         box.innerHTML += `
             <div class="admin-card">
