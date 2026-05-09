@@ -1474,3 +1474,37 @@ input[type="range"] {
             transparent
         );
 }
+/* =========================
+   BUTTON POLISH
+========================= */
+
+button {
+    letter-spacing: 0.2px;
+}
+
+.ride-actions button,
+.admin-actions button {
+    margin-top: 0;
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.small-btn.secondary-btn {
+    background: rgba(255,255,255,0.08);
+    color: #e5e7eb;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.small-btn.secondary-btn:hover {
+    border-color: rgba(250,204,21,0.25);
+}
