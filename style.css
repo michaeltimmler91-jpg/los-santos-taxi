@@ -1534,3 +1534,30 @@ button:disabled:hover {
     animation:
         jobPulse 3.5s infinite;
 }
+/* =========================
+   KPI COLORS
+========================= */
+
+.stat-open {
+    border-left: 5px solid #facc15;
+}
+
+.stat-taken {
+    border-left: 5px solid #60a5fa;
+}
+
+.stat-done {
+    border-left: 5px solid #4ade80;
+}
+
+.stat-open .stat-value {
+    color: #facc15;
+}
+
+.stat-taken .stat-value {
+    color: #60a5fa;
+}
+
+.stat-done .stat-value {
+    color: #4ade80;
+}
