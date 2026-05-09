@@ -1646,3 +1646,20 @@ button:disabled:hover {
     color: #d1d5db;
     line-height: 1.5;
 }
+/* =========================
+   SUCCESS CARD
+========================= */
+
+.success-card {
+    text-align: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,83,45,0.95),
+            rgba(10,50,25,0.95)
+        );
+
+    border-left:
+        5px solid #4ade80 !important;
+}
