@@ -241,3 +241,101 @@ function escapeAttr(value) {
 }
 
 loadCompanies();
+loadLastCompanyJobs();
+
+async function loadLastCompanyJobs() {
+
+    const box = document.getElementById("company_last_jobs");
+
+    if (!box) return;
+
+    let companyName = fixedCompanyName;
+
+    if (!companyName) {
+        companyName = document.getElementById("company_name")?.value;
+    }
+
+    if (!companyName) {
+        box.innerHTML = "Keine Firma gewählt.";
+        return;
+    }
+
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("company_name", companyName)
+        .eq("ride_type", "Essenslieferung")
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+    if (error) {
+        console.error(error);
+
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        box.innerHTML = "Noch keine Aufträge vorhanden.";
+        return;
+    }
+
+    box.innerHTML = data.map(job => {
+
+        let badge = `
+            <span class="status-badge status-pause">
+                🟡 Offen
+            </span>
+        `;
+
+        if (job.job_status === "Übernommen") {
+            badge = `
+                <span class="status-badge status-online">
+                    🚕 ${escapeHtml(job.assigned_driver || "-")}
+                </span>
+            `;
+        }
+
+        if (job.job_status === "Erledigt") {
+            badge = `
+                <span class="status-badge status-online">
+                    ✅ Geliefert
+                </span>
+            `;
+        }
+
+        return `
+            <div class="ride-card ride-card-modern">
+
+                <div class="ride-top">
+                    <span class="ride-type-badge">
+                        🍔 Lieferung
+                    </span>
+
+                    ${badge}
+                </div>
+
+                <div class="ride-route">
+                    <div>
+                        <small>Empfänger</small>
+                        <strong>${escapeHtml(job.customer_name || "-")}</strong>
+                    </div>
+
+                    <div class="ride-arrow">→</div>
+
+                    <div>
+                        <small>Ziel</small>
+                        <strong>${escapeHtml(job.destination || "-")}</strong>
+                    </div>
+                </div>
+
+                <div class="ride-info-grid">
+                    <div>🍔 ${job.food_cost || 0}$</div>
+                    <div>📝 ${escapeHtml(job.notes || "-")}</div>
+                </div>
+
+            </div>
+        `;
+
+    }).join("");
+}
