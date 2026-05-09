@@ -1508,3 +1508,29 @@ button:disabled:hover {
 .small-btn.secondary-btn:hover {
     border-color: rgba(250,204,21,0.25);
 }
+/* =========================
+   NEW JOB PULSE
+========================= */
+
+@keyframes jobPulse {
+
+    0% {
+        box-shadow:
+            0 0 0 rgba(250,204,21,0);
+    }
+
+    50% {
+        box-shadow:
+            0 0 25px rgba(250,204,21,0.18);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 rgba(250,204,21,0);
+    }
+}
+
+.ride-card-modern {
+    animation:
+        jobPulse 3.5s infinite;
+}
