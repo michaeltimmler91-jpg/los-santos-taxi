@@ -59,21 +59,23 @@ async function loadAdminStats() {
     const companyCount = (companies || []).length;
     const openJobs = (jobs || []).filter(job => job.job_status === "Offen").length;
 
-    const totalTips = (jobs || [])
-        .filter(job => job.job_status === "Erledigt")
+    const openTips = (jobs || [])
+        .filter(job => job.job_status === "Erledigt" && job.tip_paid !== true)
         .reduce((sum, job) => sum + Number(job.tip_amount || 0), 0);
 
     document.getElementById("adminStatDrivers").innerText = drivers;
     document.getElementById("adminStatCompanies").innerText = companyCount;
     document.getElementById("adminStatOpenJobs").innerText = openJobs;
-    document.getElementById("adminStatTips").innerText = `${totalTips}$`;
+    document.getElementById("adminStatTips").innerText = `${openTips}$`;
 }
 
 function loadDashboardOverview() {
     document.getElementById("dashboard_overview").innerHTML = `
         <div class="admin-card">
             <strong>📊 Adminübersicht</strong><br><br>
-            Hier kannst du Fahrer, Firmen, Fahrten und Trinkgeld verwalten.
+            Hier kannst du Fahrer, Firmen, Fahrten und Trinkgeld verwalten.<br><br>
+            Der Wert <strong>Trinkgeld Gesamt</strong> zeigt jetzt nur noch offenes,
+            noch nicht ausgezahltes Trinkgeld.
         </div>
     `;
 }
@@ -320,15 +322,26 @@ async function loadTipsStats() {
         if (!grouped[driver]) {
             grouped[driver] = {
                 rides: 0,
-                tips: 0,
+                openTips: 0,
+                paidTips: 0,
+                totalTips: 0,
                 fares: 0,
                 invoices: 0,
                 food: 0
             };
         }
 
+        const tip = Number(job.tip_amount || 0);
+
         grouped[driver].rides++;
-        grouped[driver].tips += Number(job.tip_amount || 0);
+        grouped[driver].totalTips += tip;
+
+        if (job.tip_paid === true) {
+            grouped[driver].paidTips += tip;
+        } else {
+            grouped[driver].openTips += tip;
+        }
+
         grouped[driver].fares += Number(job.fare_amount || 0);
         grouped[driver].invoices += Number(job.invoice_amount || 0);
         grouped[driver].food += Number(job.food_cost || 0);
@@ -337,16 +350,60 @@ async function loadTipsStats() {
     const html = Object.entries(grouped).map(([driver, stats]) => `
         <div class="admin-card">
             <strong>${escapeHtml(driver)}</strong><br><br>
-            🚕 Fahrten: ${stats.rides}<br>
-            🎁 Trinkgeld: ${stats.tips}$<br>
+
+            🚕 Fahrten gesamt: ${stats.rides}<br>
+            🎁 Offenes Trinkgeld: <strong>${stats.openTips}$</strong><br>
+            💸 Bereits ausgezahlt: ${stats.paidTips}$<br>
+            📦 Trinkgeld gesamt: ${stats.totalTips}$<br>
             💰 Fahrtkosten: ${stats.fares}$<br>
             🧾 Rechnungen: ${stats.invoices}$<br>
             🍔 Essenskosten: ${stats.food}$
+
+            <div class="admin-actions">
+                <button
+                    class="small-btn danger-btn"
+                    onclick="payTipsForDriver('${escapeAttr(driver)}', ${stats.openTips})"
+                    ${stats.openTips <= 0 ? "disabled" : ""}
+                >
+                    💸 Trinkgeld auszahlen
+                </button>
+            </div>
         </div>
     `).join("");
 
     document.getElementById("tips_stats").innerHTML = html || "Keine Daten vorhanden.";
     document.getElementById("tips_stats_full").innerHTML = html || "Keine Daten vorhanden.";
+}
+
+async function payTipsForDriver(driverName, amount) {
+    if (amount <= 0) {
+        alert("Dieser Fahrer hat kein offenes Trinkgeld.");
+        return;
+    }
+
+    const ok = confirm(
+        `Offenes Trinkgeld für ${driverName} wirklich als ausgezahlt markieren?\n\nBetrag: ${amount}$`
+    );
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({ tip_paid: true })
+        .eq("job_status", "Erledigt")
+        .eq("assigned_driver", driverName)
+        .neq("tip_paid", true);
+
+    if (error) {
+        alert("Trinkgeld konnte nicht ausgezahlt werden.");
+        console.error(error);
+        return;
+    }
+
+    alert(`Trinkgeld für ${driverName} wurde als ausgezahlt markiert.`);
+
+    await loadTipsStats();
+    await loadAdminStats();
 }
 
 async function loadAdminDoneJobs() {
@@ -373,6 +430,7 @@ async function loadAdminDoneJobs() {
             💰 Fahrtkosten: ${job.fare_amount || 0}$<br>
             🧾 Rechnung: ${job.invoice_amount || 0}$<br>
             🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
+            💸 Trinkgeldstatus: ${job.tip_paid === true ? "Ausgezahlt" : "Offen"}<br>
             🍔 Essenskosten: ${job.food_cost || 0}$<br>
             📝 Notiz: ${escapeHtml(job.notes || "-")}
 
@@ -416,6 +474,14 @@ async function loadAdminDoneJobs() {
                     <div class="field">
                         <label>Essenskosten</label>
                         <input type="number" id="edit_food_${job.id}" value="${job.food_cost || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Trinkgeld ausgezahlt?</label>
+                        <select id="edit_tip_paid_${job.id}">
+                            <option value="false" ${job.tip_paid !== true ? "selected" : ""}>Nein</option>
+                            <option value="true" ${job.tip_paid === true ? "selected" : ""}>Ja</option>
+                        </select>
                     </div>
 
                     <div class="field">
@@ -485,6 +551,7 @@ async function saveJobEdit(id, rideType) {
     const km = Number(document.getElementById(`edit_km_${id}`).value);
     const invoice = Number(document.getElementById(`edit_invoice_${id}`).value);
     const food = Number(document.getElementById(`edit_food_${id}`).value);
+    const tipPaid = document.getElementById(`edit_tip_paid_${id}`).value === "true";
     const notes = document.getElementById(`edit_notes_${id}`).value.trim();
 
     if (!pickup || !destination) {
@@ -510,6 +577,7 @@ async function saveJobEdit(id, rideType) {
             invoice_amount: invoice,
             tip_amount: result.tip,
             food_cost: food,
+            tip_paid: tipPaid,
             billed_to: result.billedTo,
             notes: notes
         })
@@ -523,9 +591,9 @@ async function saveJobEdit(id, rideType) {
 
     alert("Fahrt gespeichert.");
 
-    loadAdminDoneJobs();
-    loadTipsStats();
-    loadAdminStats();
+    await loadAdminDoneJobs();
+    await loadTipsStats();
+    await loadAdminStats();
 }
 
 async function deleteJob(id) {
@@ -543,9 +611,9 @@ async function deleteJob(id) {
         return;
     }
 
-    loadAdminDoneJobs();
-    loadAdminStats();
-    loadTipsStats();
+    await loadAdminDoneJobs();
+    await loadAdminStats();
+    await loadTipsStats();
 }
 
 function escapeHtml(value) {
