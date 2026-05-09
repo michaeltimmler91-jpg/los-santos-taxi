@@ -859,8 +859,7 @@ async function loadDoneJobs() {
 function loadSoundSettings() {
     const enabled = localStorage.getItem("taxiSoundEnabled");
     const soundFile = localStorage.getItem("taxiSoundFile");
-    const volume = localStorage.getItem("taxiSoundVolume") || "1";
-
+    const volume = localStorage.getItem("taxiSoundVolume") || "0.15";
     const select = document.getElementById("sound_select");
     const btn = document.getElementById("soundToggleBtn");
     const text = document.getElementById("sound_status_text");
