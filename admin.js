@@ -831,8 +831,9 @@ async function payDealerMonth() {
     const { error } = await client
         .from("taxi_jobs")
         .update({
-            dealer_paid: true
-        })
+    dealer_paid: true,
+    dealer_paid_at: new Date().toISOString()
+})
         .eq("ride_type", "Gebrauchtwagenhändler")
         .eq("job_status", "Erledigt")
         .neq("dealer_paid", true);
