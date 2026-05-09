@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi Firmenauftrag</title>
+
+    <link rel="stylesheet" href="style.css?v=15">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🍔</div>
+
+            <div>
+                <div class="main-title">Lieferauftrag</div>
+                <div class="sub-title">Los Santos Taxi • Firmenservice</div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <a href="index.html">
+                <button class="small-btn">🚕 Zur Leitstelle</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:800px;margin:auto;">
+
+        <h2>🍔 Auftrag an Taxi senden</h2>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Unternehmen</label>
+                <select id="company_name"></select>
+            </div>
+
+            <div class="field">
+                <label>Geheimer Firmen-Code</label>
+                <input type="password" id="company_code">
+            </div>
+
+            <div class="field">
+                <label>Kunde / Empfänger</label>
+                <input type="text" id="customer_name">
+            </div>
+
+            <div class="field">
+                <label>Ziel / PLZ</label>
+                <input type="text" id="destination">
+            </div>
+
+            <div class="field">
+                <label>Essenskosten</label>
+                <input type="number" id="food_cost" value="0">
+            </div>
+
+            <div class="field">
+                <label>Bemerkung</label>
+                <input type="text" id="notes">
+            </div>
+
+        </div>
+
+        <button onclick="sendCompanyJob()">
+            Auftrag senden
+        </button>
+
+        <div id="company_result" style="margin-top:20px;"></div>
+
+    </div>
+
+</div>
+
+<script src="firma.js?v=15"></script>
+
+</body>
+</html>
