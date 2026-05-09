@@ -5,6 +5,7 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let companies = [];
 let fixedCompanyName = null;
+let currentJobId = null;
 
 function getCompanyFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -121,7 +122,7 @@ async function sendCompanyJob() {
         return;
     }
 
-    const { error } = await client
+    const { data, error } = await client
         .from("taxi_jobs")
         .insert([{
             created_by: companyName,
@@ -134,8 +135,10 @@ async function sendCompanyJob() {
             food_cost: foodCost,
             food_paid_by: "firma",
             notes: notes
-        }]);
-
+            }]);
+            .select()
+            .single();
+    
     if (error) {
         console.error(error);
 
@@ -147,6 +150,11 @@ async function sendCompanyJob() {
         return;
     }
 
+currentJobId = data.id;
+
+startLiveTracking();
+updateLiveStatus(data);
+    
     resultBox.innerHTML = `
         <div class="admin-card">
             ✅ Auftrag wurde an das Taxi gesendet.
@@ -174,3 +182,74 @@ function escapeAttr(value) {
 }
 
 loadCompanies();
+function updateLiveStatus(job) {
+
+    const box = document.getElementById("live_job_status");
+
+    if (!box) return;
+
+    box.style.display = "block";
+
+    let statusHtml = "";
+
+    if (job.job_status === "Offen") {
+
+        statusHtml = `
+            <div class="status-badge status-pause">
+                🟡 Auftrag offen
+            </div>
+        `;
+    }
+
+    if (job.job_status === "Übernommen") {
+
+        statusHtml = `
+            <div class="status-badge status-online">
+                🚕 Fahrer unterwegs: ${escapeHtml(job.assigned_driver || "-")}
+            </div>
+        `;
+    }
+
+    if (job.job_status === "Erledigt") {
+
+        statusHtml = `
+            <div class="status-badge status-online">
+                ✅ Lieferung abgeschlossen
+            </div>
+        `;
+    }
+
+    box.innerHTML = `
+        <strong>Live-Status</strong>
+        <br><br>
+
+        ${statusHtml}
+    `;
+}
+
+function startLiveTracking() {
+
+    if (!currentJobId) return;
+
+    client
+        .channel("firma-job-live")
+
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_jobs"
+            },
+            payload => {
+
+                if (!payload.new) return;
+
+                if (payload.new.id === currentJobId) {
+                    updateLiveStatus(payload.new);
+                }
+            }
+        )
+
+        .subscribe();
+}
