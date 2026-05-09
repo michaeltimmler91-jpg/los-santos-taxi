@@ -1420,3 +1420,8 @@ input[type="range"] {
         justify-content: stretch;
     }
 }
+.ride-status-badge.taken {
+    background: rgba(59,130,246,0.14);
+    color: #60a5fa;
+    border-color: rgba(59,130,246,0.28);
+}
