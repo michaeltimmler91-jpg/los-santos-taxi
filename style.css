@@ -1425,3 +1425,52 @@ input[type="range"] {
     color: #60a5fa;
     border-color: rgba(59,130,246,0.28);
 }
+/* =========================
+   SIDEBAR GLASS LOOK
+========================= */
+
+.dashboard-sidebar .sidebar-card {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,20,40,0.88),
+            rgba(5,12,25,0.88)
+        );
+
+    backdrop-filter: blur(18px);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+}
+
+.dashboard-sidebar .sidebar-title {
+    position: relative;
+
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+
+.dashboard-sidebar .sidebar-title::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 60px;
+    height: 3px;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #facc15,
+            transparent
+        );
+}
