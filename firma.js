@@ -9,8 +9,13 @@ let currentJobId = null;
 let liveChannel = null;
 
 function getCompanyFromUrl() {
+
     const params = new URLSearchParams(window.location.search);
-    return params.get("firma");
+
+    return {
+        id: params.get("id"),
+        firma: params.get("firma")
+    };
 }
 
 async function loadCompanies() {
