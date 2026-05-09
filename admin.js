@@ -209,6 +209,7 @@ async function deleteUser(id) {
 
 async function createCompany() {
     const company_name = document.getElementById("new_company_name").value.trim();
+    const themeColor = document.getElementById("new_company_color").value;
 
     if (!company_name) {
         alert("Bitte Firmenname eingeben.");
@@ -217,7 +218,7 @@ async function createCompany() {
 
     const { error } = await client
         .from("taxi_companies")
-        .insert([{ company_name, active: true }]);
+        .insert([{ company_name, theme_color: themeColor, active: true }]);
 
     if (error) {
         alert("Firma konnte nicht erstellt werden.");
