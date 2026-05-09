@@ -583,8 +583,20 @@ async function completeJob(jobId, rideType) {
     }
 
     if (rideType === "Essenslieferung") {
+
+    const foodPaidBy = document.getElementById(`food_paid_by_${jobId}`)?.value || "firma";
+
+    if (foodPaidBy === "fahrer") {
+
+        // Fahrer hat Essen privat bezahlt
+        tip_amount = invoice_amount - fare_amount;
+
+    } else {
+
+        // Firma / Schließfach hat bezahlt
         tip_amount = invoice_amount - food_cost - fare_amount;
     }
+}
 
     if (rideType === "EMS") {
         billed_to = "EMS";
