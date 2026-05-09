@@ -730,5 +730,35 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+async function editCompanyColor(id, oldColor) {
 
+    const newColor = prompt(
+        "Neue Firmenfarbe:",
+        oldColor || "yellow"
+    );
+
+    if (newColor === null) return;
+
+    const { error } = await client
+        .from("taxi_companies")
+        .update({
+            theme_color: newColor.trim()
+        })
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Farbe konnte nicht gespeichert werden.");
+        return;
+    }
+
+    loadCompanies();
+}
+
+function copyCompanyLink(link) {
+
+    navigator.clipboard.writeText(link);
+
+    alert("Firmenlink kopiert.");
+}
 startAdmin();
