@@ -388,4 +388,7 @@ async function loadLastCompanyJobs() {
 
 loadCompanies();
 loadLastCompanyJobs();
+loadDriverCount();
+
+setInterval(loadDriverCount, 15000);
 
