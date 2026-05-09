@@ -249,11 +249,16 @@ async function loadCompanies() {
     data.forEach(company => {
         box.innerHTML += `
             <div class="admin-card">
-                <strong>${escapeHtml(company.company_name)}</strong>
+                <strong>${escapeHtml(company.company_name)}</strong><br>
+                🔑 Firmen-Code: <strong>${escapeHtml(company.company_code || "Kein Code gesetzt")}</strong>
 
                 <div class="admin-actions">
                     <button class="small-btn" onclick="editCompany('${company.id}', '${escapeAttr(company.company_name)}')">
-                        Bearbeiten
+                        Namen ändern
+                    </button>
+
+                    <button class="small-btn" onclick="editCompanyCode('${company.id}', '${escapeAttr(company.company_code || "")}')">
+                        Code ändern
                     </button>
 
                     <button class="small-btn danger-btn" onclick="deleteCompany('${company.id}')">
@@ -263,6 +268,28 @@ async function loadCompanies() {
             </div>
         `;
     });
+}
+
+async function editCompanyCode(id, oldCode) {
+    const newCode = prompt("Neuer Firmen-Code:", oldCode);
+
+    if (newCode === null) return;
+
+    const { error } = await client
+        .from("taxi_companies")
+        .update({
+            company_code: newCode.trim()
+        })
+        .eq("id", id);
+
+    if (error) {
+        alert("Firmen-Code konnte nicht geändert werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Firmen-Code gespeichert.");
+    loadCompanies();
 }
 
 async function editCompany(id, oldName) {
