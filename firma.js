@@ -304,6 +304,13 @@ async function loadLastCompanyJobs() {
                 </span>
             `;
         }
+        if (job.job_status === "Nicht angetroffen") {
+    badge = `
+        <span class="status-badge status-offline">
+            ❌ Nicht angetroffen
+        </span>
+    `;
+}
 
         return `
             <div class="ride-card ride-card-modern">
