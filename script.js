@@ -527,13 +527,14 @@ function calculatePreview(jobId, rideType) {
 
 if (rideType === "Essenslieferung") {
     const foodPaidBy = document.getElementById(`food_paid_by_${jobId}`)?.value || "firma";
+    const driveCost = km * 5;
+
+    fare = driveCost + foodCost;
 
     if (foodPaidBy === "fahrer") {
-        fare = km * 5;
-        tip = invoice - fare;
+        tip = invoice - driveCost;
     } else {
-        fare = (km * 5) + foodCost;
-        tip = invoice - fare;
+        tip = invoice - driveCost - foodCost;
     }
 }
 
@@ -590,19 +591,16 @@ async function completeJob(jobId, rideType) {
         tip_amount = invoice_amount - fare_amount;
     }
 
-    if (rideType === "Essenslieferung") {
-
+if (rideType === "Essenslieferung") {
     const foodPaidBy = document.getElementById(`food_paid_by_${jobId}`)?.value || "firma";
+    const driveCost = kilometers * 5;
+
+    fare_amount = driveCost + food_cost;
 
     if (foodPaidBy === "fahrer") {
-
-        // Fahrer hat Essen privat bezahlt
-        tip_amount = invoice_amount - fare_amount;
-
+        tip_amount = invoice_amount - driveCost;
     } else {
-
-        // Firma / Schließfach hat bezahlt
-        tip_amount = invoice_amount - food_cost - fare_amount;
+        tip_amount = invoice_amount - driveCost - food_cost;
     }
 }
 
