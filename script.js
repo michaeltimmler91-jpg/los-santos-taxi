@@ -529,9 +529,11 @@ if (rideType === "Essenslieferung") {
     const foodPaidBy = document.getElementById(`food_paid_by_${jobId}`)?.value || "firma";
 
     if (foodPaidBy === "fahrer") {
+        fare = km * 5;
         tip = invoice - fare;
     } else {
-        tip = invoice - foodCost - fare;
+        fare = (km * 5) + foodCost;
+        tip = invoice - fare;
     }
 }
 
