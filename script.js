@@ -933,31 +933,42 @@ async function loadDoneJobs() {
         return;
     }
 
-    box.innerHTML = "";
+box.innerHTML += `
+    <div class="compact-ride modern-done-ride">
 
-    data.forEach(job => {
-    const doneDate = job.completed_at
-        ? new Date(job.completed_at).toLocaleString("de-DE")
-        : "-";
+        <div class="done-ride-top">
+            <div class="done-ride-main">
+                <strong>
+                    ${escapeHtml(job.assigned_driver || "-")}
+                </strong>
 
-            box.innerHTML += `
-                <div class="compact-ride">
-                    <div>
-                    <strong>${escapeHtml(job.assigned_driver || "-")}</strong><br>
-                    ${escapeHtml(job.ride_type || "-")}<br>
-                    <small>🕒 ${doneDate}</small>
-                    </div>
+                <span class="ride-separator">•</span>
 
-                <div>🚕 ${job.kilometers || 0} KM</div>
-                <div>🎁 ${job.tip_amount || 0}$</div>
-                <div>🧾 ${job.invoice_amount || 0}$</div>
-
-                <div>
-                    👤 ${escapeHtml(job.customer_name || "-")}<br>
-                    📍 ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}
-                </div>
+                <span>
+                    ${escapeHtml(job.ride_type || "-")}
+                </span>
             </div>
-        `;
+
+            <div class="done-ride-date">
+                🕒 ${doneDate}
+            </div>
+        </div>
+
+        <div class="done-ride-stats">
+            <span>🚕 ${job.kilometers || 0} KM</span>
+            <span>🎁 ${job.tip_amount || 0}$</span>
+            <span>🧾 ${job.invoice_amount || 0}$</span>
+        </div>
+
+        <div class="done-ride-route">
+            👤 ${escapeHtml(job.customer_name || "-")}
+            &nbsp;&nbsp;•&nbsp;&nbsp;
+            📍 ${escapeHtml(job.pickup_location || "-")}
+            → ${escapeHtml(job.destination || "-")}
+        </div>
+
+    </div>
+`;
     });
 }
 
