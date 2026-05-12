@@ -942,44 +942,29 @@ async function loadDoneJobs() {
             ? new Date(job.completed_at).toLocaleString("de-DE")
             : "-";
 
-        box.innerHTML += `
-            <div class="compact-ride modern-done-ride">
+box.innerHTML += `
+    <div class="done-row">
 
-                <div class="done-ride-top">
+        <div class="done-driver">
+            <strong>${escapeHtml(job.assigned_driver || "-")}</strong>
+            <small>${escapeHtml(job.ride_type || "-")}</small>
+        </div>
 
-                    <div class="done-ride-main">
-                        <strong>
-                            ${escapeHtml(job.assigned_driver || "-")}
-                        </strong>
+        <div class="done-info">
+            <span>🕒 ${doneDate}</span>
+            <span>🚕 ${job.kilometers || 0} KM</span>
+            <span>🎁 ${job.tip_amount || 0}$</span>
+            <span>🧾 ${job.invoice_amount || 0}$</span>
+        </div>
 
-                        <span class="ride-separator">•</span>
+        <div class="done-route">
+            👤 ${escapeHtml(job.customer_name || "-")}
+            <span>•</span>
+            📍 ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}
+        </div>
 
-                        <span>
-                            ${escapeHtml(job.ride_type || "-")}
-                        </span>
-                    </div>
-
-                    <div class="done-ride-date">
-                        🕒 ${doneDate}
-                    </div>
-
-                </div>
-
-                <div class="done-ride-stats">
-                    <span>🚕 ${job.kilometers || 0} KM</span>
-                    <span>🎁 ${job.tip_amount || 0}$</span>
-                    <span>🧾 ${job.invoice_amount || 0}$</span>
-                </div>
-
-                <div class="done-ride-route">
-                    👤 ${escapeHtml(job.customer_name || "-")}
-                    &nbsp;&nbsp;•&nbsp;&nbsp;
-                    📍 ${escapeHtml(job.pickup_location || "-")}
-                    → ${escapeHtml(job.destination || "-")}
-                </div>
-
-            </div>
-        `;
+    </div>
+`;
     });
 }
 
