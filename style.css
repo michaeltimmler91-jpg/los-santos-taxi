@@ -1982,4 +1982,51 @@ body[data-company-theme="rainbow"] button {
     font-size:14px;
     line-height:1.4;
 }
+.done-row {
+    display: grid;
+    grid-template-columns: 170px 1fr 1.4fr;
+    gap: 14px;
+    align-items: center;
 
+    background: rgba(10,20,40,0.92);
+    border-left: 4px solid #facc15;
+    border-radius: 16px;
+
+    padding: 12px 16px;
+    margin-bottom: 10px;
+}
+
+.done-driver strong {
+    display: block;
+    color: #facc15;
+    font-size: 16px;
+}
+
+.done-driver small {
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+.done-info {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    color: #e5e7eb;
+}
+
+.done-route {
+    font-size: 14px;
+    color: #e5e7eb;
+}
+
+.done-route span {
+    color: #facc15;
+    margin: 0 8px;
+}
+
+@media (max-width: 900px) {
+    .done-row {
+        grid-template-columns: 1fr;
+    }
+}
