@@ -599,8 +599,32 @@ async function loadAdminDoneJobs() {
         </div>
     `).join("");
 
-    document.getElementById("admin_done_jobs").innerHTML = html || "Keine erledigten Fahrten.";
-    document.getElementById("admin_done_jobs_full").innerHTML = html || "Keine erledigten Fahrten.";
+document.getElementById("admin_done_jobs").innerHTML =
+    html || "Keine erledigten Fahrten.";
+
+document.getElementById("admin_done_jobs_full").innerHTML =
+    html
+        .replaceAll('id="edit_job_', 'id="full_edit_job_')
+        .replaceAll('id="edit_customer_', 'id="full_edit_customer_')
+        .replaceAll('id="edit_pickup_', 'id="full_edit_pickup_')
+        .replaceAll('id="edit_destination_', 'id="full_edit_destination_')
+        .replaceAll('id="edit_km_', 'id="full_edit_km_')
+        .replaceAll('id="edit_invoice_', 'id="full_edit_invoice_')
+        .replaceAll('id="edit_food_', 'id="full_edit_food_')
+        .replaceAll('id="edit_tip_paid_', 'id="full_edit_tip_paid_')
+        .replaceAll('id="edit_notes_', 'id="full_edit_notes_')
+        .replaceAll("toggleJobEdit('", "toggleFullJobEdit('")
+        || "Keine erledigten Fahrten.";
+}
+
+function toggleFullJobEdit(id) {
+    const box = document.getElementById(`full_edit_job_${id}`);
+    if (!box) return;
+
+    box.style.display =
+        box.style.display === "none"
+            ? "block"
+            : "none";
 }
 
 function toggleJobEdit(id) {
