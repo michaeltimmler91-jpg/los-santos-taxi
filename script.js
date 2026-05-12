@@ -919,6 +919,7 @@ async function loadMyJobs() {
 }
 
 async function loadDoneJobs() {
+
     const box = document.getElementById("done_jobs_list");
 
     const { data, error } = await client
@@ -933,42 +934,52 @@ async function loadDoneJobs() {
         return;
     }
 
-box.innerHTML += `
-    <div class="compact-ride modern-done-ride">
+    box.innerHTML = "";
 
-        <div class="done-ride-top">
-            <div class="done-ride-main">
-                <strong>
-                    ${escapeHtml(job.assigned_driver || "-")}
-                </strong>
+    data.forEach(job => {
 
-                <span class="ride-separator">•</span>
+        const doneDate = job.completed_at
+            ? new Date(job.completed_at).toLocaleString("de-DE")
+            : "-";
 
-                <span>
-                    ${escapeHtml(job.ride_type || "-")}
-                </span>
+        box.innerHTML += `
+            <div class="compact-ride modern-done-ride">
+
+                <div class="done-ride-top">
+
+                    <div class="done-ride-main">
+                        <strong>
+                            ${escapeHtml(job.assigned_driver || "-")}
+                        </strong>
+
+                        <span class="ride-separator">•</span>
+
+                        <span>
+                            ${escapeHtml(job.ride_type || "-")}
+                        </span>
+                    </div>
+
+                    <div class="done-ride-date">
+                        🕒 ${doneDate}
+                    </div>
+
+                </div>
+
+                <div class="done-ride-stats">
+                    <span>🚕 ${job.kilometers || 0} KM</span>
+                    <span>🎁 ${job.tip_amount || 0}$</span>
+                    <span>🧾 ${job.invoice_amount || 0}$</span>
+                </div>
+
+                <div class="done-ride-route">
+                    👤 ${escapeHtml(job.customer_name || "-")}
+                    &nbsp;&nbsp;•&nbsp;&nbsp;
+                    📍 ${escapeHtml(job.pickup_location || "-")}
+                    → ${escapeHtml(job.destination || "-")}
+                </div>
+
             </div>
-
-            <div class="done-ride-date">
-                🕒 ${doneDate}
-            </div>
-        </div>
-
-        <div class="done-ride-stats">
-            <span>🚕 ${job.kilometers || 0} KM</span>
-            <span>🎁 ${job.tip_amount || 0}$</span>
-            <span>🧾 ${job.invoice_amount || 0}$</span>
-        </div>
-
-        <div class="done-ride-route">
-            👤 ${escapeHtml(job.customer_name || "-")}
-            &nbsp;&nbsp;•&nbsp;&nbsp;
-            📍 ${escapeHtml(job.pickup_location || "-")}
-            → ${escapeHtml(job.destination || "-")}
-        </div>
-
-    </div>
-`;
+        `;
     });
 }
 
