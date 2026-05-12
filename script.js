@@ -936,12 +936,17 @@ async function loadDoneJobs() {
     box.innerHTML = "";
 
     data.forEach(job => {
-        box.innerHTML += `
-            <div class="compact-ride">
-                <div>
+    const doneDate = job.completed_at
+        ? new Date(job.completed_at).toLocaleString("de-DE")
+        : "-";
+
+            box.innerHTML += `
+                <div class="compact-ride">
+                    <div>
                     <strong>${escapeHtml(job.assigned_driver || "-")}</strong><br>
-                    ${escapeHtml(job.ride_type || "-")}
-                </div>
+                    ${escapeHtml(job.ride_type || "-")}<br>
+                    <small>🕒 ${doneDate}</small>
+                    </div>
 
                 <div>🚕 ${job.kilometers || 0} KM</div>
                 <div>🎁 ${job.tip_amount || 0}$</div>
