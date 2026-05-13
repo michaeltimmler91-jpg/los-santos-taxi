@@ -938,9 +938,27 @@ async function loadDoneJobs() {
 
     data.forEach(job => {
 
-        const doneDate = job.completed_at
-            ? new Date(job.completed_at).toLocaleString("de-DE")
-            : "-";
+const assignedTime = job.assigned_at
+    ? new Date(job.assigned_at).toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    })
+    : "--:--";
+
+const completedTime = job.completed_at
+    ? new Date(job.completed_at).toLocaleTimeString("de-DE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    })
+    : "--:--";
+
+const assignedFull = job.assigned_at
+    ? new Date(job.assigned_at).toLocaleString("de-DE")
+    : "-";
+
+const completedFull = job.completed_at
+    ? new Date(job.completed_at).toLocaleString("de-DE")
+    : "-";
 
 box.innerHTML += `
     <div class="done-row">
