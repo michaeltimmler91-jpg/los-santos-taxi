@@ -969,7 +969,7 @@ box.innerHTML += `
         </div>
 
         <div class="done-info">
-            <span>🕒 ${doneDate}</span>
+            <span title="Übernommen: ${assignedFull} Abgeschlossen: ${completedFull}">🟡 ${assignedTime} • 🟢 ${completedTime}</span>
             <span>🚕 ${job.kilometers || 0} KM</span>
             <span>🎁 ${job.tip_amount || 0}$</span>
             <span>🧾 ${job.invoice_amount || 0}$</span>
