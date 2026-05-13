@@ -934,51 +934,40 @@ async function loadDoneJobs() {
         return;
     }
 
-    box.innerHTML = "";
-
-    data.forEach(job => {
-
-const assignedTime = job.assigned_at
-    ? new Date(job.assigned_at).toLocaleTimeString("de-DE", {
-        hour: "2-digit",
-        minute: "2-digit"
-    })
-    : "--:--";
-
-const completedTime = job.completed_at
-    ? new Date(job.completed_at).toLocaleTimeString("de-DE", {
-        hour: "2-digit",
-        minute: "2-digit"
-    })
-    : "--:--";
-
-const assignedFull = job.assigned_at
-    ? new Date(job.assigned_at).toLocaleString("de-DE")
-    : "-";
-
-const completedFull = job.completed_at
-    ? new Date(job.completed_at).toLocaleString("de-DE")
-    : "-";
-
 box.innerHTML += `
     <div class="done-row">
 
-        <div class="done-driver">
+        <div class="done-line-top">
             <strong>${escapeHtml(job.assigned_driver || "-")}</strong>
-            <small>${escapeHtml(job.ride_type || "-")}</small>
+
+            <span class="done-dot">•</span>
+
+            <span>${escapeHtml(job.ride_type || "-")}</span>
+
+            <span class="done-dot">•</span>
+
+            <span>
+                📍 ${escapeHtml(job.pickup_location || "-")}
+                → 
+                ${escapeHtml(job.destination || "-")}
+            </span>
         </div>
 
-        <div class="done-info">
-            <span title="Übernommen: ${assignedFull} Abgeschlossen: ${completedFull}">🟡 ${assignedTime} • 🟢 ${completedTime}</span>
+        <div class="done-line-bottom">
+
+            <span
+                title="Übernommen: ${assignedFull}
+Abgeschlossen: ${completedFull}"
+            >
+                🕒 ${assignedTime} → ${completedTime}
+            </span>
+
             <span>🚕 ${job.kilometers || 0} KM</span>
-            <span>🎁 ${job.tip_amount || 0}$</span>
-            <span>🧾 ${job.invoice_amount || 0}$</span>
-        </div>
 
-        <div class="done-route">
-            👤 ${escapeHtml(job.customer_name || "-")}
-            <span>•</span>
-            📍 ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}
+            <span>🧾 ${job.invoice_amount || 0}$</span>
+
+            <span>🎁 ${job.tip_amount || 0}$</span>
+
         </div>
 
     </div>
