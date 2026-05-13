@@ -2030,3 +2030,51 @@ body[data-company-theme="rainbow"] button {
         grid-template-columns: 1fr;
     }
 }
+
+.done-row {
+    background: rgba(15, 23, 42, 0.92);
+    border-left: 4px solid #facc15;
+
+    border-radius: 14px;
+
+    padding: 12px 16px;
+    margin-bottom: 10px;
+
+    transition: 0.2s;
+}
+
+.done-row:hover {
+    background: rgba(30, 41, 59, 0.96);
+
+    transform: translateY(-1px);
+}
+
+.done-line-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    align-items: center;
+
+    font-size: 15px;
+    color: #f8fafc;
+
+    margin-bottom: 8px;
+}
+
+.done-line-top strong {
+    color: #facc15;
+}
+
+.done-line-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+.done-dot {
+    color: #64748b;
+}
