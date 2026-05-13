@@ -934,44 +934,66 @@ async function loadDoneJobs() {
         return;
     }
 
-box.innerHTML += `
-    <div class="done-row">
+    box.innerHTML = "";
 
-        <div class="done-line-top">
-            <strong>${escapeHtml(job.assigned_driver || "-")}</strong>
+    data.forEach(job => {
 
-            <span class="done-dot">•</span>
+        const assignedTime = job.assigned_at
+            ? new Date(job.assigned_at).toLocaleTimeString("de-DE", {
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+            : "--:--";
 
-            <span>${escapeHtml(job.ride_type || "-")}</span>
+        const completedTime = job.completed_at
+            ? new Date(job.completed_at).toLocaleTimeString("de-DE", {
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+            : "--:--";
 
-            <span class="done-dot">•</span>
+        const assignedFull = job.assigned_at
+            ? new Date(job.assigned_at).toLocaleString("de-DE")
+            : "-";
 
-            <span>
-                📍 ${escapeHtml(job.pickup_location || "-")}
-                → 
-                ${escapeHtml(job.destination || "-")}
-            </span>
-        </div>
+        const completedFull = job.completed_at
+            ? new Date(job.completed_at).toLocaleString("de-DE")
+            : "-";
 
-        <div class="done-line-bottom">
+        box.innerHTML += `
+            <div class="done-row">
 
-            <span
-                title="Übernommen: ${assignedFull}
+                <div class="done-line-top">
+                    <strong>${escapeHtml(job.assigned_driver || "-")}</strong>
+
+                    <span class="done-dot">•</span>
+
+                    <span>${escapeHtml(job.ride_type || "-")}</span>
+
+                    <span class="done-dot">•</span>
+
+                    <span>
+                        📍 ${escapeHtml(job.pickup_location || "-")}
+                        →
+                        ${escapeHtml(job.destination || "-")}
+                    </span>
+                </div>
+
+                <div class="done-line-bottom">
+                    <span
+                        title="Übernommen: ${assignedFull}
 Abgeschlossen: ${completedFull}"
-            >
-                🕒 ${assignedTime} → ${completedTime}
-            </span>
+                    >
+                        🕒 ${assignedTime} → ${completedTime}
+                    </span>
 
-            <span>🚕 ${job.kilometers || 0} KM</span>
+                    <span>🚕 ${job.kilometers || 0} KM</span>
+                    <span>🧾 ${job.invoice_amount || 0}$</span>
+                    <span>🎁 ${job.tip_amount || 0}$</span>
+                </div>
 
-            <span>🧾 ${job.invoice_amount || 0}$</span>
-
-            <span>🎁 ${job.tip_amount || 0}$</span>
-
-        </div>
-
-    </div>
-`;
+            </div>
+        `;
     });
 }
 
