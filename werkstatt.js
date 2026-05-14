@@ -7,6 +7,10 @@ const params = new URLSearchParams(window.location.search);
 const WORKSHOP_CODE = params.get("firma") || "";
 const PAY_CODE = `${WORKSHOP_CODE}-PAY`;
 
+if (!WORKSHOP_CODE) {
+    alert("Kein Werkstatt-Code im Link gefunden.");
+}
+
 async function loadDrivers() {
     const select = document.getElementById("taxi_driver");
 
