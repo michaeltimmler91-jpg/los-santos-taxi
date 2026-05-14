@@ -168,10 +168,38 @@ async function loadOpenWorkshopBills() {
                 </div>
 
                 <div class="done-line-bottom">
-                    <span>🕒 ${date}</span>
-                    <span>💰 ${bill.amount || 0}$</span>
-                    <span>📝 ${escapeHtml(bill.notes || "-")}</span>
-                </div>
+    <span>🕒 ${date}</span>
+    <span>💰 ${bill.amount || 0}$</span>
+    <span>📝 ${escapeHtml(bill.notes || "-")}</span>
+</div>
+
+<div class="form-grid" style="margin-top:12px;">
+    <div class="field">
+        <label>Mitarbeiter-Anmerkung</label>
+        <input
+            type="text"
+            id="staff_note_${bill.id}"
+            value="${escapeAttr(bill.staff_note || "")}"
+            placeholder="z.B. Tippfehler, Rückfrage, Korrektur..."
+        >
+    </div>
+</div>
+
+<div class="admin-actions">
+    <button
+        class="small-btn secondary-btn"
+        onclick="saveWorkshopNote('${bill.id}')"
+    >
+        📝 Anmerkung speichern
+    </button>
+
+    <button
+        class="small-btn danger-btn"
+        onclick="deleteWorkshopBill('${bill.id}')"
+    >
+        🗑 Rechnung löschen
+    </button>
+</div>
 
             </div>
         `;
