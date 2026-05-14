@@ -282,6 +282,58 @@ async function payWorkshopBills() {
     await loadWorkshopData();
 }
 
+async function deleteWorkshopBill(id) {
+
+    const code =
+        prompt("Lösch-Code eingeben:");
+
+    if (code !== PAY_CODE) {
+        alert("Falscher Code.");
+        return;
+    }
+
+    const ok =
+        confirm("Rechnung wirklich löschen?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_workshop_costs")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Rechnung konnte nicht gelöscht werden.");
+        return;
+    }
+
+    await loadWorkshopData();
+}
+
+async function saveWorkshopNote(id) {
+
+    const noteInput =
+        document.getElementById(`staff_note_${id}`);
+
+    if (!noteInput) return;
+
+    const { error } = await client
+        .from("taxi_workshop_costs")
+        .update({
+            staff_note: noteInput.value.trim()
+        })
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Anmerkung konnte nicht gespeichert werden.");
+        return;
+    }
+
+    alert("Anmerkung gespeichert.");
+}
+
 function toggleArchive() {
     const box = document.getElementById("archive_workshop_list");
     const arrow = document.getElementById("archive_arrow");
