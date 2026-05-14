@@ -2119,3 +2119,33 @@ body[data-company-theme="rainbow"] button {
 #workshop_result .success-card {
     border-left-color: #4ade80 !important;
 }
+/* =========================
+   WORKSHOP ACTIONS
+========================= */
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-actions button {
+    margin-top: 0;
+}
+
+#open_workshop_list .field {
+    margin-top: 10px;
+}
+
+#open_workshop_list input {
+    background: rgba(15, 23, 42, 0.7);
+}
+
+#archive_workshop_list .done-row {
+    opacity: 0.9;
+}
+
+#archive_workshop_list .done-row:hover {
+    opacity: 1;
+}
