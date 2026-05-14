@@ -3,8 +3,9 @@ const SUPABASE_ANON_KEY = "sb_publishable_AkIVrLBsgIV2jYJ5gGsBmw_f7P62KTK";
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const WORKSHOP_CODE = "Benny2026";
-const PAY_CODE = "ZAHLEN2026";
+const params = new URLSearchParams(window.location.search);
+const WORKSHOP_CODE = params.get("firma") || "";
+const PAY_CODE = `${WORKSHOP_CODE}-PAY`;
 
 async function loadDrivers() {
     const select = document.getElementById("taxi_driver");
