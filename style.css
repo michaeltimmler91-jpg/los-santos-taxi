@@ -2078,3 +2078,44 @@ body[data-company-theme="rainbow"] button {
 .done-dot {
     color: #64748b;
 }
+/* =========================
+   WORKSHOP PAGE
+========================= */
+
+#open_workshop_list .admin-card,
+#archive_workshop_list .admin-card {
+    margin-bottom: 14px;
+}
+
+#open_total {
+    font-size: 46px;
+}
+
+.workshop-status-open {
+    color: #f87171;
+    font-weight: 900;
+}
+
+.workshop-status-paid {
+    color: #4ade80;
+    font-weight: 900;
+}
+
+#open_workshop_list .done-row,
+#archive_workshop_list .done-row {
+    border-left-color: #facc15;
+}
+
+#open_workshop_list .done-line-top strong,
+#archive_workshop_list .done-line-top strong {
+    color: #facc15;
+}
+
+#open_workshop_list .done-line-bottom,
+#archive_workshop_list .done-line-bottom {
+    align-items: center;
+}
+
+#workshop_result .success-card {
+    border-left-color: #4ade80 !important;
+}
