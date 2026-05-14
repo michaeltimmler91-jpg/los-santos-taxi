@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werkstatt Abrechnung</title>
+
+    <link rel="stylesheet" href="style.css?v=18">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🔧</div>
+
+            <div>
+                <div class="main-title">Werkstatt Abrechnung</div>
+                <div class="sub-title">Taxi • Reparatur & Tuning</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:900px;margin:auto;">
+        <h2>🔧 Neue Rechnung eintragen</h2>
+
+        <div class="form-grid">
+            <div class="field">
+                <label>Firmencode</label>
+                <input type="password" id="firm_code">
+            </div>
+
+            <div class="field">
+                <label>Taxifahrer</label>
+                <select id="taxi_driver"></select>
+            </div>
+
+            <div class="field">
+                <label>Mechaniker</label>
+                <input type="text" id="mechanic_name">
+            </div>
+
+            <div class="field">
+                <label>Art</label>
+                <select id="work_type">
+                    <option>Reparatur</option>
+                    <option>Tuning</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Betrag</label>
+                <input type="number" id="amount" value="0">
+            </div>
+
+            <div class="field">
+                <label>Bemerkung</label>
+                <input type="text" id="notes">
+            </div>
+        </div>
+
+        <button onclick="saveWorkshopCost()">
+            Rechnung speichern
+        </button>
+
+        <div id="workshop_result" style="margin-top:20px;"></div>
+    </div>
+
+    <div class="stats-grid" style="margin-top:28px;">
+        <div class="stat-card stat-open">
+            <div class="stat-title">Offene Rechnungen</div>
+            <div class="stat-value" id="open_count">0</div>
+        </div>
+
+        <div class="stat-card stat-taken">
+            <div class="stat-title">Offene Summe</div>
+            <div class="stat-value" id="open_total">0$</div>
+        </div>
+
+        <div class="stat-card stat-done">
+            <div class="stat-title">Archiv</div>
+            <div class="stat-value" id="archive_count">0</div>
+        </div>
+    </div>
+
+    <div class="section-card" style="margin-top:24px;">
+        <div class="section-header">
+            <h2>🔴 Offene Rechnungen</h2>
+        </div>
+
+        <div id="open_workshop_list"></div>
+
+        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.08);margin:22px 0;">
+
+        <h2>✅ Wochenabrechnung</h2>
+
+        <div class="form-grid">
+            <div class="field">
+                <label>Zahlungs-Code</label>
+                <input type="password" id="pay_code">
+            </div>
+        </div>
+
+        <button class="danger-btn" onclick="payWorkshopBills()">
+            Als bezahlt markieren / auf 0 setzen
+        </button>
+    </div>
+
+    <div class="section-card" style="margin-top:24px;">
+        <div class="section-header collapsible-header" onclick="toggleArchive()">
+            <h2>📦 Archiv</h2>
+            <span class="section-arrow" id="archive_arrow">▶</span>
+        </div>
+
+        <div id="archive_workshop_list" style="display:none;"></div>
+    </div>
+
+</div>
+
+<script src="werkstatt.js?v=18"></script>
+
+</body>
+</html>
