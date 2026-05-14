@@ -28,6 +28,7 @@ async function startAdmin() {
     await loadCompanies();
     await loadTipsStats();
     await loadDealerStats();
+    await loadAnnouncements();
     await loadAdminDoneJobs();
 
     loadDashboardOverview();
@@ -872,5 +873,162 @@ async function payDealerMonth() {
 
     await loadDealerStats();
     await loadAdminStats();
+}
+
+async function createAnnouncement() {
+    const title = document.getElementById("announcement_title").value.trim();
+    const message = document.getElementById("announcement_message").value.trim();
+    const mustConfirm = document.getElementById("announcement_confirm").value === "true";
+
+    if (!title || !message) {
+        alert("Bitte Titel und Nachricht eintragen.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_announcements")
+        .insert([{
+            title,
+            message,
+            active: true,
+            must_confirm: mustConfirm
+        }]);
+
+    if (error) {
+        console.error(error);
+        alert("Info konnte nicht erstellt werden.");
+        return;
+    }
+
+    document.getElementById("announcement_title").value = "";
+    document.getElementById("announcement_message").value = "";
+    document.getElementById("announcement_confirm").value = "true";
+
+    await loadAnnouncements();
+}
+
+async function loadAnnouncements() {
+    const box = document.getElementById("announcements_list");
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_announcements")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine Infos vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    box.innerHTML = "";
+
+    for (const info of data) {
+        const reads = await loadAnnouncementReads(info.id);
+
+        box.innerHTML += `
+            <div class="admin-card">
+                <strong>${escapeHtml(info.title)}</strong><br><br>
+
+                ${escapeHtml(info.message).replaceAll("\n", "<br>")}
+
+                <br><br>
+
+                Status:
+                <strong>${info.active ? "Aktiv" : "Inaktiv"}</strong><br>
+
+                Pflicht:
+                <strong>${info.must_confirm ? "Ja" : "Nein"}</strong><br>
+
+                Bestätigt von:
+                <strong>${reads.length}</strong>
+
+                <div style="margin-top:12px;color:#cbd5e1;">
+                    ${reads.length > 0
+                        ? reads.map(r => `✅ ${escapeHtml(r.display_name)}`).join("<br>")
+                        : "Noch niemand bestätigt."
+                    }
+                </div>
+
+                <div class="admin-actions">
+                    <button
+                        class="small-btn secondary-btn"
+                        onclick="toggleAnnouncement('${info.id}', ${info.active})"
+                    >
+                        ${info.active ? "Deaktivieren" : "Aktivieren"}
+                    </button>
+
+                    <button
+                        class="small-btn danger-btn"
+                        onclick="deleteAnnouncement('${info.id}')"
+                    >
+                        Löschen
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+async function loadAnnouncementReads(announcementId) {
+    const { data, error } = await client
+        .from("taxi_announcement_reads")
+        .select("*")
+        .eq("announcement_id", announcementId)
+        .order("display_name");
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data || [];
+}
+
+async function toggleAnnouncement(id, active) {
+    const { error } = await client
+        .from("taxi_announcements")
+        .update({
+            active: !active
+        })
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Status konnte nicht geändert werden.");
+        return;
+    }
+
+    await loadAnnouncements();
+}
+
+async function deleteAnnouncement(id) {
+    const ok = confirm("Info wirklich löschen?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_announcements")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Info konnte nicht gelöscht werden.");
+        return;
+    }
+
+    await loadAnnouncements();
 }
 startAdmin();
