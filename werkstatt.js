@@ -157,52 +157,64 @@ async function loadOpenWorkshopBills() {
             : "-";
 
         html += `
-            <div class="done-row">
+    <div class="done-row">
 
-                <div class="done-line-top">
-                    <strong>${escapeHtml(bill.taxi_driver || "-")}</strong>
-                    <span class="done-dot">•</span>
-                    <span>${escapeHtml(bill.work_type || "-")}</span>
-                    <span class="done-dot">•</span>
-                    <span>👨‍🔧 ${escapeHtml(bill.mechanic_name || "-")}</span>
-                </div>
+        <div class="done-line-top">
+            <strong>${escapeHtml(bill.taxi_driver || "-")}</strong>
 
-                <div class="done-line-bottom">
-    <span>🕒 ${date}</span>
-    <span>💰 ${bill.amount || 0}$</span>
-    <span>📝 ${escapeHtml(bill.notes || "-")}</span>
-</div>
+            <span class="done-dot">•</span>
 
-<div class="form-grid" style="margin-top:12px;">
-    <div class="field">
-        <label>Mitarbeiter-Anmerkung</label>
-        <input
-            type="text"
-            id="staff_note_${bill.id}"
-            value="${escapeAttr(bill.staff_note || "")}"
-            placeholder="z.B. Tippfehler, Rückfrage, Korrektur..."
-        >
+            <span>${escapeHtml(bill.work_type || "-")}</span>
+
+            <span class="done-dot">•</span>
+
+            <span>👨‍🔧 ${escapeHtml(bill.mechanic_name || "-")}</span>
+
+            <span class="done-dot">•</span>
+
+            <span>🕒 ${date}</span>
+        </div>
+
+        <div class="done-line-bottom">
+
+            <span>💰 ${bill.amount || 0}$</span>
+
+            <span>📝 ${escapeHtml(bill.notes || "-")}</span>
+
+            ${bill.staff_note
+                ? `<span>⚠ ${escapeHtml(bill.staff_note)}</span>`
+                : ""
+            }
+
+        </div>
+
+        <div class="admin-actions">
+
+            <input
+                type="text"
+                id="staff_note_${bill.id}"
+                value="${escapeAttr(bill.staff_note || "")}"
+                placeholder="Mitarbeiter-Anmerkung..."
+            >
+
+            <button
+                class="small-btn secondary-btn"
+                onclick="saveWorkshopNote('${bill.id}')"
+            >
+                📝 Speichern
+            </button>
+
+            <button
+                class="small-btn danger-btn"
+                onclick="deleteWorkshopBill('${bill.id}')"
+            >
+                🗑 Löschen
+            </button>
+
+        </div>
+
     </div>
-</div>
-
-<div class="admin-actions">
-    <button
-        class="small-btn secondary-btn"
-        onclick="saveWorkshopNote('${bill.id}')"
-    >
-        📝 Anmerkung speichern
-    </button>
-
-    <button
-        class="small-btn danger-btn"
-        onclick="deleteWorkshopBill('${bill.id}')"
-    >
-        🗑 Rechnung löschen
-    </button>
-</div>
-
-            </div>
-        `;
+`;
     });
 
     box.innerHTML = html;
