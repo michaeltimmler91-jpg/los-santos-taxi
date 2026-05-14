@@ -265,6 +265,7 @@ async function loadWorkshopArchive() {
                     <span>💰 ${bill.amount || 0}$</span>
                     <span>👨‍🔧 ${escapeHtml(bill.mechanic_name || "-")}</span>
                     <span title="Bezahlt am: ${paidDate}">📦 Archiv</span>
+                    <span>📝 ${escapeHtml(bill.staff_note || "-")}</span>
                 </div>
 
             </div>
