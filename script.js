@@ -12,7 +12,7 @@ let realtimeStarted = false;
 let idleTimer = null;
 let idleConfirmTimer = null;
 
-const IDLE_LIMIT_MS = 60 * 60 * 1000;
+const IDLE_LIMIT_MS = 5 * 60 * 1000;
 const IDLE_CONFIRM_MS = 60 * 1000;
 
 async function loginUser() {
