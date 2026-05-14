@@ -64,6 +64,7 @@ async function startApp() {
     updateJobForm();
 
     await loadJobs();
+    await checkAnnouncements();
 
     setupRealtime();
     loadSoundSettings();
@@ -1190,5 +1191,70 @@ function escapeHtml(value) {
 function escapeAttr(value) {
     return escapeHtml(value);
 }
+let currentAnnouncement = null;
 
+async function checkAnnouncements() {
+    const { data, error } = await client
+        .from("taxi_announcements")
+        .select("*")
+        .eq("active", true)
+        .eq("must_confirm", true)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    if (!data || data.length === 0) return;
+
+    for (const info of data) {
+        const { data: readData } = await client
+            .from("taxi_announcement_reads")
+            .select("*")
+            .eq("announcement_id", info.id)
+            .eq("username", currentUser.username)
+            .maybeSingle();
+
+        if (!readData) {
+            currentAnnouncement = info;
+            showAnnouncementModal(info);
+            return;
+        }
+    }
+}
+
+function showAnnouncementModal(info) {
+    document.getElementById("announcementContent").innerHTML = `
+        <strong>${escapeHtml(info.title)}</strong>
+        <br><br>
+        ${escapeHtml(info.message).replaceAll("\n", "<br>")}
+    `;
+
+    document.getElementById("announcementModal").style.display = "flex";
+}
+
+async function confirmAnnouncement() {
+    if (!currentAnnouncement) return;
+
+    const { error } = await client
+        .from("taxi_announcement_reads")
+        .insert([{
+            announcement_id: currentAnnouncement.id,
+            username: currentUser.username,
+            display_name: currentUser.display_name
+        }]);
+
+    if (error) {
+        console.error(error);
+        alert("Bestätigung konnte nicht gespeichert werden.");
+        return;
+    }
+
+    document.getElementById("announcementModal").style.display = "none";
+
+    currentAnnouncement = null;
+
+    await checkAnnouncements();
+}
 startApp();
