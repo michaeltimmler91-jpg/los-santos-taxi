@@ -50,6 +50,9 @@
             <button onclick="showAdminTab('tab_dealer')" class="admin-nav-btn">
                 🚗 Händler
             </button>
+            <button onclick="showAdminTab('tab_announcements')" class="admin-nav-btn">
+                📢 Infos
+            </button>
         </nav>
 
         <div class="admin-sidebar-footer">
@@ -322,7 +325,51 @@
     </div>
 
 </div>
-            
+          <div class="admin-tab-content" id="tab_announcements" style="display:none;">
+
+    <div class="admin-section">
+        <h2>📢 Wichtige Infos</h2>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Titel</label>
+                <input type="text" id="announcement_title">
+            </div>
+
+            <div class="field">
+                <label>Pflichtbestätigung</label>
+
+                <select id="announcement_confirm">
+                    <option value="true">Ja</option>
+                    <option value="false">Nein</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="field">
+            <label>Nachricht</label>
+
+            <textarea
+                id="announcement_message"
+                rows="6"
+            ></textarea>
+        </div>
+
+        <button onclick="createAnnouncement()">
+            📢 Info veröffentlichen
+        </button>
+
+    </div>
+
+    <div class="admin-section">
+        <h2>📋 Aktive Infos</h2>
+
+        <div id="announcements_list"></div>
+    </div>
+
+</div>  
             <!-- TRINKGELD -->
 
             <div class="admin-tab-content" id="tab_tips" style="display:none;">
