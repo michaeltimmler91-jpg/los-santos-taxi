@@ -1040,25 +1040,157 @@ async function loadAdminTimeStats() {
         return;
     }
 
-    const grouped = {};
-
     const now = new Date();
 
     const startToday = new Date();
-    startToday.setHours(0,0,0,0);
+    startToday.setHours(0, 0, 0, 0);
 
     const startWeek = new Date();
+    const day = startWeek.getDay();
+    const diff = day === 0 ? 6 : day - 1;
 
-const day = startWeek.getDay();
+    startWeek.setDate(startWeek.getDate() - diff);
+    startWeek.setHours(0, 0, 0, 0);
 
-const diff =
-    day === 0
-        ? 6
-        : day - 1;
+    const startMonth = new Date();
+    startMonth.setDate(1);
+    startMonth.setHours(0, 0, 0, 0);
 
-startWeek.setDate(
-    startWeek.getDate() - diff
-);
+    const groupedLogs = {};
+
+    (data || []).forEach(log => {
+        if (!groupedLogs[log.username]) {
+            groupedLogs[log.username] = {
+                display_name: log.display_name,
+                logs: []
+            };
+        }
+
+        groupedLogs[log.username].logs.push(log);
+    });
+
+    const rows = Object.values(groupedLogs).map(driver => {
+        const stats = {
+            display_name: driver.display_name,
+
+            todayDuty: 0,
+            todayPause: 0,
+
+            weekDuty: 0,
+            weekPause: 0,
+
+            monthDuty: 0,
+            monthPause: 0,
+
+            totalDuty: 0,
+            totalPause: 0
+        };
+
+        for (let i = 0; i < driver.logs.length; i++) {
+            const current = driver.logs[i];
+            const next = driver.logs[i + 1];
+
+            const start = new Date(current.created_at);
+            const end = next
+                ? new Date(next.created_at)
+                : now;
+
+            if (end <= start) continue;
+
+            addStatusTime(stats, current.new_status, start, end, startToday, "today");
+            addStatusTime(stats, current.new_status, start, end, startWeek, "week");
+            addStatusTime(stats, current.new_status, start, end, startMonth, "month");
+
+            const totalSeconds = Math.floor((end - start) / 1000);
+
+            if (current.new_status === "Im Dienst") {
+                stats.totalDuty += totalSeconds;
+            }
+
+            if (current.new_status === "Pause") {
+                stats.totalPause += totalSeconds;
+            }
+        }
+
+        return stats;
+    });
+
+    if (rows.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Noch keine Dienstzeiten vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    box.innerHTML = `
+        <div class="admin-time-table admin-time-table-wide">
+
+            <div class="admin-time-head admin-time-head-wide">
+                <div>Fahrer</div>
+                <div>Heute</div>
+                <div>Woche</div>
+                <div>Monat</div>
+                <div>Gesamt</div>
+            </div>
+
+            ${rows.map(driver => `
+                <div class="admin-time-row admin-time-row-wide">
+
+                    <div>
+                        <strong>${escapeHtml(driver.display_name)}</strong>
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.todayDuty)}<br>
+                        🟡 ${formatSeconds(driver.todayPause)}
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.weekDuty)}<br>
+                        🟡 ${formatSeconds(driver.weekPause)}
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.monthDuty)}<br>
+                        🟡 ${formatSeconds(driver.monthPause)}
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.totalDuty)}<br>
+                        🟡 ${formatSeconds(driver.totalPause)}
+                    </div>
+
+                </div>
+            `).join("")}
+
+        </div>
+    `;
+}
+
+function addStatusTime(stats, status, start, end, rangeStart, key) {
+
+    if (end <= rangeStart) return;
+
+    const effectiveStart =
+        start < rangeStart
+            ? rangeStart
+            : start;
+
+    const seconds =
+        Math.floor((end - effectiveStart) / 1000);
+
+    if (seconds <= 0) return;
+
+    if (status === "Im Dienst") {
+        stats[`${key}Duty`] += seconds;
+    }
+
+    if (status === "Pause") {
+        stats[`${key}Pause`] += seconds;
+    }
+}
 
 startWeek.setHours(0,0,0,0);
 
