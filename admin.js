@@ -744,18 +744,9 @@ async function deleteJob(id) {
     await loadTipsStats();
 }
 
-function escapeHtml(value) {
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
 
-function escapeAttr(value) {
-    return escapeHtml(value);
-}
+
+
 async function editCompanyColor(id, oldColor) {
 
     const newColor = prompt(
