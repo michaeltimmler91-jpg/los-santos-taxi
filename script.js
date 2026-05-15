@@ -1291,7 +1291,19 @@ async function loadMyTimeStats() {
     startToday.setHours(0,0,0,0);
 
     const startWeek = new Date();
-    startWeek.setDate(now.getDate() - 7);
+
+    const day = startWeek.getDay();
+
+    const diff =
+        day === 0
+            ? 6
+            : day - 1;
+
+    startWeek.setDate(
+        startWeek.getDate() - diff
+    );
+
+    startWeek.setHours(0,0,0,0);
 
     let todayDuty = 0;
     let todayPause = 0;
