@@ -2239,3 +2239,57 @@ body[data-company-theme="rainbow"] button {
         transform: translateY(0) scale(1);
     }
 }
+/* =========================
+   DIENSTZEIT
+========================= */
+
+.driver-time-box {
+    margin-top: 24px;
+}
+
+.time-stat-block {
+    margin-top: 14px;
+
+    padding: 16px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(15,23,42,0.95),
+            rgba(10,15,30,0.95)
+        );
+
+    border: 1px solid rgba(255,255,255,0.06);
+
+    color: #e2e8f0;
+
+    line-height: 1.9;
+}
+
+.time-stat-block strong {
+    display: block;
+
+    color: #facc15;
+
+    font-size: 15px;
+
+    margin-bottom: 6px;
+}
+
+.time-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 4px;
+}
+
+.time-value {
+    font-weight: 700;
+
+    color: #ffffff;
+}
