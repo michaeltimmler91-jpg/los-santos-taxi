@@ -2336,3 +2336,23 @@ body[data-company-theme="rainbow"] button {
         grid-template-columns: 1fr;
     }
 }
+.compact-time {
+    padding: 14px 16px;
+    line-height: 1.3;
+}
+
+.time-section {
+    margin-bottom: 14px;
+}
+
+.time-section:last-child {
+    margin-bottom: 0;
+}
+
+.time-section strong {
+    margin-bottom: 8px;
+}
+
+.time-row {
+    padding: 3px 0;
+}
