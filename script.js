@@ -1267,4 +1267,107 @@ async function confirmAnnouncement() {
 
     await checkAnnouncements();
 }
+async function loadMyTimeStats() {
+
+    const box = document.getElementById("my_time_stats");
+
+    if (!box || !currentUser) return;
+
+    const { data, error } = await client
+        .from("taxi_status_logs")
+        .select("*")
+        .eq("username", currentUser.username)
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler";
+        return;
+    }
+
+    const now = new Date();
+
+    const startToday = new Date();
+    startToday.setHours(0,0,0,0);
+
+    const startWeek = new Date();
+    startWeek.setDate(now.getDate() - 7);
+
+    let todayDuty = 0;
+    let todayPause = 0;
+
+    let weekDuty = 0;
+    let weekPause = 0;
+
+    for (let i = 0; i < data.length; i++) {
+
+        const current = data[i];
+        const next = data[i + 1];
+
+        const start = new Date(current.created_at);
+
+        const end = next
+            ? new Date(next.created_at)
+            : now;
+
+        const diff = Math.floor((end - start) / 1000);
+
+        if (current.new_status === "Im Dienst") {
+
+            if (start >= startToday) {
+                todayDuty += diff;
+            }
+
+            if (start >= startWeek) {
+                weekDuty += diff;
+            }
+        }
+
+        if (current.new_status === "Pause") {
+
+            if (start >= startToday) {
+                todayPause += diff;
+            }
+
+            if (start >= startWeek) {
+                weekPause += diff;
+            }
+        }
+    }
+
+    box.innerHTML = `
+        <div class="time-stat-block">
+
+            <strong>Heute</strong><br>
+
+            🟢 Dienst:
+            ${formatSeconds(todayDuty)}<br>
+
+            🟡 Pause:
+            ${formatSeconds(todayPause)}
+
+            <br><br>
+
+            <strong>Diese Woche</strong><br>
+
+            🟢 Dienst:
+            ${formatSeconds(weekDuty)}<br>
+
+            🟡 Pause:
+            ${formatSeconds(weekPause)}
+
+        </div>
+    `;
+}
+
+function formatSeconds(seconds) {
+
+    const hours = Math.floor(seconds / 3600);
+
+    const minutes = Math.floor(
+        (seconds % 3600) / 60
+    );
+
+    return `${hours}h ${minutes}m`;
+}
 startApp();
