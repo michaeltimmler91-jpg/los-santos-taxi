@@ -728,6 +728,7 @@ async function loadJobs() {
     await loadDispatchers();
     await loadDriverStatus();
     await loadDashboardStats();
+    await loadMyTimeStats();
 }
 
 async function loadDashboardStats() {
