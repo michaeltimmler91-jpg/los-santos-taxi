@@ -1090,24 +1090,6 @@ function playNewJobSound(force = false) {
     });
 }
 
-function showToast(title, message) {
-    const container = document.getElementById("toastContainer");
-    if (!container) return;
-
-    const toast = document.createElement("div");
-    toast.className = "toast";
-
-    toast.innerHTML = `
-        <div class="toast-title">${escapeHtml(title)}</div>
-        <div class="toast-message">${escapeHtml(message)}</div>
-    `;
-
-    container.appendChild(toast);
-
-    setTimeout(() => {
-        toast.remove();
-    }, 4500);
-}
 
 function toggleSection(contentId, arrowId) {
 
@@ -1189,18 +1171,7 @@ async function setUserOfflineBecauseIdle() {
     alert("Du wurdest wegen Inaktivität auf Offline gesetzt.");
 }
 
-function escapeHtml(value) {
-    return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-}
 
-function escapeAttr(value) {
-    return escapeHtml(value);
-}
 let currentAnnouncement = null;
 
 async function checkAnnouncements() {
@@ -1382,14 +1353,5 @@ box.innerHTML = `
 `;
 }
 
-function formatSeconds(seconds) {
 
-    const hours = Math.floor(seconds / 3600);
-
-    const minutes = Math.floor(
-        (seconds % 3600) / 60
-    );
-
-    return `${hours}h ${minutes}m`;
-}
 startApp();
