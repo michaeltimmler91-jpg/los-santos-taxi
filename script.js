@@ -1335,29 +1335,39 @@ async function loadMyTimeStats() {
         }
     }
 
-    box.innerHTML = `
-        <div class="time-stat-block">
+box.innerHTML = `
+    <div class="time-stat-block compact-time">
 
-            <strong>Heute</strong><br>
+        <div class="time-section">
+            <strong>Heute</strong>
 
-            🟢 Dienst:
-            ${formatSeconds(todayDuty)}<br>
+            <div class="time-row">
+                <span>🟢 Dienst</span>
+                <span class="time-value">${formatSeconds(todayDuty)}</span>
+            </div>
 
-            🟡 Pause:
-            ${formatSeconds(todayPause)}
-
-            <br><br>
-
-            <strong>Diese Woche</strong><br>
-
-            🟢 Dienst:
-            ${formatSeconds(weekDuty)}<br>
-
-            🟡 Pause:
-            ${formatSeconds(weekPause)}
-
+            <div class="time-row">
+                <span>🟡 Pause</span>
+                <span class="time-value">${formatSeconds(todayPause)}</span>
+            </div>
         </div>
-    `;
+
+        <div class="time-section">
+            <strong>Diese Woche</strong>
+
+            <div class="time-row">
+                <span>🟢 Dienst</span>
+                <span class="time-value">${formatSeconds(weekDuty)}</span>
+            </div>
+
+            <div class="time-row">
+                <span>🟡 Pause</span>
+                <span class="time-value">${formatSeconds(weekPause)}</span>
+            </div>
+        </div>
+
+    </div>
+`;
 }
 
 function formatSeconds(seconds) {
