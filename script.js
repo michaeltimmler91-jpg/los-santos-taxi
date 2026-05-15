@@ -285,6 +285,15 @@ async function setDriverStatus(status) {
         return;
     }
 
+    await client
+    .from("taxi_status_logs")
+    .insert([{
+        username: currentUser.username,
+        display_name: currentUser.display_name,
+        old_status: currentDriverStatus,
+        new_status: status
+    }]);
+    
     currentDriverStatus = status;
 
     await loadDispatchers();
