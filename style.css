@@ -2293,3 +2293,46 @@ body[data-company-theme="rainbow"] button {
 
     color: #ffffff;
 }
+
+/* =========================
+   ADMIN DIENSTZEITEN
+========================= */
+
+.admin-time-table {
+    display: grid;
+    gap: 10px;
+}
+
+.admin-time-head,
+.admin-time-row {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+
+    padding: 14px 16px;
+    border-radius: 14px;
+}
+
+.admin-time-head {
+    background: rgba(250,204,21,0.12);
+    color: #facc15;
+    font-weight: 900;
+}
+
+.admin-time-row {
+    background: rgba(15,23,42,0.92);
+    border-left: 4px solid #facc15;
+    color: #e2e8f0;
+}
+
+.admin-time-row:hover {
+    background: rgba(30,41,59,0.96);
+}
+
+@media (max-width: 900px) {
+    .admin-time-head,
+    .admin-time-row {
+        grid-template-columns: 1fr;
+    }
+}
