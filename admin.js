@@ -30,6 +30,7 @@ async function startAdmin() {
     await loadDealerStats();
     await loadAnnouncements();
     await loadAdminDoneJobs();
+    await loadAdminTimeStats();
 
     loadDashboardOverview();
 }
@@ -1030,5 +1031,117 @@ async function deleteAnnouncement(id) {
     }
 
     await loadAnnouncements();
+}
+async function loadAdminTimeStats() {
+
+    const box = document.getElementById("admin_time_stats");
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_status_logs")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler";
+        return;
+    }
+
+    const grouped = {};
+
+    const now = new Date();
+
+    const startToday = new Date();
+    startToday.setHours(0,0,0,0);
+
+    const startWeek = new Date();
+    startWeek.setDate(now.getDate() - 7);
+
+    const startMonth = new Date();
+    startMonth.setMonth(now.getMonth() - 1);
+
+    for (let i = 0; i < data.length; i++) {
+
+        const current = data[i];
+        const next = data[i + 1];
+
+        if (!grouped[current.username]) {
+
+            grouped[current.username] = {
+                display_name: current.display_name,
+
+                today: 0,
+                week: 0,
+                month: 0,
+                total: 0
+            };
+        }
+
+        const start = new Date(current.created_at);
+
+        const end = next
+            ? new Date(next.created_at)
+            : now;
+
+        const diff = Math.floor((end - start) / 1000);
+
+        if (current.new_status !== "Im Dienst") continue;
+
+        grouped[current.username].total += diff;
+
+        if (start >= startToday) {
+            grouped[current.username].today += diff;
+        }
+
+        if (start >= startWeek) {
+            grouped[current.username].week += diff;
+        }
+
+        if (start >= startMonth) {
+            grouped[current.username].month += diff;
+        }
+    }
+
+    box.innerHTML = `
+        <div class="admin-time-table">
+
+            <div class="admin-time-head">
+                <div>Fahrer</div>
+                <div>Heute</div>
+                <div>Woche</div>
+                <div>Monat</div>
+                <div>Gesamt</div>
+            </div>
+
+            ${Object.values(grouped).map(driver => `
+                <div class="admin-time-row">
+
+                    <div>
+                        ${escapeHtml(driver.display_name)}
+                    </div>
+
+                    <div>
+                        ${formatSeconds(driver.today)}
+                    </div>
+
+                    <div>
+                        ${formatSeconds(driver.week)}
+                    </div>
+
+                    <div>
+                        ${formatSeconds(driver.month)}
+                    </div>
+
+                    <div>
+                        ${formatSeconds(driver.total)}
+                    </div>
+
+                </div>
+            `).join("")}
+
+        </div>
+    `;
 }
 startAdmin();
