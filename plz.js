@@ -4,9 +4,8 @@ const PLZ_MAP = {
     name: "1002",
     aliases: [],
     x: 63.8,
-    y: 18.5
+    y: 16.9
 },
-
     "1004": {
         name: "1004",
         aliases: [],
