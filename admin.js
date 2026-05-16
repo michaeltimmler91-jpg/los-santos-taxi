@@ -250,15 +250,13 @@ async function createCompany() {
 async function loadCompanies() {
     const box = document.getElementById("companies_list");
 
-    const { data, error } = await client
-        .from("taxi_companies")
-        .select("*")
-        .order("company_name");
+const data = await getTaxiUsers();
 
-    if (error) {
-        console.error(error);
-        return;
-    }
+data.sort((a, b) =>
+    String(a.display_name || "").localeCompare(
+        String(b.display_name || "")
+    )
+);
 
     box.innerHTML = "";
 
