@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi PLZ Karte</title>
+
+    <link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🗺️</div>
+
+            <div>
+                <div class="main-title">PLZ Karte</div>
+                <div class="sub-title">Los Santos Taxi • PLZ Suche</div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <a href="index.html">
+                <button class="small-btn">← Leitstelle</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="section-card">
+
+        <div class="form-grid">
+            <div class="field">
+                <label>PLZ eingeben</label>
+                <input
+                    type="text"
+                    id="plz_search"
+                    placeholder="z.B. 8054 oder MD"
+                    oninput="searchPlz()"
+                >
+            </div>
+        </div>
+
+        <div class="map-controls">
+            <button class="small-btn" onclick="zoomMap(1.2)">➕ Zoom</button>
+            <button class="small-btn" onclick="zoomMap(0.8)">➖ Zoom</button>
+            <button class="small-btn secondary-btn" onclick="resetMap()">Reset</button>
+        </div>
+
+        <div id="plz_result" style="margin-top:18px;"></div>
+
+        <div class="gta-map-box" id="gtaMapBox">
+            <div class="gta-map-inner" id="gtaMapInner">
+
+                <img
+                    src="gta-map.png"
+                    class="gta-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div id="map_marker" class="map-marker" style="display:none;"></div>
+
+                <div id="map_debug" class="map-debug">
+                    X: 0 | Y: 0
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="plz.js?v=3"></script>
+<script src="map.js?v=6"></script>
+
+</body>
+</html>
