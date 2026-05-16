@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi PLZ Karte</title>
+
+    <link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🗺️</div>
+
+            <div>
+                <div class="main-title">PLZ Karte</div>
+                <div class="sub-title">Los Santos Taxi • PLZ Suche</div>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <a href="index.html">
+                <button class="small-btn">← Leitstelle</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="section-card">
+
+        <div class="form-grid">
+            <div class="field">
+                <label>PLZ eingeben</label>
+                <input
+                    type="text"
+                    id="plz_search"
+                    placeholder="z.B. 8054"
+                    oninput="searchPlz()"
+                >
+            </div>
+        </div>
+
+        <div id="plz_result" style="margin-top:18px;"></div>
+
+        <div class="gta-map-box">
+
+            <img
+                src="gta-map.jpg"
+                class="gta-map-img"
+                alt="GTA Karte"
+            >
+
+            <div id="map_marker" class="map-marker" style="display:none;">
+                📍
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="map.js?v=1"></script>
+
+</body>
+</html>
