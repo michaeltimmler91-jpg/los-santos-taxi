@@ -1014,7 +1014,7 @@ async function loadAdminTimeStats() {
     const { data: users, error: usersError } = await client
     .from("taxi_users")
     .select("username, display_name, role")
-    .eq("role", "fahrer");
+    .in("role", ["fahrer", "admin"]);
 
 if (usersError) {
     console.error(usersError);
