@@ -49,22 +49,41 @@ function showAdminTab(tabId) {
 }
 
 async function loadAdminStats() {
+
     const users = await getTaxiUsers();
-    const { data: companies } = await client.from("taxi_companies").select("*");
-    const { data: jobs } = await client.from("taxi_jobs").select("*");
+    const companies = await getTaxiCompanies();
+    const jobs = await getTaxiJobs();
 
-    const drivers = (users || []).filter(user => user.role === "fahrer").length;
-    const companyCount = (companies || []).length;
-    const openJobs = (jobs || []).filter(job => job.job_status === "Offen").length;
+    const drivers =
+        users.filter(user => user.role === "fahrer").length;
 
-    const openTips = (jobs || [])
-        .filter(job => job.job_status === "Erledigt" && job.tip_paid !== true)
-        .reduce((sum, job) => sum + Number(job.tip_amount || 0), 0);
+    const companyCount =
+        companies.length;
 
-    document.getElementById("adminStatDrivers").innerText = drivers;
-    document.getElementById("adminStatCompanies").innerText = companyCount;
-    document.getElementById("adminStatOpenJobs").innerText = openJobs;
-    document.getElementById("adminStatTips").innerText = `${openTips}$`;
+    const openJobs =
+        jobs.filter(job => job.job_status === "Offen").length;
+
+    const openTips =
+        jobs
+            .filter(job =>
+                job.job_status === "Erledigt" &&
+                job.tip_paid !== true
+            )
+            .reduce((sum, job) => {
+                return sum + Number(job.tip_amount || 0);
+            }, 0);
+
+    document.getElementById("adminStatDrivers").innerText =
+        drivers;
+
+    document.getElementById("adminStatCompanies").innerText =
+        companyCount;
+
+    document.getElementById("adminStatOpenJobs").innerText =
+        openJobs;
+
+    document.getElementById("adminStatTips").innerText =
+        `${openTips}$`;
 }
 
 function loadDashboardOverview() {
