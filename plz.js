@@ -1,3 +1,5 @@
+const PLZ_MAP = {
+
 "1000": {
     name: "1000",
     aliases: [],
@@ -52,4 +54,5 @@
     aliases: [],
     x: 396,
     y: 652
+}
 },
