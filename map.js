@@ -225,5 +225,5 @@ function copyCoords() {
 
     navigator.clipboard.writeText(text);
 
-    alert("Koordinaten kopiert!");
+   
 }
