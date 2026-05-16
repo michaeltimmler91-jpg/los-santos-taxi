@@ -147,3 +147,20 @@ async function getAnnouncementRead(announcementId, username) {
 
     return data;
 }
+async function saveAnnouncementRead(announcementId, user) {
+
+    const { error } = await client
+        .from("taxi_announcement_reads")
+        .insert([{
+            announcement_id: announcementId,
+            username: user.username,
+            display_name: user.display_name
+        }]);
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return true;
+}
