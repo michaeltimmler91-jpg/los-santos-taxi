@@ -2359,23 +2359,24 @@ body[data-company-theme="rainbow"] button {
 
 .map-marker{
     position:absolute;
-    width:18px;
-    height:18px;
 
-    background:rgba(255, 20, 147, 0.05);
-    border:3px solid rgba(255,255,255,0.85);
+    width:26px;
+    height:26px;
 
+    border:5px solid rgba(255,20,147,0.9);
     border-radius:50%;
+
+    background:transparent;
 
     transform:translate(-50%, -50%);
 
     box-shadow:
-        0 0 10px rgba(255,20,147,0.7),
+        0 0 10px rgba(255,20,147,0.8),
         0 0 20px rgba(255,20,147,0.5);
 
-    backdrop-filter: blur(2px);
-
     z-index:50;
+
+    pointer-events:none;
 }
 
 @keyframes markerPulse {
