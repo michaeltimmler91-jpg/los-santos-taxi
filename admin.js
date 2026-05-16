@@ -131,15 +131,13 @@ async function createUser() {
 async function loadUsers() {
     const box = document.getElementById("users_list");
 
-    const { data, error } = await client
-        .from("taxi_users")
-        .select("*")
-        .order("display_name");
+const data = await getTaxiCompanies();
 
-    if (error) {
-        console.error(error);
-        return;
-    }
+data.sort((a, b) =>
+    String(a.company_name || "").localeCompare(
+        String(b.company_name || "")
+    )
+);
 
     box.innerHTML = "";
 
