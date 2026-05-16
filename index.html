@@ -180,7 +180,37 @@
     <div id="driver_status_text">
         Status: Offline
     </div>
+<div class="sidebar-card">
 
+    <div class="sidebar-title">🗺️ PLZ Suche</div>
+
+    <div class="field">
+        <label>PLZ eingeben</label>
+        <input
+            type="text"
+            id="plz_search_2"
+            placeholder="z.B. 1002"
+            oninput="searchPlz2()"
+        >
+    </div>
+
+    <div id="plz_result_2" style="margin-top:14px;"></div>
+
+    <div class="mini-map-box" id="gtaMapBox2">
+        <div class="mini-map-inner" id="gtaMapInner2">
+
+            <img
+                src="gta-map.png"
+                class="mini-map-img"
+                alt="GTA Karte"
+            >
+
+            <div id="map_marker_2" class="mini-map-marker" style="display:none;"></div>
+
+        </div>
+    </div>
+
+</div>
     <div class="status-buttons">
         <button onclick="setDriverStatus('Im Dienst')">
             🟢 Dienst
@@ -295,6 +325,7 @@
 <script src="utils.js?v=2"></script>
 <script src="api.js?v=1"></script>
 <script src="script.js?v=14"></script>
-
+<script src="plz2.js?v=1"></script>
+<script src="map2.js?v=1"></script>
 </body>
 </html>
