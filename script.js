@@ -1149,22 +1149,30 @@ async function setUserOfflineBecauseIdle() {
 let currentAnnouncement = null;
 
 async function checkAnnouncements() {
-    const data = await getActiveRequiredAnnouncements();
+
+    const data =
+        await getActiveRequiredAnnouncements();
 
     if (!data || data.length === 0) return;
 
-    const readData =
-        await getAnnouncementRead(
-            info.id,
-            currentUser.username
-        );
+    for (const info of data) {
+
+        const readData =
+            await getAnnouncementRead(
+                info.id,
+                currentUser.username
+            );
 
         if (!readData) {
+
             currentAnnouncement = info;
+
             showAnnouncementModal(info);
+
             return;
         }
     }
+}
 
 
 function showAnnouncementModal(info) {
