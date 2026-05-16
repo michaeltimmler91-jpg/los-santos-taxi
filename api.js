@@ -16,7 +16,10 @@ async function getTaxiCompanies() {
 
     const { data, error } = await client
         .from("taxi_companies")
-        .select("*");
+        .select("*")
+        .order("company_name", {
+            ascending: true
+        });
 
     if (error) {
         console.error(error);
