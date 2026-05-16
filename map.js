@@ -60,15 +60,24 @@ function searchPlz() {
         return;
     }
 
-    result.innerHTML = `
-        <div class="admin-card">
-            <strong>${location.name}</strong><br>
-            PLZ: ${foundPlz}
-        </div>
-    `;
+result.innerHTML = `
+    <div class="admin-card">
+        <strong>${location.name}</strong><br>
+        PLZ: ${foundPlz}
+    </div>
+`;
 
-    placeMarker(location.x, location.y);
-    zoomToLocation(location.x, location.y);
+const img = document.querySelector(".gta-map-img");
+
+marker.style.display = "block";
+
+marker.style.left =
+    `${(location.x / 100) * img.clientWidth}px`;
+
+marker.style.top =
+    `${(location.y / 100) * img.clientHeight}px`;
+
+zoomToLocation(location.x, location.y);
 }
 
 function updateMapTransform() {
