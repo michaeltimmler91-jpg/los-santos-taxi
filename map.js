@@ -104,8 +104,11 @@ box.addEventListener("click", function(e) {
     const percentX = ((e.clientX - rect.left) / rect.width) * 100;
     const percentY = ((e.clientY - rect.top) / rect.height) * 100;
 
-    document.getElementById("map_debug").innerText =
-        `x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}`;
+    const debugText = `x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}`;
+
+document.getElementById("map_debug").innerText = debugText;
+
+alert(debugText);
 
     const pixelX = (percentX / 100) * img.clientWidth;
     const pixelY = (percentY / 100) * img.clientHeight;
