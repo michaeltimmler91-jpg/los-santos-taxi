@@ -103,14 +103,51 @@ function resetMap() {
 }
 
 const box = document.getElementById("gtaMapBox");
+const inner = document.getElementById("gtaMapInner");
+
+let mapScale = 1;
+let mapX = 0;
+let mapY = 0;
+
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+function updateMapTransform() {
+
+    inner.style.transform =
+        `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
+}
+
+function zoomMap(factor) {
+
+    mapScale *= factor;
+
+    if (mapScale < 1) mapScale = 1;
+    if (mapScale > 6) mapScale = 6;
+
+    updateMapTransform();
+}
+
+function resetMap() {
+
+    mapScale = 1;
+    mapX = 0;
+    mapY = 0;
+
+    updateMapTransform();
+}
 
 box.addEventListener("mousedown", e => {
+
     isDragging = true;
+
     dragStartX = e.clientX - mapX;
     dragStartY = e.clientY - mapY;
 });
 
 window.addEventListener("mousemove", e => {
+
     if (!isDragging) return;
 
     mapX = e.clientX - dragStartX;
@@ -120,5 +157,6 @@ window.addEventListener("mousemove", e => {
 });
 
 window.addEventListener("mouseup", () => {
+
     isDragging = false;
 });
