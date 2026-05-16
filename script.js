@@ -1165,7 +1165,7 @@ async function checkAnnouncements() {
             return;
         }
     }
-}
+
 
 function showAnnouncementModal(info) {
     document.getElementById("announcementContent").innerHTML = `
