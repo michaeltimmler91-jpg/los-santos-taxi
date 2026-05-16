@@ -1,4 +1,4 @@
-const PLZ_MAP = {
+const PLZ_MAP2 = {
 
     "1000": { name: "1000", aliases: [], x: 64.31, y: 14.41 },
     "1001": { name: "1001", aliases: [], x: 63.14, y: 15.21 },
