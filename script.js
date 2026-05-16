@@ -1149,27 +1149,15 @@ async function setUserOfflineBecauseIdle() {
 let currentAnnouncement = null;
 
 async function checkAnnouncements() {
-    const { data, error } = await client
-        .from("taxi_announcements")
-        .select("*")
-        .eq("active", true)
-        .eq("must_confirm", true)
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        return;
-    }
+    const data = await getActiveRequiredAnnouncements();
 
     if (!data || data.length === 0) return;
 
-    for (const info of data) {
-        const { data: readData } = await client
-            .from("taxi_announcement_reads")
-            .select("*")
-            .eq("announcement_id", info.id)
-            .eq("username", currentUser.username)
-            .maybeSingle();
+    const readData =
+        await getAnnouncementRead(
+            info.id,
+            currentUser.username
+        );
 
         if (!readData) {
             currentAnnouncement = info;
