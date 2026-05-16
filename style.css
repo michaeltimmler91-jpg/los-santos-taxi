@@ -2362,7 +2362,7 @@ body[data-company-theme="rainbow"] button {
     width:18px;
     height:18px;
 
-    background:rgba(255, 20, 147, 0.45);
+    background:rgba(255, 20, 147, 0.05);
     border:3px solid rgba(255,255,255,0.85);
 
     border-radius:50%;
