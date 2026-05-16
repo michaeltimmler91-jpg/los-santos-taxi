@@ -36,36 +36,46 @@
                 <input
                     type="text"
                     id="plz_search"
-                    placeholder="z.B. 8054"
+                    placeholder="z.B. 8054 oder MD"
                     oninput="searchPlz()"
                 >
             </div>
         </div>
 
-        <div id="plz_result" style="margin-top:18px;"></div>
-<div class="gta-map-box" id="gtaMapBox">
-
-    <div class="gta-map-inner" id="gtaMapInner">
-
-        <img
-            src="gta-map.jpg"
-            class="gta-map-img"
-            alt="GTA Karte"
-        >
-
-        <div id="map_marker" class="map-marker" style="display:none;">
-            📍
+        <div class="map-controls">
+            <button class="small-btn" onclick="zoomMap(1.2)">➕ Zoom</button>
+            <button class="small-btn" onclick="zoomMap(0.8)">➖ Zoom</button>
+            <button class="small-btn secondary-btn" onclick="resetMap()">Reset</button>
         </div>
 
-        <div id="map_debug" class="map-debug">
-            X: 0 | Y: 0
+        <div id="plz_result" style="margin-top:18px;"></div>
+
+        <div class="gta-map-box" id="gtaMapBox">
+            <div class="gta-map-inner" id="gtaMapInner">
+
+                <img
+                    src="gta-map.jpg"
+                    class="gta-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div id="map_marker" class="map-marker" style="display:none;">
+                    📍
+                </div>
+
+                <div id="map_debug" class="map-debug">
+                    X: 0 | Y: 0
+                </div>
+
+            </div>
         </div>
 
     </div>
 
 </div>
+
 <script src="plz.js?v=1"></script>
-<script src="map.js?v=1"></script>
+<script src="map.js?v=2"></script>
 
 </body>
 </html>
