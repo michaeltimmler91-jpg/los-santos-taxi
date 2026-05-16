@@ -2392,23 +2392,23 @@ body[data-company-theme="rainbow"] button {
         transform: translate(-50%, -100%) scale(1);
     }
 }
-.map-debug {
-    position: absolute;
+.map-debug{
+    position:fixed;
 
-    left: 20px;
-    bottom: 20px;
+    bottom:20px;
+    left:20px;
 
-    background: rgba(0,0,0,0.7);
+    background:rgba(0,0,0,0.85);
 
-    padding: 10px 14px;
+    color:#fff;
 
-    border-radius: 12px;
+    padding:10px 14px;
 
-    color: white;
+    border-radius:10px;
 
-    font-weight: bold;
+    font-size:16px;
 
-    z-index: 50;
+    z-index:99999;
 }
 .gta-map-box {
     position: relative;
