@@ -49,7 +49,7 @@ function showAdminTab(tabId) {
 }
 
 async function loadAdminStats() {
-    const { data: users } = await client.from("taxi_users").select("*");
+    const users = await getTaxiUsers();
     const { data: companies } = await client.from("taxi_companies").select("*");
     const { data: jobs } = await client.from("taxi_jobs").select("*");
 
