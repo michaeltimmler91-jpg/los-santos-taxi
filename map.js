@@ -58,6 +58,7 @@ function searchPlz() {
     marker.style.display = "block";
     marker.style.left = `${location.x}%`;
     marker.style.top = `${location.y}%`;
+    zoomToLocation(location.x, location.y);
 }
 
 function updateMapTransform() {
@@ -126,3 +127,28 @@ function dragMap(e) {
 window.addEventListener("mouseup", () => {
     window.removeEventListener("mousemove", dragMap);
 });
+
+function zoomToLocation(xPercent, yPercent) {
+
+    const box = document.getElementById("gtaMapBox");
+    const img = document.querySelector(".gta-map-img");
+
+    mapScale = 3;
+
+    const scaledWidth = img.clientWidth * mapScale;
+    const scaledHeight = img.clientHeight * mapScale;
+
+    const targetX =
+        (xPercent / 100) * scaledWidth;
+
+    const targetY =
+        (yPercent / 100) * scaledHeight;
+
+    mapX =
+        (box.clientWidth / 2) - targetX;
+
+    mapY =
+        (box.clientHeight / 2) - targetY;
+
+    updateMapTransform();
+}
