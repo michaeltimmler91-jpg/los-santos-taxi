@@ -33,3 +33,21 @@ function searchPlz() {
     marker.style.left = `${location.x}%`;
     marker.style.top = `${location.y}%`;
 }
+const mapBox = document.querySelector(".gta-map-box");
+
+mapBox.addEventListener("click", function(e) {
+
+    const rect = mapBox.getBoundingClientRect();
+
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+    document.getElementById("map_debug").innerText =
+        `X: ${x.toFixed(1)} | Y: ${y.toFixed(1)}`;
+
+    const marker = document.getElementById("map_marker");
+
+    marker.style.display = "block";
+    marker.style.left = `${x}%`;
+    marker.style.top = `${y}%`;
+});
