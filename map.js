@@ -133,7 +133,7 @@ function zoomToLocation(xPercent, yPercent) {
     const box = document.getElementById("gtaMapBox");
     const img = document.querySelector(".gta-map-img");
 
-    mapScale = 3;
+    mapScale = 4;
 
     const scaledWidth = img.clientWidth * mapScale;
     const scaledHeight = img.clientHeight * mapScale;
