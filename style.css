@@ -2357,17 +2357,23 @@ body[data-company-theme="rainbow"] button {
     user-select: none;
 }
 
-.map-marker {
-    position: absolute;
+.map-marker{
+    position:absolute;
+    width:18px;
+    height:18px;
 
-    transform: translate(-50%, -100%);
+    background:#ff1493;
+    border:3px solid white;
 
-    font-size: 42px;
+    border-radius:50%;
 
-    filter:
-        drop-shadow(0 0 10px rgba(250,204,21,0.9));
+    transform:translate(-50%, -50%);
 
-    animation: markerPulse 1.2s infinite;
+    box-shadow:
+        0 0 10px #ff1493,
+        0 0 20px #ff1493;
+
+    z-index:50;
 }
 
 @keyframes markerPulse {
