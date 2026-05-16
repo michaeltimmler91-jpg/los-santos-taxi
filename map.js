@@ -70,3 +70,55 @@ mapBox.addEventListener("click", function(e) {
     marker.style.left = `${x}%`;
     marker.style.top = `${y}%`;
 });
+let mapScale = 1;
+let mapX = 0;
+let mapY = 0;
+
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+function updateMapTransform() {
+    const inner = document.getElementById("gtaMapInner");
+
+    inner.style.transform =
+        `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
+}
+
+function zoomMap(factor) {
+    mapScale = mapScale * factor;
+
+    if (mapScale < 1) mapScale = 1;
+    if (mapScale > 5) mapScale = 5;
+
+    updateMapTransform();
+}
+
+function resetMap() {
+    mapScale = 1;
+    mapX = 0;
+    mapY = 0;
+
+    updateMapTransform();
+}
+
+const box = document.getElementById("gtaMapBox");
+
+box.addEventListener("mousedown", e => {
+    isDragging = true;
+    dragStartX = e.clientX - mapX;
+    dragStartY = e.clientY - mapY;
+});
+
+window.addEventListener("mousemove", e => {
+    if (!isDragging) return;
+
+    mapX = e.clientX - dragStartX;
+    mapY = e.clientY - dragStartY;
+
+    updateMapTransform();
+});
+
+window.addEventListener("mouseup", () => {
+    isDragging = false;
+});
