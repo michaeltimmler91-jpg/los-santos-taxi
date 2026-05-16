@@ -180,7 +180,29 @@
     <div id="driver_status_text">
         Status: Offline
     </div>
-<div class="sidebar-card">
+
+    <div class="status-buttons">
+        <button onclick="setDriverStatus('Im Dienst')">
+            🟢 Dienst
+        </button>
+
+        <button onclick="setDriverStatus('Pause')">
+            🟡 Pause
+        </button>
+
+        <button
+            class="danger-btn"
+            onclick="setDriverStatus('Offline')"
+        >
+            🔴 Offline
+        </button>
+    </div>
+
+    <div id="active_drivers_list">
+        Keine Fahrer im Dienst.
+    </div>
+</div>
+                <div class="sidebar-card">
 
     <div class="sidebar-title">🗺️ PLZ Suche</div>
 
@@ -210,27 +232,6 @@
         </div>
     </div>
 
-</div>
-    <div class="status-buttons">
-        <button onclick="setDriverStatus('Im Dienst')">
-            🟢 Dienst
-        </button>
-
-        <button onclick="setDriverStatus('Pause')">
-            🟡 Pause
-        </button>
-
-        <button
-            class="danger-btn"
-            onclick="setDriverStatus('Offline')"
-        >
-            🔴 Offline
-        </button>
-    </div>
-
-    <div id="active_drivers_list">
-        Keine Fahrer im Dienst.
-    </div>
 </div>
                 <div class="sidebar-card">
                     <div class="sidebar-title">
