@@ -69,15 +69,14 @@ result.innerHTML = `
 
 const img = document.querySelector(".gta-map-img");
 
-marker.style.display = "block";
+const pixelX =
+    (location.x / 100) * img.clientWidth;
 
-marker.style.left =
-    `${(location.x / 100) * img.clientWidth}px`;
+const pixelY =
+    (location.y / 100) * img.clientHeight;
 
-marker.style.top =
-    `${(location.y / 100) * img.clientHeight}px`;
-
-zoomToLocation(location.x, location.y);
+placeMarker(pixelX, pixelY);
+zoomToLocation(pixelX, pixelY);
 }
 
 function updateMapTransform() {
