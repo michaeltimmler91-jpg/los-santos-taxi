@@ -748,17 +748,7 @@ async function loadDashboardStats() {
 
 async function loadOpenJobs() {
     const box = document.getElementById("open_jobs_list");
-
-    const { data, error } = await client
-        .from("taxi_jobs")
-        .select("*")
-        .eq("job_status", "Offen")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        return;
-    }
+    const data = await getOpenJobs();
 
     box.innerHTML = "";
 
@@ -927,18 +917,7 @@ async function loadMyJobs() {
 async function loadDoneJobs() {
 
     const box = document.getElementById("done_jobs_list");
-
-    const { data, error } = await client
-        .from("taxi_jobs")
-        .select("*")
-        .eq("job_status", "Erledigt")
-        .order("completed_at", { ascending: false })
-        .limit(20);
-
-    if (error) {
-        console.error(error);
-        return;
-    }
+    const data = await getDoneJobs(20);
 
     box.innerHTML = "";
 
