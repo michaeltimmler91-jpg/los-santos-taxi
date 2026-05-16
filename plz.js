@@ -23,5 +23,10 @@ const PLZ_MAP = {
         x: 55,
         y: 30
     }
+        "LSMD": {
+        name: "LSMD",
+        x: 49,
+        y: 63
+    },
 
 };
