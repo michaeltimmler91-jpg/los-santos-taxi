@@ -911,19 +911,7 @@ async function createAnnouncement() {
 
 async function loadAnnouncements() {
     const box = document.getElementById("announcements_list");
-
-    if (!box) return;
-
-    const { data, error } = await client
-        .from("taxi_announcements")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-    if (error) {
-        console.error(error);
-        box.innerHTML = "Fehler beim Laden.";
-        return;
-    }
+    const data = await getAnnouncements();
 
     if (!data || data.length === 0) {
         box.innerHTML = `
