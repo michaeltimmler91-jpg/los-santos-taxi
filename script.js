@@ -1178,18 +1178,12 @@ function showAnnouncementModal(info) {
 }
 
 async function confirmAnnouncement() {
-    if (!currentAnnouncement) return;
+    const saved = await saveAnnouncementRead(
+        currentAnnouncement.id,
+        currentUser
+    );
 
-    const { error } = await client
-        .from("taxi_announcement_reads")
-        .insert([{
-            announcement_id: currentAnnouncement.id,
-            username: currentUser.username,
-            display_name: currentUser.display_name
-        }]);
-
-    if (error) {
-        console.error(error);
+    if (!saved) {
         alert("Bestätigung konnte nicht gespeichert werden.");
         return;
     }
