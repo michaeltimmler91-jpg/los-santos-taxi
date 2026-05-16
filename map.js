@@ -168,11 +168,22 @@ box.addEventListener("click", function(e) {
     showDebug(debugText);
 
     document.getElementById("plz_result").innerHTML = `
-        <div class="admin-card">
-            <strong>Klick-Position</strong><br>
+    <div class="admin-card">
+        <strong>Klick-Position</strong><br><br>
+
+        <div id="click_coords">
             ${debugText}
         </div>
-    `;
+
+        <button
+            class="small-btn"
+            style="margin-top:14px;"
+            onclick="copyCoords()"
+        >
+            📋 Kopieren
+        </button>
+    </div>
+`;
 
     placeMarker(rawX, rawY);
 });
