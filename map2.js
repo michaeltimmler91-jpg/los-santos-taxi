@@ -1,10 +1,10 @@
-let map2Scale = 1;
-let map2X = 0;
-let map2Y = 0;
-
 const box2 = document.getElementById("gtaMapBox2");
 const inner2 = document.getElementById("gtaMapInner2");
 const img2 = document.querySelector(".mini-map-img");
+
+let map2Scale = 1;
+let map2X = 0;
+let map2Y = 0;
 
 function placeMarker2(pixelX, pixelY) {
     const marker = document.getElementById("map_marker_2");
@@ -25,25 +25,7 @@ function searchPlz2() {
         return;
     }
 
-    let foundPlz = input;
-    let location = PLZ_MAP_2[input];
-
-    if (!location) {
-        const search = input.toLowerCase();
-
-        for (const [plz, data] of Object.entries(PLZ_MAP_2)) {
-            if (
-                data.name.toLowerCase().includes(search) ||
-                (data.aliases || []).some(alias =>
-                    alias.toLowerCase().includes(search)
-                )
-            ) {
-                foundPlz = plz;
-                location = data;
-                break;
-            }
-        }
-    }
+    const location = PLZ_MAP_2[input];
 
     if (!location) {
         result.innerHTML = `
@@ -51,7 +33,6 @@ function searchPlz2() {
                 ❌ PLZ nicht gefunden.
             </div>
         `;
-
         marker.style.display = "none";
         return;
     }
@@ -59,7 +40,8 @@ function searchPlz2() {
     result.innerHTML = `
         <div class="admin-card">
             <strong>${location.name}</strong><br>
-            PLZ: ${foundPlz}
+            PLZ: ${input}<br>
+            X: ${location.x} | Y: ${location.y}
         </div>
     `;
 
