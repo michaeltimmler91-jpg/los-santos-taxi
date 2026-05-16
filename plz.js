@@ -1,5 +1,12 @@
 const PLZ_MAP = {
 
+    "1000": {
+    name: "1000",
+    aliases: [],
+    x: 63.6,
+    y: 15.9
+},
+
     "1002": {
     name: "1002",
     aliases: [],
