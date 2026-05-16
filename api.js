@@ -78,3 +78,37 @@ async function getDoneJobs(limit = 20) {
 
     return data || [];
 }
+async function getAnnouncements() {
+
+    const { data, error } = await client
+        .from("taxi_announcements")
+        .select("*")
+        .order("created_at", {
+            ascending: false
+        });
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data || [];
+}
+
+async function getActiveAnnouncements() {
+
+    const { data, error } = await client
+        .from("taxi_announcements")
+        .select("*")
+        .eq("active", true)
+        .order("created_at", {
+            ascending: false
+        });
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data || [];
+}
