@@ -6,6 +6,18 @@ let isDragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 
+const box = document.getElementById("gtaMapBox");
+const inner = document.getElementById("gtaMapInner");
+const img = document.querySelector(".gta-map-img");
+
+function placeMarker(pixelX, pixelY) {
+    const marker = document.getElementById("map_marker");
+
+    marker.style.display = "block";
+    marker.style.left = `${pixelX}px`;
+    marker.style.top = `${pixelY}px`;
+}
+
 function searchPlz() {
     const input = document.getElementById("plz_search").value.trim();
     const result = document.getElementById("plz_result");
@@ -55,15 +67,11 @@ function searchPlz() {
         </div>
     `;
 
-    marker.style.display = "block";
-    marker.style.left = `${location.x}%`;
-    marker.style.top = `${location.y}%`;
+    placeMarker(location.x, location.y);
     zoomToLocation(location.x, location.y);
 }
 
 function updateMapTransform() {
-    const inner = document.getElementById("gtaMapInner");
-
     inner.style.transform =
         `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
 }
@@ -85,25 +93,21 @@ function resetMap() {
     updateMapTransform();
 }
 
-const box = document.getElementById("gtaMapBox");
-const inner = document.getElementById("gtaMapInner");
-
 box.addEventListener("click", function(e) {
     if (isDragging) return;
 
-    const rect = inner.getBoundingClientRect();
+    const rect = img.getBoundingClientRect();
 
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const scaleX = img.naturalWidth / rect.width;
+    const scaleY = img.naturalHeight / rect.height;
+
+    const x = (e.clientX - rect.left) * scaleX;
+    const y = (e.clientY - rect.top) * scaleY;
 
     document.getElementById("map_debug").innerText =
-        `X: ${x.toFixed(1)} | Y: ${y.toFixed(1)}`;
+        `x: ${Math.round(x)}, y: ${Math.round(y)}`;
 
-    const marker = document.getElementById("map_marker");
-
-    marker.style.display = "block";
-    marker.style.left = `${x}%`;
-    marker.style.top = `${y}%`;
+    placeMarker(x, y);
 });
 
 box.addEventListener("mousedown", e => {
@@ -128,27 +132,11 @@ window.addEventListener("mouseup", () => {
     window.removeEventListener("mousemove", dragMap);
 });
 
-function zoomToLocation(xPercent, yPercent) {
-
-    const box = document.getElementById("gtaMapBox");
-    const img = document.querySelector(".gta-map-img");
-
+function zoomToLocation(pixelX, pixelY) {
     mapScale = 4;
 
-    const scaledWidth = img.clientWidth * mapScale;
-    const scaledHeight = img.clientHeight * mapScale;
-
-    const targetX =
-        (xPercent / 100) * scaledWidth;
-
-    const targetY =
-        (yPercent / 100) * scaledHeight;
-
-    mapX =
-        (box.clientWidth / 2) - targetX;
-
-    mapY =
-        (box.clientHeight / 2) - targetY;
+    mapX = (box.clientWidth / 2) - (pixelX * mapScale);
+    mapY = (box.clientHeight / 2) - (pixelY * mapScale);
 
     updateMapTransform();
 }
