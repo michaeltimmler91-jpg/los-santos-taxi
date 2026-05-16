@@ -9,7 +9,26 @@ function searchPlz() {
         return;
     }
 
-    const location = PLZ_MAP[input];
+    let location = PLZ_MAP[input];
+
+if (!location) {
+
+    for (const [plz, data] of Object.entries(PLZ_MAP)) {
+
+        const search = input.toLowerCase();
+
+        if (
+            data.name.toLowerCase().includes(search)
+            ||
+            (data.aliases || []).some(alias =>
+                alias.toLowerCase().includes(search)
+            )
+        ) {
+            location = data;
+            break;
+        }
+    }
+}
 
     if (!location) {
         result.innerHTML = `
