@@ -1,44 +1,23 @@
-let mapScale = 1;
-let mapX = 0;
-let mapY = 0;
+let map2Scale = 1;
+let map2X = 0;
+let map2Y = 0;
 
-let isDragging = false;
-let mouseDownX = 0;
-let mouseDownY = 0;
-let dragStartX = 0;
-let dragStartY = 0;
+const box2 = document.getElementById("gtaMapBox2");
+const inner2 = document.getElementById("gtaMapInner2");
+const img2 = document.querySelector(".mini-map-img");
 
-const box = document.getElementById("gtaMapBox");
-const inner = document.getElementById("gtaMapInner");
-const img = document.querySelector(".gta-map-img");
-
-let debugBox = document.getElementById("map_debug");
-
-if (debugBox) {
-    document.body.appendChild(debugBox);
-}
-
-function showDebug(text) {
-    if (debugBox) {
-        debugBox.innerText = text;
-        debugBox.style.display = "block";
-    }
-
-    console.log(text);
-}
-
-function placeMarker(pixelX, pixelY) {
-    const marker = document.getElementById("map_marker");
+function placeMarker2(pixelX, pixelY) {
+    const marker = document.getElementById("map_marker_2");
 
     marker.style.display = "block";
     marker.style.left = `${pixelX}px`;
     marker.style.top = `${pixelY}px`;
 }
 
-function searchPlz() {
-    const input = document.getElementById("plz_search").value.trim();
-    const result = document.getElementById("plz_result");
-    const marker = document.getElementById("map_marker");
+function searchPlz2() {
+    const input = document.getElementById("plz_search_2").value.trim();
+    const result = document.getElementById("plz_result_2");
+    const marker = document.getElementById("map_marker_2");
 
     if (!input) {
         result.innerHTML = "";
@@ -47,12 +26,12 @@ function searchPlz() {
     }
 
     let foundPlz = input;
-    let location = PLZ_MAP[input];
+    let location = PLZ_MAP_2[input];
 
     if (!location) {
         const search = input.toLowerCase();
 
-        for (const [plz, data] of Object.entries(PLZ_MAP)) {
+        for (const [plz, data] of Object.entries(PLZ_MAP_2)) {
             if (
                 data.name.toLowerCase().includes(search) ||
                 (data.aliases || []).some(alias =>
@@ -80,150 +59,27 @@ function searchPlz() {
     result.innerHTML = `
         <div class="admin-card">
             <strong>${location.name}</strong><br>
-            PLZ: ${foundPlz}<br>
-            X: ${location.x} | Y: ${location.y}
+            PLZ: ${foundPlz}
         </div>
     `;
 
-    const pixelX = (location.x / 100) * img.clientWidth;
-    const pixelY = (location.y / 100) * img.clientHeight;
+    const pixelX = (location.x / 100) * img2.clientWidth;
+    const pixelY = (location.y / 100) * img2.clientHeight;
 
-    placeMarker(pixelX, pixelY);
-    zoomToLocation(pixelX, pixelY);
+    placeMarker2(pixelX, pixelY);
+    zoomToLocation2(pixelX, pixelY);
 }
 
-function updateMapTransform() {
-    inner.style.transform =
-        `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
+function updateMap2Transform() {
+    inner2.style.transform =
+        `translate(${map2X}px, ${map2Y}px) scale(${map2Scale})`;
 }
 
-function zoomMap(factor) {
-    mapScale *= factor;
+function zoomToLocation2(pixelX, pixelY) {
+    map2Scale = 4;
 
-    if (mapScale < 1) mapScale = 1;
-    if (mapScale > 6) mapScale = 6;
+    map2X = (box2.clientWidth / 2) - (pixelX * map2Scale);
+    map2Y = (box2.clientHeight / 2) - (pixelY * map2Scale);
 
-    updateMapTransform();
-}
-
-function resetMap() {
-    mapScale = 1;
-    mapX = 0;
-    mapY = 0;
-
-    updateMapTransform();
-}
-
-box.addEventListener("mousedown", e => {
-    isDragging = false;
-
-    mouseDownX = e.clientX;
-    mouseDownY = e.clientY;
-
-    dragStartX = e.clientX - mapX;
-    dragStartY = e.clientY - mapY;
-
-    window.addEventListener("mousemove", dragMap);
-});
-
-function dragMap(e) {
-    const moved =
-        Math.abs(e.clientX - mouseDownX) +
-        Math.abs(e.clientY - mouseDownY);
-
-    if (moved < 5) return;
-
-    isDragging = true;
-
-    mapX = e.clientX - dragStartX;
-    mapY = e.clientY - dragStartY;
-
-    updateMapTransform();
-}
-
-window.addEventListener("mouseup", () => {
-    window.removeEventListener("mousemove", dragMap);
-});
-
-box.addEventListener("click", function(e) {
-    if (isDragging) return;
-
-    const boxRect = box.getBoundingClientRect();
-
-    const rawX =
-        (e.clientX - boxRect.left - mapX) / mapScale;
-
-    const rawY =
-        (e.clientY - boxRect.top - mapY) / mapScale;
-
-    const percentX =
-        (rawX / img.clientWidth) * 100;
-
-    const percentY =
-        (rawY / img.clientHeight) * 100;
-
-    const debugText =
-        `x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}`;
-
-    showDebug(debugText);
-
-    document.getElementById("plz_result").innerHTML = `
-    <div class="admin-card">
-
-        <strong>Klick-Position</strong><br><br>
-
-        <div style="
-            font-size:20px;
-            color:#facc15;
-            font-weight:900;
-            margin-bottom:14px;
-        ">
-            X: ${percentX.toFixed(2)}
-            <br>
-            Y: ${percentY.toFixed(2)}
-        </div>
-
-        <div
-            id="click_coords"
-            style="
-                background:rgba(0,0,0,0.35);
-                padding:12px;
-                border-radius:12px;
-                font-family:monospace;
-                margin-bottom:14px;
-            "
-        >
-x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}
-        </div>
-
-        <button
-            class="small-btn"
-            onclick="copyCoords()"
-        >
-            📋 Kopieren
-        </button>
-
-    </div>
-`;
-
-    placeMarker(rawX, rawY);
-});
-
-function zoomToLocation(pixelX, pixelY) {
-    mapScale = 4;
-
-    mapX = (box.clientWidth / 2) - (pixelX * mapScale);
-    mapY = (box.clientHeight / 2) - (pixelY * mapScale);
-
-    updateMapTransform();
-}
-function copyCoords() {
-
-    const text =
-        document.getElementById("click_coords")
-        .innerText;
-
-    navigator.clipboard.writeText(text);
-
-   
+    updateMap2Transform();
 }
