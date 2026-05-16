@@ -523,17 +523,7 @@ async function payTipsForDriver(driverName, amount) {
 }
 
 async function loadAdminDoneJobs() {
-    const { data, error } = await client
-        .from("taxi_jobs")
-        .select("*")
-        .in("job_status", ["Erledigt", "Nicht angetroffen"])
-        .order("completed_at", { ascending: false })
-        .limit(50);
-
-    if (error) {
-        console.error(error);
-        return;
-    }
+    const data = await getDoneJobs(50);
 
     const html = data.map(job => `
         <div class="admin-card">
