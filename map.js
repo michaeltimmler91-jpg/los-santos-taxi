@@ -3,12 +3,29 @@ let mapX = 0;
 let mapY = 0;
 
 let isDragging = false;
+let mouseDownX = 0;
+let mouseDownY = 0;
 let dragStartX = 0;
 let dragStartY = 0;
 
 const box = document.getElementById("gtaMapBox");
 const inner = document.getElementById("gtaMapInner");
 const img = document.querySelector(".gta-map-img");
+
+let debugBox = document.getElementById("map_debug");
+
+if (debugBox) {
+    document.body.appendChild(debugBox);
+}
+
+function showDebug(text) {
+    if (debugBox) {
+        debugBox.innerText = text;
+        debugBox.style.display = "block";
+    }
+
+    console.log(text);
+}
 
 function placeMarker(pixelX, pixelY) {
     const marker = document.getElementById("map_marker");
@@ -63,7 +80,8 @@ function searchPlz() {
     result.innerHTML = `
         <div class="admin-card">
             <strong>${location.name}</strong><br>
-            PLZ: ${foundPlz}
+            PLZ: ${foundPlz}<br>
+            X: ${location.x} | Y: ${location.y}
         </div>
     `;
 
@@ -96,28 +114,11 @@ function resetMap() {
     updateMapTransform();
 }
 
-box.addEventListener("click", function(e) {
-    if (isDragging) return;
-
-    const rect = img.getBoundingClientRect();
-
-    const percentX = ((e.clientX - rect.left) / rect.width) * 100;
-    const percentY = ((e.clientY - rect.top) / rect.height) * 100;
-
-    const debugText = `x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}`;
-
-document.getElementById("map_debug").innerText = debugText;
-
-alert(debugText);
-
-    const pixelX = (percentX / 100) * img.clientWidth;
-    const pixelY = (percentY / 100) * img.clientHeight;
-
-    placeMarker(pixelX, pixelY);
-});
-
 box.addEventListener("mousedown", e => {
     isDragging = false;
+
+    mouseDownX = e.clientX;
+    mouseDownY = e.clientY;
 
     dragStartX = e.clientX - mapX;
     dragStartY = e.clientY - mapY;
@@ -126,6 +127,12 @@ box.addEventListener("mousedown", e => {
 });
 
 function dragMap(e) {
+    const moved =
+        Math.abs(e.clientX - mouseDownX) +
+        Math.abs(e.clientY - mouseDownY);
+
+    if (moved < 5) return;
+
     isDragging = true;
 
     mapX = e.clientX - dragStartX;
@@ -136,6 +143,38 @@ function dragMap(e) {
 
 window.addEventListener("mouseup", () => {
     window.removeEventListener("mousemove", dragMap);
+});
+
+box.addEventListener("click", function(e) {
+    if (isDragging) return;
+
+    const boxRect = box.getBoundingClientRect();
+
+    const rawX =
+        (e.clientX - boxRect.left - mapX) / mapScale;
+
+    const rawY =
+        (e.clientY - boxRect.top - mapY) / mapScale;
+
+    const percentX =
+        (rawX / img.clientWidth) * 100;
+
+    const percentY =
+        (rawY / img.clientHeight) * 100;
+
+    const debugText =
+        `x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}`;
+
+    showDebug(debugText);
+
+    document.getElementById("plz_result").innerHTML = `
+        <div class="admin-card">
+            <strong>Klick-Position</strong><br>
+            ${debugText}
+        </div>
+    `;
+
+    placeMarker(rawX, rawY);
 });
 
 function zoomToLocation(pixelX, pixelY) {
