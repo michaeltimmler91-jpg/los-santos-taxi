@@ -169,19 +169,40 @@ box.addEventListener("click", function(e) {
 
     document.getElementById("plz_result").innerHTML = `
     <div class="admin-card">
+
         <strong>Klick-Position</strong><br><br>
 
-        <div id="click_coords">
-            ${debugText}
+        <div style="
+            font-size:20px;
+            color:#facc15;
+            font-weight:900;
+            margin-bottom:14px;
+        ">
+            X: ${percentX.toFixed(2)}
+            <br>
+            Y: ${percentY.toFixed(2)}
+        </div>
+
+        <div
+            id="click_coords"
+            style="
+                background:rgba(0,0,0,0.35);
+                padding:12px;
+                border-radius:12px;
+                font-family:monospace;
+                margin-bottom:14px;
+            "
+        >
+x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}
         </div>
 
         <button
             class="small-btn"
-            style="margin-top:14px;"
             onclick="copyCoords()"
         >
             📋 Kopieren
         </button>
+
     </div>
 `;
 
@@ -195,4 +216,14 @@ function zoomToLocation(pixelX, pixelY) {
     mapY = (box.clientHeight / 2) - (pixelY * mapScale);
 
     updateMapTransform();
+}
+function copyCoords() {
+
+    const text =
+        document.getElementById("click_coords")
+        .innerText;
+
+    navigator.clipboard.writeText(text);
+
+    alert("Koordinaten kopiert!");
 }
