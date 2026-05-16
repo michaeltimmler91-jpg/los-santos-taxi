@@ -420,15 +420,7 @@ async function deleteCompany(id) {
 }
 
 async function loadTipsStats() {
-    const { data, error } = await client
-        .from("taxi_jobs")
-        .select("*")
-        .eq("job_status", "Erledigt");
-
-    if (error) {
-        console.error(error);
-        return;
-    }
+    const data = await getDoneJobs(500);
 
     const grouped = {};
 
