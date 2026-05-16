@@ -130,8 +130,7 @@ async function createUser() {
 
 async function loadUsers() {
     const box = document.getElementById("users_list");
-
-const data = await getTaxiCompanies();
+    const data = await getTaxiUsers();
 
 data.sort((a, b) =>
     String(a.company_name || "").localeCompare(
@@ -249,8 +248,7 @@ async function createCompany() {
 
 async function loadCompanies() {
     const box = document.getElementById("companies_list");
-
-const data = await getTaxiUsers();
+    const data = await getTaxiCompanies();
 
 data.sort((a, b) =>
     String(a.display_name || "").localeCompare(
@@ -280,7 +278,7 @@ data.sort((a, b) =>
                     <div>
 
                         <strong>
-                            ${escapeHtml(company.company_name)}
+                            ${escapeHtml(company.company_name || "Unbekannte Firma")}
                         </strong>
 
                         <br>
@@ -294,7 +292,11 @@ data.sort((a, b) =>
 
                         🔑 Firmen-Code:
                         <strong>
-                            ${escapeHtml(company.company_code || "Kein Code gesetzt")}
+                            ${escapeHtml(
+                                company.company_code && company.company_code.trim() !== ""
+                                    ? company.company_code
+                                    : "Kein Code gesetzt"
+                            )}
                         </strong>
 
                         <br><br>
