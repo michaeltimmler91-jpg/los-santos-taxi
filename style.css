@@ -2383,3 +2383,21 @@ body[data-company-theme="rainbow"] button {
         transform: translate(-50%, -100%) scale(1);
     }
 }
+.map-debug {
+    position: absolute;
+
+    left: 20px;
+    bottom: 20px;
+
+    background: rgba(0,0,0,0.7);
+
+    padding: 10px 14px;
+
+    border-radius: 12px;
+
+    color: white;
+
+    font-weight: bold;
+
+    z-index: 50;
+}
