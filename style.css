@@ -2401,3 +2401,18 @@ body[data-company-theme="rainbow"] button {
 
     z-index: 50;
 }
+.gta-map-box {
+    position: relative;
+
+    overflow: hidden;
+}
+
+.gta-map-inner {
+    position: relative;
+
+    width: fit-content;
+
+    transform-origin: top left;
+
+    transition: transform 0.1s;
+}
