@@ -1011,6 +1011,23 @@ async function loadAdminTimeStats() {
 
     if (!box) return;
 
+    const { data: users, error: usersError } = await client
+    .from("taxi_users")
+    .select("username, display_name, role")
+    .eq("role", "fahrer");
+
+if (usersError) {
+    console.error(usersError);
+    box.innerHTML = "Fehler beim Laden der Fahrer.";
+    return;
+}
+
+const activeUsers = {};
+
+(users || []).forEach(user => {
+    activeUsers[user.username] = user.display_name;
+});
+
     const { data, error } = await client
         .from("taxi_status_logs")
         .select("*")
@@ -1041,15 +1058,20 @@ async function loadAdminTimeStats() {
     const groupedLogs = {};
 
     (data || []).forEach(log => {
-        if (!groupedLogs[log.username]) {
-            groupedLogs[log.username] = {
-                display_name: log.display_name,
-                logs: []
-            };
-        }
 
-        groupedLogs[log.username].logs.push(log);
-    });
+    if (!activeUsers[log.username]) {
+        return;
+    }
+
+    if (!groupedLogs[log.username]) {
+        groupedLogs[log.username] = {
+            display_name: activeUsers[log.username],
+            logs: []
+        };
+    }
+
+    groupedLogs[log.username].logs.push(log);
+});
 
     const rows = Object.values(groupedLogs).map(driver => {
         const stats = {
