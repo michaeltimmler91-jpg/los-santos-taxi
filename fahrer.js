@@ -84,6 +84,9 @@ function setMobileMode(mode) {
     );
 
     mobileRenderDispatchers();
+
+    mobileLoadOpenJobs();
+    mobileLoadMyJobs();
 }
 
 async function mobileLoadAll() {
@@ -271,8 +274,7 @@ async function mobileLoadDispatchers() {
 
     mobileRenderDispatchers();
 
-    mobileLoadOpenJobs();
-    mobileLoadMyJobs();
+    
 }
 
 function mobileIsDispatcher() {
