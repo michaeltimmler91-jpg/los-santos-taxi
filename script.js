@@ -750,52 +750,71 @@ async function loadOpenJobs() {
     const box = document.getElementById("open_jobs_list");
     const data = await getOpenJobs();
 
-if (!data || data.length === 0) {
-    box.innerHTML = `
-        <div class="admin-card empty-state-card">
-            <strong>📭 Keine offenen Fahrten</strong><br>
-            Aktuell ist alles ruhig. Noch.
-        </div>
-    `;
+    box.innerHTML = "";
 
-    return;
-}
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card empty-state-card">
+                <strong>📭 Keine offenen Fahrten</strong><br>
+                Aktuell ist alles ruhig. Noch.
+            </div>
+        `;
+
+        return;
+    }
+
     data.forEach(job => {
+
+        const companyLine =
+        job.company_name
+        ? `<div>🏢 ${escapeHtml(job.company_name)}</div>`
+        : "";
+
+        const emsLine =
+        job.ems_staff_name
+        ? `<div>🚑 ${escapeHtml(job.ems_staff_name)}</div>`
+        : "";
+
+        const notesLine =
+        job.notes
+        ? `<div>📝 ${escapeHtml(job.notes)}</div>`
+        : "";
+
         box.innerHTML += `
-    <div class="ride-card ride-card-modern">
-        <div class="ride-top">
-            <span class="ride-type-badge">${escapeHtml(job.ride_type)}</span>
-            <span class="ride-status-badge">Offen</span>
-        </div>
+            <div class="ride-card ride-card-modern">
+                <div class="ride-top">
+                    <span class="ride-type-badge">${escapeHtml(job.ride_type || "Fahrt")}</span>
+                    <span class="ride-status-badge">Offen</span>
+                </div>
 
-        <div class="ride-route">
-            <div>
-                <small>Abholung</small>
-                <strong>${escapeHtml(job.pickup_location || "-")}</strong>
+                <div class="ride-route">
+                    <div>
+                        <small>Abholung</small>
+                        <strong>${escapeHtml(job.pickup_location || "-")}</strong>
+                    </div>
+
+                    <div class="ride-arrow">→</div>
+
+                    <div>
+                        <small>Ziel</small>
+                        <strong>${escapeHtml(job.destination || "-")}</strong>
+                    </div>
+                </div>
+
+                <div class="ride-info-grid">
+                    <div>👤 ${escapeHtml(job.customer_name || "-")}</div>
+                    ${companyLine}
+                    ${emsLine}
+                    ${notesLine}
+                </div>
+
+                <div class="ride-actions">
+                    <button class="small-btn" onclick="takeJob('${job.id}')">
+                        🚕 Auftrag übernehmen
+                    </button>
+                </div>
             </div>
-
-            <div class="ride-arrow">→</div>
-
-            <div>
-                <small>Ziel</small>
-                <strong>${escapeHtml(job.destination || "-")}</strong>
-            </div>
-        </div>
-
-        <div class="ride-info-grid">
-            <div>👤 ${escapeHtml(job.customer_name || "-")}</div>
-            <div>🏢 ${escapeHtml(job.company_name || "-")}</div>
-            <div>🚑 ${escapeHtml(job.ems_staff_name || "-")}</div>
-            <div>📝 ${escapeHtml(job.notes || "-")}</div>
-        </div>
-
-        <div class="ride-actions">
-            <button class="small-btn" onclick="takeJob('${job.id}')">
-                🚕 Auftrag übernehmen
-            </button>
-        </div>
-    </div>
-`;
+        `;
     });
 }
 
