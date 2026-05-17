@@ -213,9 +213,9 @@
 
         <input
             type="text"
-            id="plz_search_2"
+            id="service_plz_search"
             placeholder="z.B. 1000"
-            oninput="searchPlz2()"
+            oninput="searchServicePlz()"
         >
     </div>
 
@@ -229,21 +229,25 @@
 
 </div>
 
-    <div id="plz_result_2" style="margin-top:14px;"></div>
+    <div id="service_plz_result" style="margin-top:14px;"></div>
 
-<div class="mini-map-box" id="gtaMapBox2">
-        <div class="mini-map-inner" id="gtaMapInner2">
+<div class="service-map-box taxi-service-map" id="serviceMapBox">
+    <div class="service-map-inner" id="serviceMapInner">
 
-            <img
-                src="gta-map.png"
-                class="mini-map-img"
-                alt="GTA Karte"
-            >
+        <img
+            src="gta-map.png"
+            class="service-map-img"
+            alt="GTA Karte"
+        >
 
-            <div id="map_marker_2" class="mini-map-marker" style="display:none;"></div>
+        <div
+            id="service_map_marker"
+            class="service-map-marker service-marker-taxi"
+            style="display:none;"
+        ></div>
 
-        </div>
     </div>
+</div>
 
 </div>
                 <div class="sidebar-card">
@@ -340,6 +344,6 @@
 <script src="api.js?v=1"></script>
 <script src="script.js?v=14"></script>
 <script src="plz.js?v=2"></script>
-<script src="map2.js?v=6"></script>
+<script src="map-service.js?v=2"></script>
 </body>
 </html>
