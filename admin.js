@@ -1256,5 +1256,40 @@ function addStatusTime(stats, status, start, end, rangeStart, key) {
     }
 }
 
+function formatLastSeen(date) {
+    const now = new Date();
+
+    const diffMinutes =
+        Math.floor((now - date) / 1000 / 60);
+
+    if (diffMinutes < 1) {
+        return "gerade eben";
+    }
+
+    if (diffMinutes < 60) {
+        return `vor ${diffMinutes} Min`;
+    }
+
+    const diffHours =
+        Math.floor(diffMinutes / 60);
+
+    if (diffHours < 24) {
+        return `vor ${diffHours} Std`;
+    }
+
+    const diffDays =
+        Math.floor(diffHours / 24);
+
+    if (diffDays < 7) {
+        return `vor ${diffDays} Tagen`;
+    }
+
+    return date.toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
+}
+
 
 startAdmin();
