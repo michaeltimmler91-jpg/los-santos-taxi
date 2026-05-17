@@ -878,7 +878,12 @@ if (diffMinutes >= 10) {
             <div class="ride-card ride-card-modern">
                 <div class="ride-top">
                     <span class="ride-type-badge">${escapeHtml(job.ride_type || "Fahrt")}</span>
-                    <span class="ride-status-badge">Offen</span>
+                    <div class="ride-top-right">
+                        <span class="ride-status-badge">Offen</span>
+                        <span class="wait-badge ${waitingClass}">
+                        ⏱️ ${waitingText}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="ride-route">
