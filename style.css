@@ -3171,3 +3171,23 @@ body[data-company-theme="rainbow"] button {
 .job-actions button {
     margin-top: 0;
 }
+.ride-card-taken {
+    border-left-color: rgba(59,130,246,0.85);
+}
+
+.ride-edit-box {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.ride-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.ride-actions button {
+    margin-top: 0;
+}
