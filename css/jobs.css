@@ -85,18 +85,7 @@
 .compact-ride strong {
     color: #facc15;
 }
-.empty-state-card {
-    text-align: center;
-    padding: 22px;
-    color: #cbd5e1;
-}
 
-.empty-state-card strong {
-    display: block;
-    margin-bottom: 6px;
-    color: #facc15;
-    font-size: 17px;
-}
 
 .ride-actions {
     display: flex;
