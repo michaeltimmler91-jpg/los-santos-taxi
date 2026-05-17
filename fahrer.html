@@ -45,7 +45,7 @@
             </button>
         </div>
 
-        <div class="mobile-tabs">
+<div class="mobile-tabs">
 
     <button id="tabDriverBtn" class="active" onclick="setMobileMode('driver')">
         🚕 Fahrer
@@ -57,72 +57,9 @@
 
 </div>
 
+<!-- FAHRERMODUS -->
+
 <div id="driverModeBox">
-
-            <div class="card mobile-card">
-                <h2>📡 Leitstelle</h2>
-
-                <div id="mobile_dispatcher_status">
-                    Lädt...
-                </div>
-
-                <button id="mobileDispatcherBtn" onclick="mobileToggleDispatcher()">
-                    Leitstelle übernehmen
-                </button>
-            </div>
-
-            <div class="card mobile-card" id="mobileCreateJobBox" style="display:none;">
-                <h2>➕ Neuer Auftrag</h2>
-
-                <div class="field">
-                    <label>Fahrtart</label>
-                    <select id="mobile_job_ride_type">
-                        <option>Normale Fahrt</option>
-                        <option>Essenslieferung</option>
-                        <option>EMS</option>
-                        <option>Bambi-Tour</option>
-                        <option>Gebrauchtwagenhändler</option>
-                    </select>
-                </div>
-
-                <div class="field">
-                    <label>Abholort / PLZ</label>
-                    <input type="text" id="mobile_job_pickup_location">
-                </div>
-
-                <div class="field">
-                    <label>Ziel / PLZ</label>
-                    <input type="text" id="mobile_job_destination">
-                </div>
-
-                <div class="field">
-                    <label>Kunde / Empfänger</label>
-                    <input type="text" id="mobile_job_customer_name">
-                </div>
-
-                <div class="field">
-                    <label>Bemerkung</label>
-                    <input type="text" id="mobile_job_notes">
-                </div>
-
-                <button onclick="mobileCreateJob()">
-                    Auftrag erstellen
-                </button>
-            </div>
-
-            <div class="card mobile-card">
-                <h2>🟢 Fahrer im Dienst</h2>
-
-                <div id="mobile_active_drivers">
-                    Lädt...
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
 
     <div class="card mobile-card">
         <div class="mobile-section-head">
@@ -147,6 +84,11 @@
             Lädt...
         </div>
     </div>
+
+</div>
+
+<!-- LEITSTELLENMODUS -->
+
 <div id="dispatcherModeBox" style="display:none;">
 
     <div class="card mobile-card">
@@ -201,85 +143,101 @@
     </div>
 
     <div class="card mobile-card">
-        <h2>🟢 Fahrer im Dienst</h2>
+        <div class="mobile-section-head">
+            <h2>📞 Offene Fahrten</h2>
 
-        <div id="mobile_active_drivers">
+            <button class="small-btn" onclick="mobileLoadAll()">
+                🔄
+            </button>
+        </div>
+
+        <div id="mobile_dispatcher_open_jobs">
+            Lädt...
+        </div>
+    </div>
+
+    <div class="card mobile-card">
+        <div class="mobile-section-head">
+            <h2>🚕 Meine Fahrt</h2>
+        </div>
+
+        <div id="mobile_dispatcher_my_jobs">
             Lädt...
         </div>
     </div>
 
 </div>
+
+<!-- STATUS -->
+
+<div class="card mobile-card">
+    <h2>🚦 Status</h2>
+
+    <div id="mobile_driver_status">
+        Lädt...
+    </div>
+
+    <div class="mobile-button-grid">
+        <button onclick="mobileSetDriverStatus('Im Dienst')">
+            🟢 Dienst
+        </button>
+
+        <button onclick="mobileSetDriverStatus('Pause')">
+            🟡 Pause
+        </button>
+
+        <button class="danger-btn" onclick="mobileSetDriverStatus('Offline')">
+            🔴 Offline
+        </button>
+    </div>
 </div>
 
-        <div class="card mobile-card">
-            <h2>🚦 Status</h2>
+<!-- PLZ -->
 
-            <div id="mobile_driver_status">
-                Lädt...
-            </div>
+<div class="card mobile-card">
+    <h2>🗺️ PLZ Suche</h2>
 
-            <div class="mobile-button-grid">
-                <button onclick="mobileSetDriverStatus('Im Dienst')">
-                    🟢 Dienst
-                </button>
+    <div class="plz-search-row">
+        <div class="field plz-search-field">
+            <label>PLZ eingeben</label>
 
-                <button onclick="mobileSetDriverStatus('Pause')">
-                    🟡 Pause
-                </button>
-
-                <button class="danger-btn" onclick="mobileSetDriverStatus('Offline')">
-                    🔴 Offline
-                </button>
-            </div>
+            <input
+                type="text"
+                id="service_plz_search"
+                placeholder="z.B. 1000"
+                oninput="searchServicePlz()"
+            >
         </div>
 
-        <div class="card mobile-card">
-            <h2>🗺️ PLZ Suche</h2>
+        <a
+            href="plz_melden.html"
+            target="_blank"
+            class="small-btn secondary-btn plz-report-link"
+        >
+            📍 Fehler
+        </a>
+    </div>
 
-            <div class="plz-search-row">
-                <div class="field plz-search-field">
-                    <label>PLZ eingeben</label>
-                    <input
-                        type="text"
-                        id="service_plz_search"
-                        placeholder="z.B. 1000"
-                        oninput="searchServicePlz()"
-                    >
-                </div>
+    <div id="service_plz_result" style="margin-top:14px;"></div>
 
-                <a
-                    href="plz_melden.html"
-                    target="_blank"
-                    class="small-btn secondary-btn plz-report-link"
-                >
-                    📍 Fehler
-                </a>
-            </div>
+    <div class="service-map-box mobile-service-map" id="serviceMapBox">
+        <div class="service-map-inner" id="serviceMapInner">
 
-            <div id="service_plz_result" style="margin-top:14px;"></div>
+            <img
+                src="gta-map.png"
+                class="service-map-img"
+                alt="GTA Karte"
+            >
 
-            <div class="service-map-box mobile-service-map" id="serviceMapBox">
-                <div class="service-map-inner" id="serviceMapInner">
+            <div
+                id="service_map_marker"
+                class="service-map-marker service-marker-taxi"
+                style="display:none;"
+            ></div>
 
-                    <img
-                        src="gta-map.png"
-                        class="service-map-img"
-                        alt="GTA Karte"
-                    >
-
-                    <div
-                        id="service_map_marker"
-                        class="service-map-marker service-marker-taxi"
-                        style="display:none;"
-                    ></div>
-
-                </div>
-            </div>
         </div>
-
-        
-
-        
+    </div>
+</div>
 
 <div id="toastContainer"></div>
 
