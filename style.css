@@ -3384,3 +3384,10 @@ body[data-company-theme="rainbow"] button {
     color: #94a3b8;
     padding: 12px;
 }
+.driver-busy {
+    border-color: rgba(59,130,246,0.24);
+}
+
+.driver-busy small {
+    color: #93c5fd;
+}
