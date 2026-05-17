@@ -3273,3 +3273,25 @@ body[data-company-theme="rainbow"] button {
 .sound-card {
     opacity: 0.92;
 }
+#createJobBox {
+    border-left: 5px solid rgba(250,204,21,0.7);
+}
+
+#createJobBox .section-header {
+    margin-bottom: 14px;
+}
+
+#createJobBox .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+#createJobBox button {
+    margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+    #createJobBox .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
