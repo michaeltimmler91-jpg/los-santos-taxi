@@ -823,6 +823,27 @@ async function loadOpenJobs() {
     const box = document.getElementById("open_jobs_list");
     const data = await getOpenJobs();
 
+    const createdAt = new Date(job.created_at);
+const now = new Date();
+
+const diffMinutes =
+Math.floor((now - createdAt) / 1000 / 60);
+
+let waitingText = "Gerade eben";
+let waitingClass = "wait-good";
+
+if (diffMinutes >= 1) {
+    waitingText = `${diffMinutes} Min`;
+}
+
+if (diffMinutes >= 5) {
+    waitingClass = "wait-medium";
+}
+
+if (diffMinutes >= 10) {
+    waitingClass = "wait-bad";
+}
+    
     box.innerHTML = "";
 
     if (!data || data.length === 0) {
