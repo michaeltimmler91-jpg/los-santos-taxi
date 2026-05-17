@@ -2587,3 +2587,114 @@ body[data-company-theme="rainbow"] button {
     margin-left: auto;
     padding: 8px 12px;
 }
+/* =========================
+   WORKSHOP PAGE FINAL POLISH
+========================= */
+
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: stretch;
+    margin-top: 10px;
+}
+
+.compact-invoice-box,
+.workshop-map-card {
+    min-height: 675px;
+}
+
+.compact-invoice-box h2,
+.workshop-map-card h2 {
+    font-size: 26px;
+    margin-bottom: 14px;
+}
+
+.compact-invoice-box .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.workshop-map-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.workshop-map-card .admin-card {
+    padding: 16px 18px;
+    margin-bottom: 14px !important;
+}
+
+.workshop-map-card .admin-card strong {
+    font-size: 18px;
+}
+
+.map-feedback-mini {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+    align-items: center;
+
+    padding: 14px 16px;
+    margin-bottom: 14px;
+
+    border-radius: 18px;
+    background: rgba(15,23,42,0.78);
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.map-feedback-mini strong {
+    color: #facc15;
+    font-size: 15px;
+}
+
+.map-feedback-mini span {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.map-feedback-mini button {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    margin-top: 0;
+    padding: 9px 14px;
+    white-space: nowrap;
+}
+
+.workshop-map-card > br {
+    display: none;
+}
+
+#workshop_plz_result .admin-card {
+    border-left-color: #facc15;
+    padding: 14px 18px;
+}
+
+.workshop-mini-map-box {
+    height: 285px;
+    margin-top: 14px;
+    border-radius: 20px;
+    background: #07111f;
+}
+
+.workshop-mini-map-img {
+    filter: saturate(0.95) contrast(0.98);
+}
+
+.workshop-map-marker {
+    width: 34px;
+    height: 34px;
+    border-width: 5px;
+}
+
+@media (max-width: 1100px) {
+    .workshop-top-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compact-invoice-box,
+    .workshop-map-card {
+        min-height: auto;
+    }
+}
