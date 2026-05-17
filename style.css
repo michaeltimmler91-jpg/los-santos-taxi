@@ -2715,3 +2715,33 @@ body[data-company-theme="rainbow"] button {
     grid-template-columns: 1fr;
     margin-top: 0 !important;
 }
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.workshop-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.workshop-stats-vertical {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 0 !important;
+}
+
+.compact-invoice-box,
+.workshop-map-card {
+    min-height: auto !important;
+}
+
+@media (max-width: 1100px) {
+    .workshop-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
