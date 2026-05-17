@@ -3,9 +3,9 @@ let companies = [];
 let activeDispatchers = [];
 let currentDriverStatus = "Offline";
 let realtimeStarted = false;
-
 let idleTimer = null;
 let idleConfirmTimer = null;
+let lastHeartbeatUpdate = null;
 
 const IDLE_LIMIT_MS = 20 * 60 * 1000;
 const IDLE_CONFIRM_MS = 60 * 1000;
@@ -1410,6 +1410,26 @@ box.innerHTML = `
     </div>
 `;
 }
+function updateLiveClock() {
 
+    const box =
+    document.getElementById("live_clock");
+
+    if (!box) {
+        return;
+    }
+
+    const now = new Date();
+
+    box.innerHTML =
+        "🟢 Live • " +
+        now.toLocaleTimeString("de-DE", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit"
+        });
+}
+
+setInterval(updateLiveClock, 1000);
 
 startApp();
