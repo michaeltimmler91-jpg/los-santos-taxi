@@ -23,7 +23,9 @@
         </div>
     </div>
 
-    <div class="card" style="max-width:900px;margin:auto;">
+    <div class="workshop-top-grid">
+
+    <div class="card compact-invoice-box">
         <h2>🔧 Neue Rechnung eintragen</h2>
 
         <div class="form-grid">
@@ -67,7 +69,48 @@
 
         <div id="workshop_result" style="margin-top:20px;"></div>
     </div>
+    <div class="card workshop-map-card">
 
+        <h2>🗺️ Werkstatt PLZ-Finder</h2>
+
+        <div class="admin-card" style="margin-bottom:16px;">
+            <strong>Los Santos PLZ Karte</strong><br>
+            Für alle Mechaniker, die „komm mal 1037“ hören und erstmal den Schraubenschlüssel fallen lassen. 😄
+        </div>
+
+        <div class="field">
+            <label>PLZ suchen</label>
+            <input
+                type="text"
+                id="workshop_plz_search"
+                placeholder="z.B. 1002"
+                oninput="searchWorkshopPlz()"
+            >
+        </div>
+
+        <div id="workshop_plz_result" style="margin-top:14px;"></div>
+
+        <div class="workshop-mini-map-box" id="workshopMapBox">
+            <div class="workshop-mini-map-inner" id="workshopMapInner">
+
+                <img
+                    src="gta-map.png"
+                    class="workshop-mini-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div
+                    id="workshop_map_marker"
+                    class="workshop-map-marker"
+                    style="display:none;"
+                ></div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
     <div class="stats-grid" style="margin-top:28px;">
         <div class="stat-card stat-open">
             <div class="stat-title">Offene Rechnungen</div>
@@ -122,6 +165,7 @@
 <script src="utils.js?v=2"></script>
 <script src="api.js?v=1"></script>
 <script src="werkstatt.js?v=19"></script>
-
+<script src="plz.js?v=10"></script>
+<script src="map-workshop.js?v=1"></script>
 </body>
 </html>
