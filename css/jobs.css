@@ -31,3 +31,57 @@
 .ride-actions button {
     margin-top: 0;
 }
+.ride-card {
+    background:
+        rgba(10,20,40,0.95);
+
+    border:
+        1px solid rgba(255,255,255,0.05);
+
+    border-left:
+        5px solid #facc15;
+
+    border-radius: 20px;
+
+    padding: 20px;
+
+    margin-bottom: 18px;
+
+    line-height: 1.7;
+}
+
+.ride-card strong {
+    color: #facc15;
+    font-size: 18px;
+}
+
+.compact-ride {
+    display: grid;
+
+    grid-template-columns:
+        180px
+        100px
+        120px
+        120px
+        auto;
+
+    gap: 14px;
+
+    align-items: center;
+
+    background:
+        rgba(10,20,40,0.95);
+
+    border-left:
+        4px solid #facc15;
+
+    border-radius: 18px;
+
+    padding: 16px;
+
+    margin-bottom: 12px;
+}
+
+.compact-ride strong {
+    color: #facc15;
+}
