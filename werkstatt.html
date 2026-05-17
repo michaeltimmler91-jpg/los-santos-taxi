@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Werkstatt Abrechnung</title>
 
-    <link rel="stylesheet" href="style.css?v=19">
+    <link rel="stylesheet" href="style.css?v=20">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -25,126 +25,126 @@
 
     <div class="workshop-top-grid">
 
-    <div class="workshop-left-column">
+        <div class="workshop-left-column">
 
-    <div class="card compact-invoice-box">
-        <h2>🔧 Neue Rechnung eintragen</h2>
+            <div class="card compact-invoice-box">
+                <h2>🔧 Neue Rechnung eintragen</h2>
 
-        <div class="form-grid">
-            <div class="field">
-                <label>Firmencode</label>
-                <input type="password" id="firm_code">
-            </div>
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Firmencode</label>
+                        <input type="password" id="firm_code">
+                    </div>
 
-            <div class="field">
-                <label>Taxifahrer</label>
-                <select id="taxi_driver"></select>
-            </div>
+                    <div class="field">
+                        <label>Taxifahrer</label>
+                        <select id="taxi_driver"></select>
+                    </div>
 
-            <div class="field">
-                <label>Mechaniker</label>
-                <input type="text" id="mechanic_name">
-            </div>
+                    <div class="field">
+                        <label>Mechaniker</label>
+                        <input type="text" id="mechanic_name">
+                    </div>
 
-            <div class="field">
-                <label>Art</label>
-                <select id="work_type">
-                    <option>Reparatur</option>
-                    <option>Tuning</option>
-                </select>
-            </div>
+                    <div class="field">
+                        <label>Art</label>
+                        <select id="work_type">
+                            <option>Reparatur</option>
+                            <option>Tuning</option>
+                        </select>
+                    </div>
 
-            <div class="field">
-                <label>Betrag</label>
-                <input type="number" id="amount" value="0">
-            </div>
+                    <div class="field">
+                        <label>Betrag</label>
+                        <input type="number" id="amount" value="0">
+                    </div>
 
-            <div class="field">
-                <label>Bemerkung</label>
-                <input type="text" id="notes">
-            </div>
-        </div>
+                    <div class="field">
+                        <label>Bemerkung</label>
+                        <input type="text" id="notes">
+                    </div>
+                </div>
 
-        <button onclick="saveWorkshopCost()">
-            Rechnung speichern
-        </button>
+                <button onclick="saveWorkshopCost()">
+                    Rechnung speichern
+                </button>
 
                 <div id="workshop_result" style="margin-top:20px;"></div>
-    </div>
-        <div class="stats-grid" style="margin-top:28px;">
-        <div class="stat-card stat-open">
-            <div class="stat-title">Offene Rechnungen</div>
-            <div class="stat-value" id="open_count">0</div>
-        </div>
-
-        <div class="stat-card stat-taken">
-            <div class="stat-title">Offene Summe</div>
-            <div class="stat-value" id="open_total">0$</div>
-        </div>
-
-        <div class="stat-card stat-done">
-            <div class="stat-title">Archiv</div>
-            <div class="stat-value" id="archive_count">0</div>
-        </div>
-    </div>
-
-            <div class="card workshop-map-card">
-
-        <h2>🗺️ Werkstatt PLZ-Finder</h2>
-        <div class="map-feedback-mini">
-    <strong>🗺️ Kartenfehler gefunden?</strong>
-    <span>
-        PLZ schwimmt im Meer, steckt im Berg oder ist verschwunden?
-    </span>
-
-    <button
-        class="small-btn secondary-btn"
-        onclick="window.open('DEIN-LINK-HIER', '_blank')"
-    >
-        📍 Melden
-    </button>
-</div>
-        
-      <div class="admin-card" style="margin-bottom:16px;">
-            <strong>Los Santos PLZ Karte</strong><br>
-            Für alle Mechaniker, die „komm mal 1037“ hören und erstmal den Schraubenschlüssel fallen lassen. 😄
-        </div>
-
-        <div class="field">
-            <label>PLZ suchen</label>
-            <input
-                type="text"
-                id="workshop_plz_search"
-                placeholder="z.B. 1002"
-                oninput="searchWorkshopPlz()"
-            >
-        </div>
-        
-
-        <div id="workshop_plz_result" style="margin-top:14px;"></div>
-
-        <div class="workshop-mini-map-box" id="workshopMapBox">
-            <div class="workshop-mini-map-inner" id="workshopMapInner">
-
-                <img
-                    src="gta-map.png"
-                    class="workshop-mini-map-img"
-                    alt="GTA Karte"
-                >
-
-                <div
-                    id="workshop_map_marker"
-                    class="workshop-map-marker"
-                    style="display:none;"
-                ></div>
-
             </div>
+
+            <div class="stats-grid workshop-stats-vertical">
+                <div class="stat-card stat-open">
+                    <div class="stat-title">Offene Rechnungen</div>
+                    <div class="stat-value" id="open_count">0</div>
+                </div>
+
+                <div class="stat-card stat-taken">
+                    <div class="stat-title">Offene Summe</div>
+                    <div class="stat-value" id="open_total">0$</div>
+                </div>
+
+                <div class="stat-card stat-done">
+                    <div class="stat-title">Archiv</div>
+                    <div class="stat-value" id="archive_count">0</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="card workshop-map-card">
+
+            <h2>🗺️ Werkstatt PLZ-Finder</h2>
+
+            <div class="map-feedback-mini">
+                <strong>🗺️ Kartenfehler gefunden?</strong>
+                <span>PLZ schwimmt im Meer, steckt im Berg oder ist verschwunden?</span>
+
+                <button
+                    class="small-btn secondary-btn"
+                    onclick="window.open('DEIN-LINK-HIER', '_blank')"
+                >
+                    📍 Melden
+                </button>
+            </div>
+
+            <div class="admin-card" style="margin-bottom:16px;">
+                <strong>Los Santos PLZ Karte</strong><br>
+                Für alle Mechaniker, die „komm mal 1037“ hören und erstmal den Schraubenschlüssel fallen lassen. 😄
+            </div>
+
+            <div class="field">
+                <label>PLZ suchen</label>
+                <input
+                    type="text"
+                    id="workshop_plz_search"
+                    placeholder="z.B. 1002"
+                    oninput="searchWorkshopPlz()"
+                >
+            </div>
+
+            <div id="workshop_plz_result" style="margin-top:14px;"></div>
+
+            <div class="workshop-mini-map-box" id="workshopMapBox">
+                <div class="workshop-mini-map-inner" id="workshopMapInner">
+
+                    <img
+                        src="gta-map.png"
+                        class="workshop-mini-map-img"
+                        alt="GTA Karte"
+                    >
+
+                    <div
+                        id="workshop_map_marker"
+                        class="workshop-map-marker"
+                        style="display:none;"
+                    ></div>
+
+                </div>
+            </div>
+
         </div>
 
     </div>
-</div>
-</div>
-    
 
     <div class="section-card" style="margin-top:24px;">
         <div class="section-header">
@@ -179,11 +179,13 @@
     </div>
 
 </div>
+
 <script src="config.js?v=2"></script>
 <script src="utils.js?v=2"></script>
 <script src="api.js?v=1"></script>
 <script src="werkstatt.js?v=19"></script>
 <script src="plz.js?v=10"></script>
 <script src="map-workshop.js?v=1"></script>
+
 </body>
 </html>
