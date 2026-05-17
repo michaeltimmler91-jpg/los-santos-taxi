@@ -46,41 +46,44 @@
         </div>
 
         <div class="mobile-tabs">
-            <div id="driverModeBox">
 
-            <div class="card mobile-card">
-                <div class="mobile-section-head">
-                    <h2>📞 Offene Fahrten</h2>
+    <button id="tabDriverBtn" class="active" onclick="setMobileMode('driver')">
+        🚕 Fahrer
+    </button>
 
-                    <button class="small-btn" onclick="mobileLoadAll()">
-                        🔄
-                    </button>
-                </div>
+    <button id="tabDispatcherBtn" onclick="setMobileMode('dispatcher')">
+        📡 Leitstelle
+    </button>
 
-                <div id="mobile_open_jobs">
-                    Lädt...
-                </div>
-            </div>
+</div>
 
-            <div class="card mobile-card">
-                <div class="mobile-section-head">
-                    <h2>🚕 Meine Fahrt</h2>
-                </div>
+<div id="driverModeBox">
 
-                <div id="mobile_my_jobs">
-                    Lädt...
-                </div>
-            </div>
+    <div class="card mobile-card">
+        <div class="mobile-section-head">
+            <h2>📞 Offene Fahrten</h2>
 
-        </div>
-            <button id="tabDriverBtn" class="active" onclick="setMobileMode('driver')">
-                🚕 Fahrer
-            </button>
-
-            <button id="tabDispatcherBtn" onclick="setMobileMode('dispatcher')">
-                📡 Leitstelle
+            <button class="small-btn" onclick="mobileLoadAll()">
+                🔄
             </button>
         </div>
+
+        <div id="mobile_open_jobs">
+            Lädt...
+        </div>
+    </div>
+
+    <div class="card mobile-card">
+        <div class="mobile-section-head">
+            <h2>🚕 Meine Fahrt</h2>
+        </div>
+
+        <div id="mobile_my_jobs">
+            Lädt...
+        </div>
+    </div>
+
+</div>
 
         <div class="card mobile-card">
             <h2>🚦 Status</h2>
