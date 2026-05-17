@@ -59,8 +59,6 @@
 
 <div id="driverModeBox">
 
-    <div id="dispatcherModeBox" style="display:none;">
-
             <div class="card mobile-card">
                 <h2>📡 Leitstelle</h2>
 
@@ -149,7 +147,68 @@
             Lädt...
         </div>
     </div>
+<div id="dispatcherModeBox" style="display:none;">
 
+    <div class="card mobile-card">
+        <h2>📡 Leitstelle</h2>
+
+        <div id="mobile_dispatcher_status">
+            Lädt...
+        </div>
+
+        <button id="mobileDispatcherBtn" onclick="mobileToggleDispatcher()">
+            Leitstelle übernehmen
+        </button>
+    </div>
+
+    <div class="card mobile-card" id="mobileCreateJobBox" style="display:none;">
+        <h2>➕ Neuer Auftrag</h2>
+
+        <div class="field">
+            <label>Fahrtart</label>
+            <select id="mobile_job_ride_type">
+                <option>Normale Fahrt</option>
+                <option>Essenslieferung</option>
+                <option>EMS</option>
+                <option>Bambi-Tour</option>
+                <option>Gebrauchtwagenhändler</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Abholort / PLZ</label>
+            <input type="text" id="mobile_job_pickup_location">
+        </div>
+
+        <div class="field">
+            <label>Ziel / PLZ</label>
+            <input type="text" id="mobile_job_destination">
+        </div>
+
+        <div class="field">
+            <label>Kunde / Empfänger</label>
+            <input type="text" id="mobile_job_customer_name">
+        </div>
+
+        <div class="field">
+            <label>Bemerkung</label>
+            <input type="text" id="mobile_job_notes">
+        </div>
+
+        <button onclick="mobileCreateJob()">
+            Auftrag erstellen
+        </button>
+    </div>
+
+    <div class="card mobile-card">
+        <h2>🟢 Fahrer im Dienst</h2>
+
+        <div id="mobile_active_drivers">
+            Lädt...
+        </div>
+    </div>
+
+</div>
 </div>
 
         <div class="card mobile-card">
