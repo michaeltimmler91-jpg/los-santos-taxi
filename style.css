@@ -3322,3 +3322,65 @@ body[data-company-theme="rainbow"] button {
     box-shadow:
         0 8px 24px rgba(0,0,0,0.25);
 }
+.driver-mini-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.driver-mini-stats div {
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(15,23,42,0.75);
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+}
+
+.driver-mini-stats strong {
+    display: block;
+    color: #facc15;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.driver-mini-stats span {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.driver-group-title {
+    margin: 12px 0 8px;
+    color: #cbd5e1;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.driver-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 10px;
+    margin-bottom: 6px;
+
+    border-radius: 12px;
+    background: rgba(15,23,42,0.66);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.driver-row span {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.driver-row small {
+    color: #94a3b8;
+}
+
+.empty-mini {
+    text-align: center;
+    color: #94a3b8;
+    padding: 12px;
+}
