@@ -821,6 +821,8 @@ async function loadOpenJobs() {
 async function loadMyJobs() {
     const box = document.getElementById("my_jobs_list");
 
+    box.innerHTML = "";
+
     const { data, error } = await client
         .from("taxi_jobs")
         .select("*")
@@ -830,119 +832,161 @@ async function loadMyJobs() {
 
     if (error) {
         console.error(error);
+
+        box.innerHTML = `
+            <div class="admin-card empty-state-card">
+                <strong>❌ Fehler beim Laden</strong><br>
+                Deine Fahrten konnten nicht geladen werden.
+            </div>
+        `;
+
         return;
     }
 
     if (!data || data.length === 0) {
-    box.innerHTML = `
-        <div class="admin-card empty-state-card">
-            <strong>🚕 Keine eigene Fahrt</strong><br>
-            Du hast aktuell keinen Auftrag übernommen.
-        </div>
-    `;
+        box.innerHTML = `
+            <div class="admin-card empty-state-card">
+                <strong>🚕 Keine eigene Fahrt</strong><br>
+                Du hast aktuell keinen Auftrag übernommen.
+            </div>
+        `;
 
-    return;
-}
+        return;
+    }
 
     data.forEach(job => {
-       const foodFields = job.ride_type === "Essenslieferung" ? `
-    <div class="field">
-        <label>Essenskosten</label>
-        <input
-            type="number"
-            id="food_${job.id}"
-            value="${job.food_cost || 0}"
-            oninput="calculatePreview('${job.id}', '${job.ride_type}')"
-        >
-    </div>
+        const companyLine = job.company_name
+            ? `<div>🏢 ${escapeHtml(job.company_name)}</div>`
+            : "";
 
-    <div class="field">
-        <label>Essengeld bezahlt durch</label>
-        <select
-            id="food_paid_by_${job.id}"
-            onchange="calculatePreview('${job.id}', '${job.ride_type}')"
-        >
-            <option value="firma" ${job.food_paid_by !== "fahrer" ? "selected" : ""}>
-                Firma / Schließfach
-            </option>
+        const emsLine = job.ems_staff_name
+            ? `<div>🚑 ${escapeHtml(job.ems_staff_name)}</div>`
+            : "";
 
-            <option value="fahrer" ${job.food_paid_by === "fahrer" ? "selected" : ""}>
-                Fahrer privat
-            </option>
-        </select>
-    </div>
-` : "";
+        const notesLine = job.notes
+            ? `<div>📝 ${escapeHtml(job.notes)}</div>`
+            : "";
+
+        const foodFields = job.ride_type === "Essenslieferung" ? `
+            <div class="field">
+                <label>Essenskosten</label>
+                <input
+                    type="number"
+                    id="food_${job.id}"
+                    value="${job.food_cost || 0}"
+                    oninput="calculatePreview('${job.id}', '${job.ride_type}')"
+                >
+            </div>
+
+            <div class="field">
+                <label>Essengeld bezahlt durch</label>
+                <select
+                    id="food_paid_by_${job.id}"
+                    onchange="calculatePreview('${job.id}', '${job.ride_type}')"
+                >
+                    <option value="firma" ${job.food_paid_by !== "fahrer" ? "selected" : ""}>
+                        Firma / Schlie&szlig;fach
+                    </option>
+
+                    <option value="fahrer" ${job.food_paid_by === "fahrer" ? "selected" : ""}>
+                        Fahrer privat
+                    </option>
+                </select>
+            </div>
+        ` : "";
 
         box.innerHTML += `
-            <div class="ride-card ride-card-modern">
-    <div class="ride-top">
-        <span class="ride-type-badge">${escapeHtml(job.ride_type)}</span>
-        <span class="ride-status-badge taken">Übernommen</span>
-    </div>
+            <div class="ride-card ride-card-modern ride-card-taken">
+                <div class="ride-top">
+                    <span class="ride-type-badge">${escapeHtml(job.ride_type || "Fahrt")}</span>
+                    <span class="ride-status-badge taken">&Uuml;bernommen</span>
+                </div>
 
-    <div class="ride-route">
-        <div>
-            <small>Abholung</small>
-            <strong>${escapeHtml(job.pickup_location || "-")}</strong>
-        </div>
-
-        <div class="ride-arrow">→</div>
-
-        <div>
-            <small>Ziel</small>
-            <strong>${escapeHtml(job.destination || "-")}</strong>
-        </div>
-    </div>
-
-    <div class="ride-info-grid">
-        <div>🏢 ${escapeHtml(job.company_name || "-")}</div>
-        <div>🚑 ${escapeHtml(job.ems_staff_name || "-")}</div>
-        <div>👤 ${escapeHtml(job.customer_name || "-")}</div>
-        <div>📝 ${escapeHtml(job.notes || "-")}</div>
-    </div>
-
-                <div class="form-grid">
-                    <div class="field">
-                        <label>Kunde / Empfänger</label>
-                        <input type="text" id="customer_${job.id}" value="${escapeAttr(job.customer_name || "")}">
+                <div class="ride-route">
+                    <div>
+                        <small>Abholung</small>
+                        <strong>${escapeHtml(job.pickup_location || "-")}</strong>
                     </div>
 
-                    <div class="field">
-                        <label>Ziel</label>
-                        <input type="text" id="destination_${job.id}" value="${escapeAttr(job.destination || "")}">
-                    </div>
+                    <div class="ride-arrow">→</div>
 
-                    <div class="field">
-                        <label>Kilometer</label>
-                        <input type="number" id="km_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
-                    </div>
-
-                    <div class="field">
-                        <label>${getFareLabel(job.ride_type)}</label>
-                        <div class="preview-box" id="preview_fare_${job.id}">0$</div>
-                    </div>
-
-                    <div class="field">
-                        <label>Ausgestellte Rechnung</label>
-                        <input type="number" id="invoice_${job.id}" value="0" oninput="calculatePreview('${job.id}', '${job.ride_type}')">
-                    </div>
-
-                    <div class="field">
-                        <label>Errechnetes Trinkgeld</label>
-                        <div class="preview-box" id="preview_tip_${job.id}">0$</div>
-                    </div>
-
-                    ${foodFields}
-
-                    <div class="field">
-                        <label>Abschluss-Bemerkung</label>
-                        <input type="text" id="done_notes_${job.id}">
+                    <div>
+                        <small>Ziel</small>
+                        <strong>${escapeHtml(job.destination || "-")}</strong>
                     </div>
                 </div>
 
-                <button onclick="completeJob('${job.id}', '${job.ride_type}')">Fahrt abschließen</button>
-                <button class="small-btn secondary-btn" onclick="releaseJob('${job.id}')">Auftrag freigeben</button>
-                <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">Fahrgast nicht angetroffen</button>
+                <div class="ride-info-grid">
+                    <div>👤 ${escapeHtml(job.customer_name || "-")}</div>
+                    ${companyLine}
+                    ${emsLine}
+                    ${notesLine}
+                </div>
+
+                <div class="ride-edit-box">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Kunde / Empf&auml;nger</label>
+                            <input type="text" id="customer_${job.id}" value="${escapeAttr(job.customer_name || "")}">
+                        </div>
+
+                        <div class="field">
+                            <label>Ziel</label>
+                            <input type="text" id="destination_${job.id}" value="${escapeAttr(job.destination || "")}">
+                        </div>
+
+                        <div class="field">
+                            <label>Kilometer</label>
+                            <input
+                                type="number"
+                                id="km_${job.id}"
+                                value="0"
+                                oninput="calculatePreview('${job.id}', '${job.ride_type}')"
+                            >
+                        </div>
+
+                        <div class="field">
+                            <label>${getFareLabel(job.ride_type)}</label>
+                            <div class="preview-box" id="preview_fare_${job.id}">0$</div>
+                        </div>
+
+                        <div class="field">
+                            <label>Ausgestellte Rechnung</label>
+                            <input
+                                type="number"
+                                id="invoice_${job.id}"
+                                value="0"
+                                oninput="calculatePreview('${job.id}', '${job.ride_type}')"
+                            >
+                        </div>
+
+                        <div class="field">
+                            <label>Errechnetes Trinkgeld</label>
+                            <div class="preview-box" id="preview_tip_${job.id}">0$</div>
+                        </div>
+
+                        ${foodFields}
+
+                        <div class="field">
+                            <label>Abschluss-Bemerkung</label>
+                            <input type="text" id="done_notes_${job.id}">
+                        </div>
+                    </div>
+
+                    <div class="ride-actions">
+                        <button onclick="completeJob('${job.id}', '${job.ride_type}')">
+                            ✅ Fahrt abschlie&szlig;en
+                        </button>
+
+                        <button class="small-btn secondary-btn" onclick="releaseJob('${job.id}')">
+                            ↩️ Auftrag freigeben
+                        </button>
+
+                        <button class="small-btn danger-btn" onclick="markNoShow('${job.id}')">
+                            ❌ Fahrgast nicht angetroffen
+                        </button>
+                    </div>
+                </div>
             </div>
         `;
 
