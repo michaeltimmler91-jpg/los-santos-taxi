@@ -2897,3 +2897,13 @@ body[data-company-theme="rainbow"] button {
         0 0 8px rgba(59,130,246,0.8),
         0 0 18px rgba(59,130,246,0.45);
 }
+.taxi-service-map {
+    height: 260px;
+}
+
+.service-marker-taxi {
+    border: 5px solid rgba(236,72,153,0.95);
+    box-shadow:
+        0 0 8px rgba(236,72,153,0.8),
+        0 0 18px rgba(236,72,153,0.45);
+}
