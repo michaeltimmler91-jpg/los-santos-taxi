@@ -307,54 +307,93 @@ async function loadDriverStatus() {
         return;
     }
 
-    const own = data.find(d => d.username === currentUser.username);
+    const drivers = data || [];
+
+    const own = drivers.find(d => d.username === currentUser.username);
     currentDriverStatus = own ? own.status : "Offline";
 
     const text = document.getElementById("driver_status_text");
+
     if (text) {
         let badgeClass = "status-offline";
-let badgeText = "🔴 Offline";
+        let badgeText = "🔴 Offline";
 
-if (currentDriverStatus === "Im Dienst") {
-    badgeClass = "status-online";
-    badgeText = "🟢 Im Dienst";
-}
+        if (currentDriverStatus === "Im Dienst") {
+            badgeClass = "status-online";
+            badgeText = "🟢 Im Dienst";
+        }
 
-if (currentDriverStatus === "Pause") {
-    badgeClass = "status-pause";
-    badgeText = "🟡 Pause";
-}
+        if (currentDriverStatus === "Pause") {
+            badgeClass = "status-pause";
+            badgeText = "🟡 Pause";
+        }
 
-text.innerHTML = `
-    <div class="status-badge ${badgeClass}">
-        ${badgeText}
-    </div>
-`;
+        text.innerHTML = `
+            <div class="status-badge ${badgeClass}">
+                ${badgeText}
+            </div>
+        `;
     }
 
     const activeBox = document.getElementById("active_drivers_list");
-    if (!activeBox) return;
 
-    const activeDrivers = data.filter(d => d.status === "Im Dienst");
-    const pausedDrivers = data.filter(d => d.status === "Pause");
+    if (!activeBox) {
+        renderDispatchers();
+        return;
+    }
 
-    let html = "";
+    const activeDrivers = drivers.filter(d => d.status === "Im Dienst");
+    const pausedDrivers = drivers.filter(d => d.status === "Pause");
+
+    let html = `
+        <div class="driver-mini-stats">
+            <div>
+                <strong>${activeDrivers.length}</strong>
+                <span>Im Dienst</span>
+            </div>
+
+            <div>
+                <strong>${pausedDrivers.length}</strong>
+                <span>Pause</span>
+            </div>
+        </div>
+    `;
 
     if (activeDrivers.length > 0) {
-        html += "<br><strong>Im Dienst:</strong><br>";
+        html += `<div class="driver-group-title">🟢 Verf&uuml;gbar</div>`;
+
         activeDrivers.forEach(driver => {
-            html += `🟢 ${escapeHtml(driver.display_name)}<br>`;
+            html += `
+                <div class="driver-row driver-online">
+                    <span>${escapeHtml(driver.display_name)}</span>
+                    <small>Dienst</small>
+                </div>
+            `;
         });
     }
 
     if (pausedDrivers.length > 0) {
-        html += "<br><strong>Pause:</strong><br>";
+        html += `<div class="driver-group-title">🟡 Pause</div>`;
+
         pausedDrivers.forEach(driver => {
-            html += `🟡 ${escapeHtml(driver.display_name)}<br>`;
+            html += `
+                <div class="driver-row driver-pause">
+                    <span>${escapeHtml(driver.display_name)}</span>
+                    <small>Pause</small>
+                </div>
+            `;
         });
     }
 
-    activeBox.innerHTML = html || "<br>Keine Fahrer im Dienst.";
+    if (activeDrivers.length === 0 && pausedDrivers.length === 0) {
+        html += `
+            <div class="empty-mini">
+                Keine Fahrer im Dienst.
+            </div>
+        `;
+    }
+
+    activeBox.innerHTML = html;
 
     renderDispatchers();
 }
