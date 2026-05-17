@@ -447,7 +447,9 @@ async function mobileCreateJob() {
 
 async function mobileLoadOpenJobs() {
     const box =
-    document.getElementById("mobile_open_jobs");
+    mobileMode === "dispatcher"
+    ? document.getElementById("mobile_dispatcher_open_jobs")
+    : document.getElementById("mobile_open_jobs");
 
     const { data, error } =
     await client
@@ -547,7 +549,9 @@ async function mobileTakeJob(jobId) {
 
 async function mobileLoadMyJobs() {
     const box =
-    document.getElementById("mobile_my_jobs");
+    mobileMode === "dispatcher"
+    ? document.getElementById("mobile_dispatcher_my_jobs")
+    : document.getElementById("mobile_my_jobs");
 
     const { data, error } =
     await client
