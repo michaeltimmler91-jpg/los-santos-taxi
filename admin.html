@@ -1,409 +1,442 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taxi Adminbereich</title>
-
-    <link rel="stylesheet" href="style.css?v=14">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-
-<div class="admin-shell">
-
-    <aside class="admin-sidebar-nav">
-
-        <div class="admin-brand">
-            <div class="admin-brand-icon">🚕</div>
-            <div>
-                <div class="admin-brand-title">Taxi Admin</div>
-                <div class="admin-brand-sub">Los Santos Taxi</div>
-            </div>
-        </div>
-
-        <nav class="admin-nav">
-
-            <button onclick="showAdminTab('tab_dashboard')" class="admin-nav-btn active">
-                📊 Übersicht
-            </button>
-
-            <button onclick="showAdminTab('tab_users')" class="admin-nav-btn">
-                👥 Benutzer
-            </button>
-
-            <button onclick="showAdminTab('tab_companies')" class="admin-nav-btn">
-                🏢 Firmen
-            </button>
-            
-            <button onclick="showAdminTab('tab_workshops')" class="admin-nav-btn">
-    🔧         Werkstätten
-            </button>
-            
-            <button onclick="showAdminTab('tab_rides')" class="admin-nav-btn">
-                🚕 Fahrten
-            </button>
-
-            <button onclick="showAdminTab('tab_tips')" class="admin-nav-btn">
-                🎁 Trinkgeld
-            </button>
-            <button onclick="showAdminTab('tab_times')" class="admin-nav-btn">
-                ⏱️ Dienstzeiten
-            </button>
-            <button onclick="showAdminTab('tab_dealer')" class="admin-nav-btn">
-                🚗 Händler
-            </button>
-            <button onclick="showAdminTab('tab_announcements')" class="admin-nav-btn">
-                📢 Infos
-            </button>
-        </nav>
-
-        <div class="admin-sidebar-footer">
-            <a href="index.html">
-                <button class="small-btn">← Leitstelle</button>
-            </a>
-
-            <button class="small-btn danger-btn" onclick="logoutAdmin()">
-                Logout
-            </button>
-        </div>
-
-    </aside>
-
-    <main class="admin-main">
-
-        <div class="admin-page-header">
-
-            <div>
-                <h1>👑 Taxi Adminbereich</h1>
-                <p>Benutzer, Firmen, Fahrten & Trinkgeld verwalten</p>
-            </div>
-
-            <div class="admin-user-pill">
-                Eingeloggt als<br>
-                <strong id="adminUserName">-</strong>
-            </div>
-
-        </div>
-
-        <div id="adminAccessDenied" class="admin-section" style="display:none;">
-            <h2>Kein Zugriff</h2>
-            <p>Du bist kein Admin.</p>
-
-            <a href="index.html">
-                <button>Zurück zur Leitstelle</button>
-            </a>
-        </div>
-
-        <div id="adminApp" style="display:none;">
-
-            <div class="admin-dashboard-grid">
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Fahrer</div>
-                    <div class="admin-kpi-value" id="adminStatDrivers">0</div>
-                </div>
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Firmen</div>
-                    <div class="admin-kpi-value" id="adminStatCompanies">0</div>
-                </div>
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Offene Aufträge</div>
-                    <div class="admin-kpi-value" id="adminStatOpenJobs">0</div>
-                </div>
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Offenes Trinkgeld</div>
-                    <div class="admin-kpi-value" id="adminStatTips">0$</div>
-                </div>
-
-            </div>
-
-            <!-- DASHBOARD -->
-            <div class="admin-tab-content" id="tab_workshops" style="display:none;">
-
-    <div class="admin-section">
-        <h2>🔧 Werkstattlisten</h2>
-
-        <div class="admin-card">
-            <strong>Benny's</strong><br>
-            Firmencode: <strong>Benny2026</strong><br>
-            Zahlungs-Code: <strong>Benny2026-PAY</strong><br><br>
-
-            <a href="werkstatt.html?firma=Benny2026" target="_blank">
-                <button class="small-btn">Benny's öffnen</button>
-            </a>
-        </div>
-
-        <div class="admin-card">
-            <strong>Blackline</strong><br>
-            Firmencode: <strong>Blackline2026</strong><br>
-            Zahlungs-Code: <strong>Blackline2026-PAY</strong><br><br>
-
-            <a href="werkstatt.html?firma=Blackline2026" target="_blank">
-                <button class="small-btn">Blackline öffnen</button>
-            </a>
-        </div>
-
-        <div class="admin-card">
-            <strong>WCP</strong><br>
-            Firmencode: <strong>WCP2026</strong><br>
-            Zahlungs-Code: <strong>WCP2026-PAY</strong><br><br>
-
-            <a href="werkstatt.html?firma=WCP2026" target="_blank">
-                <button class="small-btn">WCP öffnen</button>
-            </a>
-        </div>
-
-        <div class="admin-card">
-            <strong>LSC</strong><br>
-            Firmencode: <strong>LSC2026</strong><br>
-            Zahlungs-Code: <strong>LSC2026-PAY</strong><br><br>
-
-            <a href="werkstatt.html?firma=LSC2026" target="_blank">
-                <button class="small-btn">LSC öffnen</button>
-            </a>
-        </div>
-
-    </div>
-
-</div>
-
-            <div class="admin-tab-content" id="tab_dashboard">
-
-                <div class="admin-layout">
-
-                    <div>
-                        <div class="admin-section">
-                            <h2>📊 Übersicht</h2>
-                            <div id="dashboard_overview"></div>
-                        </div>
-
-                        <div class="admin-section">
-                            <h2>🚕 Letzte Fahrten</h2>
-                            <div id="admin_done_jobs"></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="admin-section">
-                            <h2>🎁 Trinkgeld Übersicht</h2>
-                            <div id="tips_stats"></div>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- BENUTZER -->
-
-            <div class="admin-tab-content" id="tab_users" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>👥 Benutzer erstellen</h2>
-
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Benutzername</label>
-                            <input type="text" id="new_username">
-                        </div>
-
-                        <div class="field">
-                            <label>Anzeigename</label>
-                            <input type="text" id="new_display_name">
-                        </div>
-
-                        <div class="field">
-                            <label>Passwort</label>
-                            <input type="text" id="new_password">
-                        </div>
-
-                        <div class="field">
-                            <label>Rolle</label>
-                            <select id="new_role">
-                                <option value="fahrer">Fahrer</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button onclick="createUser()">Benutzer erstellen</button>
-                </div>
-
-                <div class="admin-section">
-                    <h2>👥 Benutzerverwaltung</h2>
-                    <div id="users_list"></div>
-                </div>
-
-            </div>
-
-            <!-- FIRMEN -->
-
-            <div class="admin-tab-content" id="tab_companies" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>🏢 Liefer-Unternehmen</h2>
-
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Neues Unternehmen</label>
-                            <input type="text" id="new_company_name">
-                        </div>
-                       <div class="field">
-    <label>Firmenfarbe</label>
-
-    <select id="new_company_color">
-
-        <option value="yellow">🟡 Gelb</option>
-        <option value="orange">🟠 Orange</option>
-        <option value="red">🔴 Rot</option>
-        <option value="darkred">🟥 Dunkelrot</option>
-
-        <option value="blue">🔵 Blau</option>
-        <option value="darkblue">🌌 Dunkelblau</option>
-        <option value="cyan">🩵 Cyan</option>
-        <option value="turquoise">🌊 Türkis</option>
-
-        <option value="green">🟢 Grün</option>
-        <option value="lime">🟩 Lime</option>
-        <option value="darkgreen">🌲 Dunkelgrün</option>
-
-        <option value="purple">🟣 Lila</option>
-        <option value="violet">💜 Violett</option>
-        <option value="pink">🌸 Pink</option>
-        <option value="magenta">💖 Magenta</option>
-
-        <option value="white">⚪ Weiß</option>
-        <option value="silver">🪙 Silber</option>
-        <option value="gray">⚫ Grau</option>
-        <option value="black">⬛ Schwarz</option>
-
-        <option value="gold">✨ Gold</option>
-        <option value="bronze">🥉 Bronze</option>
-
-        <option value="rainbow">🌈 Rainbow</option>
-        <option value="neon">⚡ Neon</option>
-        <option value="fire">🔥 Feuer</option>
-        <option value="ice">❄️ Eis</option>
-
-    </select>
-</div>
-                    </div>
-
-                    <button onclick="createCompany()">Unternehmen hinzufügen</button>
-
-                    <br><br>
-
-                    <div id="companies_list"></div>
-                </div>
-
-            </div>
-
-            <!-- FAHRTEN -->
-
-            <div class="admin-tab-content" id="tab_rides" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>🚕 Erledigte Fahrten</h2>
-                    <div id="admin_done_jobs_full"></div>
-                </div>
-
-            </div>
-
-            <div class="admin-tab-content" id="tab_dealer" style="display:none;">
-
-    <div class="admin-section">
-        <h2>🚗 Gebrauchtwagenhändler-Abrechnung</h2>
-
-        <div id="dealer_stats"></div>
-
-        <br>
-
-        <button class="danger-btn" onclick="payDealerMonth()">
-            💰 Monat abrechnen / zurücksetzen
-        </button>
-    </div>
-
-</div>
-          <div class="admin-tab-content" id="tab_announcements" style="display:none;">
-
-    <div class="admin-section">
-        <h2>📢 Wichtige Infos</h2>
-
-        <div class="form-grid">
-
-            <div class="field">
-                <label>Titel</label>
-                <input type="text" id="announcement_title">
-            </div>
-
-            <div class="field">
-                <label>Pflichtbestätigung</label>
-
-                <select id="announcement_confirm">
-                    <option value="true">Ja</option>
-                    <option value="false">Nein</option>
-                </select>
-            </div>
-
-        </div>
-
-        <div class="field">
-            <label>Nachricht</label>
-
-            <textarea
-                id="announcement_message"
-                rows="6"
-            ></textarea>
-        </div>
-
-        <button onclick="createAnnouncement()">
-            📢 Info veröffentlichen
-        </button>
-
-    </div>
-
-    <div class="admin-section">
-        <h2>📋 Aktive Infos</h2>
-
-        <div id="announcements_list"></div>
-    </div>
-
-</div>  
-<div class="admin-tab-content" id="tab_times" style="display:none;">
-
-    <div class="admin-section">
-        <h2>⏱️ Fahrer Dienstzeiten</h2>
-
-        <div id="admin_time_stats"></div>
-    </div>
-
-</div>
-            
-            <!-- TRINKGELD -->
-
-            <div class="admin-tab-content" id="tab_tips" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>🎁 Trinkgeld-Auszahlung</h2>
-                    <div id="tips_stats_full"></div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
-<script src="config.js?v=2"></script>
-<script src="utils.js?v=2"></script>
-<script src="api.js?v=1"></script>
-<script src="admin.js?v=15"></script>
-
-</body>
-</html>
+/* =========================
+   WORKSHOP PAGE
+========================= */
+
+#open_workshop_list .admin-card,
+#archive_workshop_list .admin-card {
+    margin-bottom: 14px;
+}
+
+#open_total {
+    font-size: 46px;
+}
+
+.workshop-status-open {
+    color: #f87171;
+    font-weight: 900;
+}
+
+.workshop-status-paid {
+    color: #4ade80;
+    font-weight: 900;
+}
+
+#open_workshop_list .done-row,
+#archive_workshop_list .done-row {
+    border-left-color: #facc15;
+}
+
+#open_workshop_list .done-line-top strong,
+#archive_workshop_list .done-line-top strong {
+    color: #facc15;
+}
+
+#open_workshop_list .done-line-bottom,
+#archive_workshop_list .done-line-bottom {
+    align-items: center;
+}
+
+#workshop_result .success-card {
+    border-left-color: #4ade80 !important;
+}
+
+/* =========================
+   WORKSHOP ACTIONS
+========================= */
+
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-actions button {
+    margin-top: 0;
+}
+
+#open_workshop_list .field {
+    margin-top: 10px;
+}
+
+#open_workshop_list input {
+    background: rgba(15, 23, 42, 0.7);
+}
+
+#archive_workshop_list .done-row {
+    opacity: 0.9;
+}
+
+#archive_workshop_list .done-row:hover {
+    opacity: 1;
+}
+.admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.admin-actions input {
+    flex: 1;
+    min-width: 220px;
+    margin: 0;
+}
+
+.admin-actions button {
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* =========================
+   WORKSHOP PLZ MAP
+========================= */
+
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: stretch;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.compact-invoice-box {
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+.workshop-map-card {
+    min-height: 420px;
+}
+
+.workshop-map-card h2 {
+    margin-bottom: 16px;
+}
+
+.workshop-mini-map-box {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    margin-top: 14px;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #07111f;
+}
+
+.workshop-mini-map-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
+    transition: transform 0.15s ease;
+}
+
+.workshop-mini-map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+}
+
+.workshop-map-marker {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(255,20,147,0.9);
+    border-radius: 50%;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    box-shadow:
+        0 0 6px rgba(255,20,147,0.8),
+        0 0 12px rgba(255,20,147,0.45);
+    z-index: 50;
+    pointer-events: none;
+}
+
+@media (max-width: 1100px) {
+    .workshop-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.map-feedback-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    margin-top: 14px;
+    padding: 12px 14px;
+
+    border-radius: 16px;
+    background: rgba(15,23,42,0.72);
+    border: 1px solid rgba(255,255,255,0.06);
+
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.map-feedback-mini strong {
+    color: #facc15;
+    font-size: 14px;
+}
+
+.map-feedback-mini button {
+    margin-top: 0;
+    margin-left: auto;
+    padding: 8px 12px;
+}
+
+/* =========================
+   WORKSHOP PAGE FINAL POLISH
+========================= */
+
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: stretch;
+    margin-top: 10px;
+}
+
+.compact-invoice-box,
+.workshop-map-card {
+    min-height: 675px;
+}
+
+.compact-invoice-box h2,
+.workshop-map-card h2 {
+    font-size: 26px;
+    margin-bottom: 14px;
+}
+
+.compact-invoice-box .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.workshop-map-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.workshop-map-card .admin-card {
+    padding: 16px 18px;
+    margin-bottom: 14px !important;
+}
+
+.workshop-map-card .admin-card strong {
+    font-size: 18px;
+}
+
+.map-feedback-mini {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 12px;
+    align-items: center;
+
+    padding: 14px 16px;
+    margin-bottom: 14px;
+
+    border-radius: 18px;
+    background: rgba(15,23,42,0.78);
+    border: 1px solid rgba(255,255,255,0.07);
+}
+
+.map-feedback-mini strong {
+    color: #facc15;
+    font-size: 15px;
+}
+
+.map-feedback-mini span {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.map-feedback-mini button {
+    grid-row: 1 / span 2;
+    grid-column: 2;
+    margin-top: 0;
+    padding: 9px 14px;
+    white-space: nowrap;
+}
+
+.workshop-map-card > br {
+    display: none;
+}
+
+#workshop_plz_result .admin-card {
+    border-left-color: #facc15;
+    padding: 14px 18px;
+}
+
+.workshop-mini-map-box {
+    height: 285px;
+    margin-top: 14px;
+    border-radius: 20px;
+    background: #07111f;
+}
+
+.workshop-mini-map-img {
+    filter: saturate(0.95) contrast(0.98);
+}
+
+.workshop-map-marker {
+    width: 34px;
+    height: 34px;
+    border-width: 5px;
+}
+
+@media (max-width: 1100px) {
+    .workshop-top-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compact-invoice-box,
+    .workshop-map-card {
+        min-height: auto;
+    }
+}
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.workshop-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.workshop-left-column .stats-grid {
+    grid-template-columns: 1fr;
+    margin-top: 0 !important;
+}
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.workshop-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.workshop-stats-vertical {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 0 !important;
+}
+
+.compact-invoice-box,
+.workshop-map-card {
+    min-height: auto !important;
+}
+
+@media (max-width: 1100px) {
+    .workshop-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
+.plz-report-card {
+    margin-bottom: 18px;
+}
+
+.plz-report-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+
+.plz-report-top span {
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.plz-report-meta {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.plz-report-text {
+    background: rgba(15,23,42,0.72);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 12px 14px;
+    color: #e5e7eb;
+    line-height: 1.5;
+}
+
+.plz-status-badge {
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.status-offen {
+    background: rgba(239,68,68,0.16);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.25);
+}
+
+.status-bearbeitung {
+    background: rgba(250,204,21,0.16);
+    color: #facc15;
+    border: 1px solid rgba(250,204,21,0.25);
+}
+
+.status-erledigt {
+    background: rgba(34,197,94,0.16);
+    color: #4ade80;
+    border: 1px solid rgba(34,197,94,0.25);
+}
+.map-feedback-inline {
+    margin-top: 10px;
+    margin-bottom: 12px;
+
+    display: flex;
+    justify-content: flex-end;
+}
+
+.plz-report-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+}
+.plz-search-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.plz-search-field {
+    flex: 1;
+}
+
+.plz-report-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 46px;
+    padding: 0 16px;
+
+    text-decoration: none;
+    white-space: nowrap;
+}

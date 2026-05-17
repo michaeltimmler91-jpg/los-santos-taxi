@@ -1,0 +1,408 @@
+/* =========================
+   STATUS BADGES
+========================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 14px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.status-online {
+    background: rgba(34,197,94,0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34,197,94,0.25);
+}
+
+.status-pause {
+    background: rgba(250,204,21,0.15);
+    color: #facc15;
+    border: 1px solid rgba(250,204,21,0.25);
+}
+
+.status-offline {
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.25);
+}
+.stat-card::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(250,204,21,0.08),
+            transparent 60%
+        );
+
+    pointer-events: none;
+}
+
+.stat-value {
+    text-shadow:
+        0 0 18px rgba(250,204,21,0.18);
+}
+
+.stat-card:hover .stat-value {
+    text-shadow:
+        0 0 28px rgba(250,204,21,0.35);
+}
+
+/* =========================
+   SIDEBAR GLASS LOOK
+========================= */
+
+.dashboard-sidebar .sidebar-card {
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(10,20,40,0.88),
+            rgba(5,12,25,0.88)
+        );
+
+    backdrop-filter: blur(18px);
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+        0 10px 35px rgba(0,0,0,0.35);
+}
+
+.dashboard-sidebar .sidebar-title {
+    position: relative;
+
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+
+.dashboard-sidebar .sidebar-title::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 60px;
+    height: 3px;
+
+    border-radius: 999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #facc15,
+            transparent
+        );
+}
+
+/* =========================
+   KPI COLORS
+========================= */
+
+.stat-open {
+    border-left: 5px solid #facc15;
+}
+
+.stat-taken {
+    border-left: 5px solid #60a5fa;
+}
+
+.stat-done {
+    border-left: 5px solid #4ade80;
+}
+
+.stat-open .stat-value {
+    color: #facc15;
+}
+
+.stat-taken .stat-value {
+    color: #60a5fa;
+}
+
+.stat-done .stat-value {
+    color: #4ade80;
+}
+
+/* =========================
+   SIDEBAR BUTTON EFFECTS
+========================= */
+
+.status-buttons button,
+.sound-row button,
+#dispatcherToggleBtn {
+
+    position: relative;
+    overflow: hidden;
+}
+
+.status-buttons button::before,
+.sound-row button::before,
+#dispatcherToggleBtn::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: -120%;
+
+    width: 120%;
+    height: 100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.18),
+            transparent
+        );
+
+    transition: 0.6s;
+}
+
+.status-buttons button:hover::before,
+.sound-row button:hover::before,
+#dispatcherToggleBtn:hover::before {
+
+    left: 120%;
+}
+.toast {
+    min-width: 320px;
+    max-width: 380px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8,18,38,0.96),
+            rgba(4,10,25,0.96)
+        );
+
+    border:
+        1px solid rgba(255,255,255,0.08);
+
+    border-left:
+        5px solid #facc15;
+
+    border-radius: 22px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,0.45);
+
+    backdrop-filter: blur(16px);
+
+    animation:
+        toastIn 0.35s ease;
+}
+
+.toast-title {
+    font-weight: 900;
+    color: #facc15;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+.toast-message {
+    font-size: 14px;
+    color: #d1d5db;
+    line-height: 1.5;
+}
+
+/* =========================
+   DIENSTZEIT
+========================= */
+
+#my_time_stats .compact-time {
+    padding: 0;
+    background: transparent;
+    border: 0;
+}
+
+#my_time_stats .time-section {
+    padding: 14px 16px;
+    margin-bottom: 12px;
+
+    border-radius: 16px;
+
+    background: rgba(15,23,42,0.72);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+
+#my_time_stats .time-section:last-child {
+    margin-bottom: 0;
+}
+
+#my_time_stats .time-section strong {
+    display: block;
+    color: #facc15;
+    margin-bottom: 10px;
+}
+
+#my_time_stats .time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 4px 0;
+}
+
+#my_time_stats .time-value {
+    font-weight: 900;
+    color: #ffffff;
+}
+
+
+/* Sidebar compact polish */
+.dashboard-sidebar .sidebar-card {
+    padding: 18px;
+}
+
+.sidebar-title {
+    margin-bottom: 12px;
+}
+
+.status-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.status-buttons button {
+    margin-top: 0;
+}
+
+#active_drivers_list,
+#dispatcher_status,
+#my_time_stats {
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(15,23,42,0.62);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+
+#driver_status_text {
+    font-weight: 900;
+    color: #facc15;
+    margin-bottom: 8px;
+}
+
+.sound-card {
+    opacity: 0.92;
+}
+
+
+/* Live clock / driver mini stats */
+.live-clock {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 14px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(15,23,42,0.92),
+            rgba(30,41,59,0.92)
+        );
+
+    border:
+        1px solid rgba(34,197,94,0.25);
+
+    color: #22c55e;
+
+    font-weight: 800;
+    font-size: 14px;
+
+    box-shadow:
+        0 8px 24px rgba(0,0,0,0.25);
+}
+.driver-mini-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.driver-mini-stats div {
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(15,23,42,0.75);
+    border: 1px solid rgba(255,255,255,0.06);
+    text-align: center;
+}
+
+.driver-mini-stats strong {
+    display: block;
+    color: #facc15;
+    font-size: 22px;
+    line-height: 1;
+}
+
+.driver-mini-stats span {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.driver-group-title {
+    margin: 12px 0 8px;
+    color: #cbd5e1;
+    font-weight: 900;
+    font-size: 13px;
+}
+
+.driver-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 10px;
+    margin-bottom: 6px;
+
+    border-radius: 12px;
+    background: rgba(15,23,42,0.66);
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.driver-row span {
+    color: #f8fafc;
+    font-weight: 700;
+}
+
+.driver-row small {
+    color: #94a3b8;
+}
+
+.empty-mini {
+    text-align: center;
+    color: #94a3b8;
+    padding: 12px;
+}
+.driver-busy {
+    border-color: rgba(59,130,246,0.24);
+}
+
+.driver-busy small {
+    color: #93c5fd;
+}

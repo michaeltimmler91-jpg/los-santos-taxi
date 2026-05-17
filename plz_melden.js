@@ -1,91 +1,144 @@
-const supabaseClient =
-supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-async function sendPlzReport(){
+    <title>PLZ Fehler melden</title>
 
-    const plz =
-    document
-    .getElementById("report_plz")
-    .value
-    .trim();
+    <link rel="stylesheet" href="style.css?v=20">
 
-    const type =
-    document
-    .getElementById("report_type")
-    .value;
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
-    const text =
-    document
-    .getElementById("report_text")
-    .value
-    .trim();
+<div class="container">
 
-    const name =
-    document
-    .getElementById("report_name")
-    .value
-    .trim();
+    <div class="modern-header">
+        <div class="header-left">
 
-    if(!plz){
-
-        document
-        .getElementById("report_result")
-        .innerHTML = `
-            <div class="error-box">
-                Bitte eine PLZ eingeben.
+            <div class="logo-icon">
+                🗺️
             </div>
-        `;
 
-        return;
-    }
+            <div>
+                <div class="main-title">
+                    PLZ Fehler melden
+                </div>
 
-    const { error } =
-    await supabaseClient
-    .from("plz_reports")
-    .insert([{
-
-        plz: plz,
-        type: type,
-        text: text,
-        reporter: name
-
-    }]);
-
-    if(error){
-
-        console.error(error);
-
-        document
-        .getElementById("report_result")
-        .innerHTML = `
-            <div class="error-box">
-                Fehler beim Senden.
+                <div class="sub-title">
+                    Los Santos Kartenservice
+                </div>
             </div>
-        `;
 
-        return;
-    }
-
-    document
-    .getElementById("report_result")
-    .innerHTML = `
-        <div class="success-box">
-            ✅ Danke! Die Meldung wurde gespeichert.
         </div>
-    `;
+    </div>
 
-    document
-    .getElementById("report_plz")
-    .value = "";
+    <div
+        class="card"
+        style="
+            max-width:850px;
+            margin:auto;
+        "
+    >
 
-    document
-    .getElementById("report_text")
-    .value = "";
+        <h2>
+            📍 Kartenfehler melden
+        </h2>
 
-    document
-    .getElementById("report_name")
-    .value = "";
-}
+        <div class="admin-card" style="margin-bottom:20px;">
+
+            <strong>
+                🗺️ Kartenfehler gefunden?
+            </strong>
+            <br>
+
+            Falls eine PLZ im Meer schwimmt,
+            mitten im Berg steckt oder komplett
+            verschwunden ist:
+            Hier kannst du es melden 👀
+
+        </div>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>
+                    PLZ
+                </label>
+
+                <input
+                    type="text"
+                    id="report_plz"
+                    placeholder="z.B. 1037"
+                >
+            </div>
+
+            <div class="field">
+                <label>
+                    Problem
+                </label>
+
+                <select id="report_type">
+
+                    <option value="fehlt">
+                        PLZ fehlt
+                    </option>
+
+                    <option value="falsch">
+                        PLZ sitzt falsch
+                    </option>
+
+                    <option value="doppelt">
+                        Doppelte PLZ
+                    </option>
+
+                    <option value="sonstiges">
+                        Sonstiges
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="field" style="grid-column:1/-1;">
+                <label>
+                    Beschreibung
+                </label>
+
+                <textarea
+                    id="report_text"
+                    placeholder="Was stimmt nicht?"
+                    rows="5"
+                ></textarea>
+            </div>
+
+            <div class="field">
+                <label>
+                    Dein Name (optional)
+                </label>
+
+                <input
+                    type="text"
+                    id="report_name"
+                    placeholder="z.B. Lennox"
+                >
+            </div>
+
+        </div>
+
+        <button onclick="sendPlzReport()">
+            📍 Fehler melden
+        </button>
+
+        <div
+            id="report_result"
+            style="margin-top:20px;"
+        ></div>
+
+    </div>
+
+</div>
+<script src="config.js?v=1"></script>
+<script src="plz_melden.js?v=1"></script>
+</body>
+</html>

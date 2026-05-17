@@ -1,0 +1,234 @@
+/* =========================
+   GTA PLZ KARTE
+========================= */
+
+.gta-map-box {
+    position: relative;
+
+    margin-top: 24px;
+
+    width: 100%;
+    max-height: none;
+
+    overflow: visible;
+
+    border-radius: 24px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    background: rgba(5,15,35,0.95);
+
+    box-shadow:
+        0 15px 45px rgba(0,0,0,0.45);
+}
+
+.gta-map-img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    user-select: none;
+}
+
+.map-marker{
+    position:absolute;
+
+    width:28px;
+    height:28px;
+
+    border:4px solid rgba(255,20,147,0.85);
+    border-radius:50%;
+
+    background:transparent;
+
+    transform:translate(-50%, -50%);
+
+    box-shadow:
+        0 0 6px rgba(255,20,147,0.7),
+        0 0 10px rgba(255,20,147,0.4);
+
+    z-index:50;
+
+    pointer-events:none;
+}
+
+@keyframes markerPulse {
+    0% {
+        transform: translate(-50%, -100%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -100%) scale(1.25);
+    }
+
+    100% {
+        transform: translate(-50%, -100%) scale(1);
+    }
+}
+.map-debug{
+    position:fixed;
+
+    bottom:20px;
+    left:20px;
+
+    background:rgba(0,0,0,0.85);
+
+    color:#fff;
+
+    padding:10px 14px;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    z-index:99999;
+}
+.gta-map-box {
+    position: relative;
+
+    overflow: hidden;
+}
+
+.gta-map-inner {
+    position: relative;
+
+    width: fit-content;
+
+    transform-origin: top left;
+
+    transition: transform 0.1s;
+}
+
+/* =========================
+   MINI PLZ MAP SIDEBAR
+========================= */
+
+.mini-map-box {
+    position: relative;
+
+    width: 100%;
+    height: 260px;
+
+    margin-top: 14px;
+
+    overflow: hidden;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    background: rgba(5,15,35,0.95);
+}
+
+.mini-map-inner {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    transform-origin: top left;
+
+    transition: transform 0.15s ease;
+}
+
+.mini-map-img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    user-select: none;
+}
+
+.mini-map-marker {
+    position: absolute;
+
+    width: 22px;
+    height: 22px;
+
+    border: 3px solid rgba(255,20,147,0.9);
+    border-radius: 50%;
+
+    background: transparent;
+
+    transform: translate(-50%, -50%);
+
+    box-shadow:
+        0 0 6px rgba(255,20,147,0.8),
+        0 0 12px rgba(255,20,147,0.45);
+
+    z-index: 50;
+
+    pointer-events: none;
+}
+
+/* =========================
+   SERVICE PLZ MAP PAGES
+========================= */
+
+.service-map-card {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.service-map-box {
+    position: relative;
+    width: 100%;
+    height: 520px;
+    margin-top: 16px;
+    overflow: hidden;
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #07111f;
+}
+
+.service-map-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
+    transition: transform 0.15s ease;
+}
+
+.service-map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+}
+
+.service-map-marker {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    pointer-events: none;
+}
+
+.service-marker-md {
+    border: 5px solid rgba(34,211,238,0.95);
+    box-shadow:
+        0 0 8px rgba(34,211,238,0.8),
+        0 0 18px rgba(34,211,238,0.45);
+}
+
+.service-marker-pd {
+    border: 5px solid rgba(59,130,246,0.95);
+    box-shadow:
+        0 0 8px rgba(59,130,246,0.8),
+        0 0 18px rgba(59,130,246,0.45);
+}
+.taxi-service-map {
+    height: 260px;
+}
+
+.service-marker-taxi {
+    border: 5px solid rgba(236,72,153,0.95);
+    box-shadow:
+        0 0 8px rgba(236,72,153,0.8),
+        0 0 18px rgba(236,72,153,0.45);
+}

@@ -1,55 +1,79 @@
-let map2Scale = 1;
-let map2X = 0;
-let map2Y = 0;
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi PLZ Karte</title>
 
-function searchPlz2() {
-    const input = document.getElementById("plz_search_2").value.trim();
-    const result = document.getElementById("plz_result_2");
-    const marker = document.getElementById("map_marker_2");
+    <link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
 
-    const box2 = document.getElementById("gtaMapBox2");
-    const inner2 = document.getElementById("gtaMapInner2");
-    const img2 = document.querySelector(".mini-map-img");
+<div class="container">
 
-    const DATA = typeof PLZ_MAP_2 !== "undefined" ? PLZ_MAP_2 : PLZ_MAP;
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🗺️</div>
 
-    if (!input) {
-        result.innerHTML = "";
-        marker.style.display = "none";
-        return;
-    }
-
-    const location = DATA[input];
-
-    if (!location) {
-        result.innerHTML = `
-            <div class="admin-card">
-                ❌ PLZ nicht gefunden.
+            <div>
+                <div class="main-title">PLZ Karte</div>
+                <div class="sub-title">Los Santos Taxi • PLZ Suche</div>
             </div>
-        `;
-        marker.style.display = "none";
-        return;
-    }
-
-    result.innerHTML = `
-        <div class="admin-card">
-            <strong>${location.name}</strong><br>
-            PLZ: ${input}
         </div>
-    `;
 
-    const pixelX = (location.x / 100) * img2.clientWidth;
-    const pixelY = (location.y / 100) * img2.clientHeight;
+        <div class="header-right">
+            <a href="index.html">
+                <button class="small-btn">← Leitstelle</button>
+            </a>
+        </div>
+    </div>
 
-    marker.style.display = "block";
-    marker.style.left = `${pixelX}px`;
-    marker.style.top = `${pixelY}px`;
+    <div class="section-card">
 
-    map2Scale = 5;
+        <div class="form-grid">
+            <div class="field">
+                <label>PLZ eingeben</label>
+                <input
+                    type="text"
+                    id="plz_search"
+                    placeholder="z.B. 8054 oder MD"
+                    oninput="searchPlz()"
+                >
+            </div>
+        </div>
 
-    map2X = (box2.clientWidth / 2) - (pixelX * map2Scale);
-    map2Y = (box2.clientHeight / 2) - (pixelY * map2Scale);
+        <div class="map-controls">
+            <button class="small-btn" onclick="zoomMap(1.2)">➕ Zoom</button>
+            <button class="small-btn" onclick="zoomMap(0.8)">➖ Zoom</button>
+            <button class="small-btn secondary-btn" onclick="resetMap()">Reset</button>
+        </div>
 
-    inner2.style.transform =
-        `translate(${map2X}px, ${map2Y}px) scale(${map2Scale})`;
-}
+        <div id="plz_result" style="margin-top:18px;"></div>
+
+        <div class="gta-map-box" id="gtaMapBox">
+            <div class="gta-map-inner" id="gtaMapInner">
+
+                <img
+                    src="gta-map.png"
+                    class="gta-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div id="map_marker" class="map-marker" style="display:none;"></div>
+
+                <div id="map_debug" class="map-debug">
+                    X: 0 | Y: 0
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="plz2.js?v=2"></script>
+<script src="map2.js?v=2"></script>
+
+</body>
+</html>

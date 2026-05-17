@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LSPD PLZ-Finder</title>
+    <title>LSMD PLZ-Finder</title>
 
     <link rel="stylesheet" href="style.css?v=21">
 </head>
@@ -13,23 +13,23 @@
 
     <div class="modern-header">
         <div class="header-left">
-            <div class="logo-icon">🚔</div>
+            <div class="logo-icon">🩺</div>
             <div>
-                <div class="main-title">LSPD PLZ-Finder</div>
-                <div class="sub-title">Einsatzorte • Fahndungen • Streifenhilfe</div>
+                <div class="main-title">LSMD PLZ-Finder</div>
+                <div class="sub-title">Einsatzorte schneller finden</div>
             </div>
         </div>
     </div>
 
     <div
         class="card service-map-card"
-        data-map-theme="pd"
+        data-map-theme="md"
     >
-        <h2>🚔 Einsatzort suchen</h2>
+        <h2>🩺 Einsatzort suchen</h2>
 
         <div class="admin-card" style="margin-bottom:16px;">
-            <strong>🗺️ Streifenkarte</strong><br>
-            Damit aus einer Verfolgung nicht plötzlich eine Stadtrundfahrt wird 😄
+            <strong>🗺️ Einsatzort finden</strong><br>
+            Für alle Medics, die „Patient bei 3027“ hören und erstmal den Defibrillator suchen 😄
         </div>
 
         <div class="plz-search-row">
@@ -38,7 +38,7 @@
                 <input
                     type="text"
                     id="service_plz_search"
-                    placeholder="z.B. 1041"
+                    placeholder="z.B. 3027"
                     oninput="searchServicePlz()"
                 >
             </div>
@@ -65,7 +65,7 @@
 
                 <div
                     id="service_map_marker"
-                    class="service-map-marker service-marker-pd"
+                    class="service-map-marker service-marker-md"
                     style="display:none;"
                 ></div>
 

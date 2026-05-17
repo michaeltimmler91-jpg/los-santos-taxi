@@ -1,191 +1,61 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Werkstatt Abrechnung</title>
+function escapeHtml(value) {
 
-    <link rel="stylesheet" href="style.css?v=20">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
 
-<div class="container">
+function escapeAttr(value) {
+    return escapeHtml(value);
+}
 
-    <div class="modern-header">
-        <div class="header-left">
-            <div class="logo-icon">🔧</div>
+function formatSeconds(seconds) {
 
-            <div>
-                <div class="main-title">Werkstatt Abrechnung</div>
-                <div class="sub-title">Taxi • Reparatur & Tuning</div>
-            </div>
-        </div>
-    </div>
+    const hours =
+        Math.floor(seconds / 3600);
 
-    <div class="workshop-top-grid">
+    const minutes =
+        Math.floor((seconds % 3600) / 60);
 
-        <div class="workshop-left-column">
+    return `${hours}h ${minutes}m`;
+}
 
-            <div class="card compact-invoice-box">
-                <h2>🔧 Neue Rechnung eintragen</h2>
+function formatDate(dateString) {
 
-                <div class="form-grid">
-                    <div class="field">
-                        <label>Firmencode</label>
-                        <input type="password" id="firm_code">
-                    </div>
+    if (!dateString) return "-";
 
-                    <div class="field">
-                        <label>Taxifahrer</label>
-                        <select id="taxi_driver"></select>
-                    </div>
+    return new Date(dateString)
+        .toLocaleString("de-DE");
+}
 
-                    <div class="field">
-                        <label>Mechaniker</label>
-                        <input type="text" id="mechanic_name">
-                    </div>
+function showToast(title, message) {
 
-                    <div class="field">
-                        <label>Art</label>
-                        <select id="work_type">
-                            <option>Reparatur</option>
-                            <option>Tuning</option>
-                        </select>
-                    </div>
+    const container =
+        document.getElementById("toastContainer");
 
-                    <div class="field">
-                        <label>Betrag</label>
-                        <input type="number" id="amount" value="0">
-                    </div>
+    if (!container) return;
 
-                    <div class="field">
-                        <label>Bemerkung</label>
-                        <input type="text" id="notes">
-                    </div>
-                </div>
+    const toast =
+        document.createElement("div");
 
-                <button onclick="saveWorkshopCost()">
-                    Rechnung speichern
-                </button>
+    toast.className = "toast";
 
-                <div id="workshop_result" style="margin-top:20px;"></div>
-            </div>
-
-            <div class="stats-grid workshop-stats-vertical">
-                <div class="stat-card stat-open">
-                    <div class="stat-title">Offene Rechnungen</div>
-                    <div class="stat-value" id="open_count">0</div>
-                </div>
-
-                <div class="stat-card stat-taken">
-                    <div class="stat-title">Offene Summe</div>
-                    <div class="stat-value" id="open_total">0$</div>
-                </div>
-
-                <div class="stat-card stat-done">
-                    <div class="stat-title">Archiv</div>
-                    <div class="stat-value" id="archive_count">0</div>
-                </div>
-            </div>
-
+    toast.innerHTML = `
+        <div class="toast-title">
+            ${escapeHtml(title)}
         </div>
 
-        <div class="card workshop-map-card">
-
-            <h2>🗺️ Werkstatt PLZ-Finder</h2>
-
-            <div class="map-feedback-mini">
-                <strong>🗺️ Kartenfehler gefunden?</strong>
-                <span>PLZ schwimmt im Meer, steckt im Berg oder ist verschwunden?</span>
-
-                <button
-                    class="small-btn secondary-btn"
-                    onclick="window.open('https://los-santos-taxi.michaeltimmler91.workers.dev/plz_melden', '_blank')"
-                >
-                    📍 Melden
-                </button>
-            </div>
-
-            <div class="admin-card" style="margin-bottom:16px;">
-                <strong>Los Santos PLZ Karte</strong><br>
-                Für alle Mechaniker, die „komm mal 1037“ hören und erstmal den Schraubenschlüssel fallen lassen. 😄
-            </div>
-
-            <div class="field">
-                <label>PLZ suchen</label>
-                <input
-                    type="text"
-                    id="workshop_plz_search"
-                    placeholder="z.B. 1002"
-                    oninput="searchWorkshopPlz()"
-                >
-            </div>
-
-            <div id="workshop_plz_result" style="margin-top:14px;"></div>
-
-            <div class="workshop-mini-map-box" id="workshopMapBox">
-                <div class="workshop-mini-map-inner" id="workshopMapInner">
-
-                    <img
-                        src="gta-map.png"
-                        class="workshop-mini-map-img"
-                        alt="GTA Karte"
-                    >
-
-                    <div
-                        id="workshop_map_marker"
-                        class="workshop-map-marker"
-                        style="display:none;"
-                    ></div>
-
-                </div>
-            </div>
-
+        <div class="toast-message">
+            ${escapeHtml(message)}
         </div>
+    `;
 
-    </div>
+    container.appendChild(toast);
 
-    <div class="section-card" style="margin-top:24px;">
-        <div class="section-header">
-            <h2>🔴 Offene Rechnungen</h2>
-        </div>
-
-        <div id="open_workshop_list"></div>
-
-        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.08);margin:22px 0;">
-
-        <h2>✅ Wochenabrechnung</h2>
-
-        <div class="form-grid">
-            <div class="field">
-                <label>Zahlungs-Code</label>
-                <input type="password" id="pay_code">
-            </div>
-        </div>
-
-        <button class="danger-btn" onclick="payWorkshopBills()">
-            Als bezahlt markieren / auf 0 setzen
-        </button>
-    </div>
-
-    <div class="section-card" style="margin-top:24px;">
-        <div class="section-header collapsible-header" onclick="toggleArchive()">
-            <h2>📦 Archiv</h2>
-            <span class="section-arrow" id="archive_arrow">▶</span>
-        </div>
-
-        <div id="archive_workshop_list" style="display:none;"></div>
-    </div>
-
-</div>
-
-<script src="config.js?v=2"></script>
-<script src="utils.js?v=2"></script>
-<script src="api.js?v=1"></script>
-<script src="werkstatt.js?v=19"></script>
-<script src="plz.js?v=10"></script>
-<script src="map-workshop.js?v=1"></script>
-
-</body>
-</html>
+    setTimeout(() => {
+        toast.remove();
+    }, 4500);
+}

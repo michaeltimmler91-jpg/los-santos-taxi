@@ -1,351 +1,217 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+const DEALER_CODE = "GWH2026";
 
-    <title>Taxi Leitstelle</title>
+async function loginDealer() {
+    const code = document.getElementById("dealer_code").value.trim();
+    const resultBox = document.getElementById("dealer_login_result");
 
-    <link rel="stylesheet" href="style.css?v=30">
+    resultBox.innerHTML = "";
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+    if (code !== DEALER_CODE) {
+        resultBox.innerHTML = `
+            <div class="admin-card">
+                ❌ Händler-Code ist falsch.
+            </div>
+        `;
+        return;
+    }
 
-<div class="container">
+    localStorage.setItem("dealerAccess", "true");
 
-    <div id="loginBox" class="card" style="max-width:450px;margin:auto;margin-top:100px;">
-        <h2>🚕 Taxi Leitstelle Login</h2>
+    document.getElementById("dealer_login_card").style.display = "none";
+    document.getElementById("dealer_app").style.display = "block";
 
-        <div class="field">
-            <label>Benutzername</label>
-            <input type="text" id="login_username" autocomplete="username">
+    await loadDealerData();
+}
+
+async function loadDealerData() {
+    await loadOpenDealerRides();
+    await loadDealerArchive();
+}
+
+async function loadOpenDealerRides() {
+    const list = document.getElementById("dealer_open_list");
+
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("ride_type", "Gebrauchtwagenhändler")
+        .eq("job_status", "Erledigt")
+        .neq("dealer_paid", true)
+        .order("completed_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        list.innerHTML = `
+            <div class="admin-card">
+                Fehler beim Laden.
+            </div>
+        `;
+        return;
+    }
+
+    const rides = data || [];
+
+    const total = rides.reduce((sum, ride) => {
+        return sum + Number(ride.invoice_amount || 0);
+    }, 0);
+
+    document.getElementById("dealer_open_count").innerText = rides.length;
+    document.getElementById("dealer_open_total").innerText = `${total}$`;
+
+    if (rides.length === 0) {
+        list.innerHTML = `
+            <div class="admin-card">
+                Keine offenen Händlerfahrten vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div class="admin-card">
+            <strong>💰 Offene Monatssumme</strong><br><br>
+            <span style="font-size:42px;color:#facc15;font-weight:900;">
+                ${total}$
+            </span>
+            <br><br>
+            🚗 Offene Fahrten: ${rides.length}
         </div>
+    `;
 
-        <div class="field">
-            <label>Passwort</label>
-            <input type="password" id="login_password" autocomplete="current-password">
-        </div>
+    rides.forEach(ride => {
+        html += `
+            <div class="ride-card ride-card-modern">
+                <div class="ride-top">
+                    <span class="ride-type-badge">
+                        🚗 Händlerfahrt
+                    </span>
 
-        <button onclick="loginUser()">Login</button>
-    </div>
+                    <span class="ride-status-badge">
+                        Offen
+                    </span>
+                </div>
 
-    <div id="appBox" style="display:none;">
+                <div class="ride-route">
+                    <div>
+                        <small>Kunde</small>
+                        <strong>${escapeHtml(ride.customer_name || "-")}</strong>
+                    </div>
 
-        <div class="modern-header">
-            <div class="header-left">
-                <div class="logo-icon">🚕</div>
+                    <div class="ride-arrow">→</div>
+
+                    <div>
+                        <small>Ziel</small>
+                        <strong>${escapeHtml(ride.destination || "-")}</strong>
+                    </div>
+                </div>
+
+                <div class="ride-info-grid">
+                    <div>🚕 Fahrer: ${escapeHtml(ride.assigned_driver || "-")}</div>
+                    <div>📍 Start: ${escapeHtml(ride.pickup_location || "-")}</div>
+                    <div>📏 KM: ${ride.kilometers || 0}</div>
+                    <div>🧾 Rechnung: ${ride.invoice_amount || 0}$</div>
+                    <div>📝 ${escapeHtml(ride.notes || "-")}</div>
+                </div>
+            </div>
+        `;
+    });
+
+    list.innerHTML = html;
+}
+
+async function loadDealerArchive() {
+    const list = document.getElementById("dealer_archive_list");
+
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("ride_type", "Gebrauchtwagenhändler")
+        .eq("job_status", "Erledigt")
+        .eq("dealer_paid", true)
+        .order("dealer_paid_at", { ascending: false })
+        .limit(50);
+
+    if (error) {
+        console.error(error);
+        list.innerHTML = `
+            <div class="admin-card">
+                Fehler beim Laden.
+            </div>
+        `;
+        return;
+    }
+
+    const rides = data || [];
+
+    document.getElementById("dealer_archive_count").innerText = rides.length;
+
+    if (rides.length === 0) {
+        list.innerHTML = `
+            <div class="admin-card">
+                Noch keine bezahlten Händlerfahrten vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    let html = "";
+
+    rides.forEach(ride => {
+        html += `
+            <div class="compact-ride">
+                <div>
+                    <strong>${escapeHtml(ride.assigned_driver || "-")}</strong><br>
+                    Händlerfahrt
+                </div>
+
+                <div>🚕 ${ride.kilometers || 0} KM</div>
+                <div>🧾 ${ride.invoice_amount || 0}$</div>
+                <div>✅ Bezahlt</div>
 
                 <div>
-                    <div class="main-title">Taxi Leitstelle</div>
-                    <div class="sub-title">Dispatch • Aufträge • Fahrerstatus</div>
+                    👤 ${escapeHtml(ride.customer_name || "-")}<br>
+                    📍 ${escapeHtml(ride.pickup_location || "-")} → ${escapeHtml(ride.destination || "-")}
                 </div>
             </div>
-            <div id="live_clock" class="live-clock">
-                🟢 Live
-            </div>
-            <div class="header-right">
-                <div class="header-user">
-                    <div class="header-user-label">Eingeloggt als</div>
-                    <div class="header-user-name"><span id="currentUserName"></span></div>
-                    <div style="font-size:13px;color:#94a3b8;">
-                        Rolle: <span id="currentUserRole"></span>
-                    </div>
-                </div>
-
-                <a href="admin.html" id="adminLink" style="display:none;">
-                    <button class="small-btn">👑 Admin</button>
-                </a>
-
-                <button class="small-btn danger-btn" onclick="logoutUser()">Logout</button>
-            </div>
-        </div>
-
-        <div class="dashboard-layout">
-
-            <div class="dashboard-main">
-
-                <div class="stats-grid">
-                    <div class="stat-card stat-open">
-                        <div class="stat-title">Offene Aufträge</div>
-                        <div class="stat-value" id="stat_open">0</div>
-                    </div>
-
-                    <div class="stat-card stat-taken">
-                        <div class="stat-title">Übernommen</div>
-                        <div class="stat-value" id="stat_taken">0</div>
-                    </div>
-
-                    <div class="stat-card stat-done">
-                        <div class="stat-title">Erledigt</div>
-                        <div class="stat-value" id="stat_done">0</div>
-                    </div>
-                </div>
-
-                <div class="section-card" id="createJobBox" style="display:none;">
-                    <div class="section-header">
-                        <h2>➕ Neuer Auftrag</h2>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Fahrtart</label>
-                            <select id="job_ride_type" onchange="updateJobForm()">
-                                <option>Normale Fahrt</option>
-                                <option>Essenslieferung</option>
-                                <option>EMS</option>
-                                <option>Bambi-Tour</option>
-                                <option>Gebrauchtwagenhändler</option>
-                            </select>
-                        </div>
-
-                        <div class="field" id="companyField" style="display:none;">
-                            <label>Unternehmen</label>
-                            <select id="job_company_name" onchange="setPickupFromCompany()"></select>
-                        </div>
-
-                        <div class="field" id="emsField" style="display:none;">
-                            <label>EMS Mitarbeiter</label>
-                            <input type="text" id="job_ems_staff_name">
-                        </div>
-
-                        <div class="field">
-                            <label>Abholort / PLZ</label>
-                            <input type="text" id="job_pickup_location">
-                        </div>
-
-                        <div class="field">
-                            <label>Ziel / PLZ</label>
-                            <input type="text" id="job_destination">
-                        </div>
-
-                        <div class="field">
-                            <label>Kunde / Empfänger</label>
-                            <input type="text" id="job_customer_name">
-                        </div>
-
-                        <div class="field">
-                            <label>Bemerkung</label>
-                            <input type="text" id="job_notes">
-                        </div>
-                    </div>
-
-                    <button onclick="createJob()">Auftrag erstellen</button>
-                </div>
-
-                <div class="section-card">
-                    <div class="section-header collapsible-header" onclick="toggleSection('open_jobs_list', 'arrow_open')">
-                        <h2>📞 Offene Fahrten</h2>
-                        <span class="section-arrow" id="arrow_open">▼</span>
-                    </div>
-
-                    <div id="open_jobs_list"></div>
-                </div>
-
-                <div class="section-card">
-                    <div class="section-header collapsible-header" onclick="toggleSection('my_jobs_list', 'arrow_my')">
-                        <h2>🚕 Meine Fahrten</h2>
-                        <span class="section-arrow" id="arrow_my">▼</span>
-                    </div>
-
-                    <div id="my_jobs_list"></div>
-                </div>
-
-                <div class="section-card">
-                    <div class="section-header collapsible-header" onclick="toggleSection('done_jobs_list', 'arrow_done')">
-                        <h2>✅ Letzte Fahrten</h2>
-                        <span class="section-arrow" id="arrow_done">▼</span>
-                    </div>
-
-                    <div id="done_jobs_list"></div>
-                </div>
-
-            </div>
-
-            <div class="dashboard-sidebar">
-
-                <div class="sidebar-card">
-                    <div class="sidebar-title">📡 Leitstelle</div>
-
-                    <div id="dispatcher_status">
-                        Keine Leitstelle aktiv.
-                    </div>
-
-                    <button id="dispatcherToggleBtn" onclick="toggleDispatcherStatus()">
-                        Leitstelle übernehmen
-                    </button>
-                </div>
-
-                <div class="sidebar-card">
-    <div class="sidebar-title">🚦 Fahrerstatus</div>
-
-    <div id="driver_status_text">
-        Status: Offline
-    </div>
-
-    <div class="status-buttons">
-        <button onclick="setDriverStatus('Im Dienst')">
-            🟢 Dienst
-        </button>
-
-        <button onclick="setDriverStatus('Pause')">
-            🟡 Pause
-        </button>
-
-        <button
-            class="danger-btn"
-            onclick="setDriverStatus('Offline')"
-        >
-            🔴 Offline
-        </button>
-    </div>
-
-    <div id="active_drivers_list">
-        Keine Fahrer im Dienst.
-    </div>
-</div>
-                <div class="sidebar-card">
-
-    <div class="sidebar-title">🗺️ PLZ Suche (in Arbeit)</div>
-
-    <div class="plz-search-row">
-
-    <div class="field plz-search-field">
-        <label>PLZ eingeben</label>
-
-        <input
-            type="text"
-            id="service_plz_search"
-            placeholder="z.B. 1000"
-            oninput="searchServicePlz()"
-        >
-    </div>
-
-    <a
-        href="plz_melden.html"
-        target="_blank"
-        class="small-btn secondary-btn plz-report-link"
-    >
-        📍 Fehler melden
-    </a>
-
-</div>
-
-    <div id="service_plz_result" style="margin-top:14px;"></div>
-
-<div class="service-map-box taxi-service-map" id="serviceMapBox">
-    <div class="service-map-inner" id="serviceMapInner">
-
-        <img
-            src="gta-map.png"
-            class="service-map-img"
-            alt="GTA Karte"
-        >
-
-        <div
-            id="service_map_marker"
-            class="service-map-marker service-marker-taxi"
-            style="display:none;"
-        ></div>
-
-    </div>
-</div>
-
-</div>
-                <div class="sidebar-card">
-                    <div class="sidebar-title">
-        ⏱️ Meine Dienstzeit
-    </div>
-
-    <div id="my_time_stats">
-        Lädt...
-    </div>
-</div>
-
-                <div class="sidebar-card sound-card">
-                    <div class="sound-head">
-                        <div class="sidebar-title">🔔 Auftragssound</div>
-                        <div id="sound_status_text" class="sound-state">Sound: An</div>
-                    </div>
-
-                    <div class="sound-row">
-                        <select id="sound_select" onchange="saveSoundSettings()">
-                            <option value="bing.mp3">Bing</option>
-                            <option value="ruelps.mp3">Rülps</option>
-                            <option value="tuturu.mp3">Tuturu</option>
-                        </select>
-
-                        <button class="small-btn" onclick="toggleSound()" id="soundToggleBtn">Sound aus</button>
-                        <button class="small-btn" onclick="testSound()">Test</button>
-                    </div>
-
-                    <div class="sound-volume-box">
-                        <div class="sound-volume-label">
-                            <span>Lautstärke</span>
-                            <strong id="sound_volume_text">15%</strong>
-                        </div>
-
-                        <input
-                            type="range"
-                            id="sound_volume"
-                            min="0"
-                            max="1"
-                            step="0.05"
-                            value="0.15"
-                            oninput="saveSoundSettings()"
-                        >
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<div id="toastContainer"></div>
-
-<audio id="newJobSound"></audio>
-
-<div id="idleModal" class="idle-modal" style="display:none;">
-    <div class="idle-box">
-        <h2>⏰ Noch da?</h2>
-
-        <p>
-            Du warst länger nicht aktiv.
-            Wenn du noch da bist, bestätige bitte kurz.
-        </p>
-
-        <button onclick="confirmStillActive()">Ja, ich bin noch da</button>
-    </div>
-</div>
-<div id="announcementModal" class="announcement-modal" style="display:none;">
-
-    <div class="announcement-box">
-
-        <div class="announcement-title">
-            📢 Wichtige Information
-        </div>
-
-        <div
-            id="announcementContent"
-            class="announcement-content"
-        ></div>
-
-        <button onclick="confirmAnnouncement()">
-            ✅ Verstanden & bestätigt
-        </button>
-
-    </div>
-
-</div>
-<script src="config.js?v=2"></script>
-<script src="utils.js?v=2"></script>
-<script src="api.js?v=1"></script>
-<script src="script.js?v=17"></script>
-<script src="plz.js?v=2"></script>
-<script src="map-service.js?v=2"></script>
-</body>
-</html>
+        `;
+    });
+
+    list.innerHTML = html;
+}
+
+function toggleDealerArchive() {
+    const box = document.getElementById("dealer_archive_list");
+    const arrow = document.getElementById("dealer_archive_arrow");
+
+    if (!box || !arrow) return;
+
+    if (box.style.display === "none") {
+        box.style.display = "block";
+        arrow.innerText = "▼";
+    } else {
+        box.style.display = "none";
+        arrow.innerText = "▶";
+    }
+}
+
+function checkDealerSession() {
+    const hasAccess = localStorage.getItem("dealerAccess") === "true";
+
+    if (!hasAccess) return;
+
+    document.getElementById("dealer_login_card").style.display = "none";
+    document.getElementById("dealer_app").style.display = "block";
+
+    loadDealerData();
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+checkDealerSession();
