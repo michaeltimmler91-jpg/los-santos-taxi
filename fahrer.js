@@ -203,8 +203,13 @@ async function mobileLoadDriverStatus() {
         });
     }
 
-    document.getElementById("mobile_active_drivers").innerHTML =
+    const activeDriversBox =
+document.getElementById("mobile_active_drivers");
+
+if (activeDriversBox) {
+    activeDriversBox.innerHTML =
     html || "Keine Fahrer im Dienst.";
+}
 }
 
 async function mobileSetDriverStatus(status) {
