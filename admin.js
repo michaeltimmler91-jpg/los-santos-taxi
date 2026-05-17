@@ -28,6 +28,7 @@ async function startAdmin() {
     await loadAdminTimeStats();
 
     loadDashboardOverview();
+    loadAdminStatusUsers();
 }
 
 function logoutAdmin() {
@@ -1290,6 +1291,98 @@ function formatLastSeen(date) {
         year: "numeric"
     });
 }
+async function loadAdminStatusUsers() {
+    const select = document.getElementById("admin_status_user");
 
+    if (!select) return;
+
+    const { data, error } = await client
+        .from("taxi_users")
+        .select("username, display_name, role")
+        .in("role", ["fahrer", "admin"])
+        .order("display_name", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    select.innerHTML = "";
+
+    (data || []).forEach(user => {
+        select.innerHTML += `
+            <option value="${escapeAttr(user.username)}" data-name="${escapeAttr(user.display_name)}">
+                ${escapeHtml(user.display_name)}
+            </option>
+        `;
+    });
+}
+
+async function adminChangeDriverStatus() {
+    const userSelect = document.getElementById("admin_status_user");
+    const statusSelect = document.getElementById("admin_status_value");
+    const result = document.getElementById("admin_status_result");
+
+    const username = userSelect.value;
+    const displayName = userSelect.options[userSelect.selectedIndex].dataset.name;
+    const newStatus = statusSelect.value;
+
+    const ok = confirm(`${displayName} wirklich auf "${newStatus}" setzen?`);
+
+    if (!ok) return;
+
+    const { data: oldData } = await client
+        .from("taxi_driver_status")
+        .select("*")
+        .eq("username", username)
+        .maybeSingle();
+
+    const oldStatus = oldData ? oldData.status : "Unbekannt";
+
+    const { error } = await client
+        .from("taxi_driver_status")
+        .upsert({
+            username: username,
+            display_name: displayName,
+            status: newStatus,
+            updated_at: new Date().toISOString()
+        }, {
+            onConflict: "username"
+        });
+
+    if (error) {
+        console.error(error);
+        result.innerHTML = "❌ Status konnte nicht geändert werden.";
+        return;
+    }
+
+    await client
+        .from("taxi_status_logs")
+        .insert([{
+            username: username,
+            display_name: displayName,
+            old_status: oldStatus,
+            new_status: newStatus
+        }]);
+
+    if (newStatus === "Offline") {
+        await client
+            .from("taxi_dispatchers")
+            .update({ active: false })
+            .eq("username", username)
+            .eq("active", true);
+    }
+
+    result.innerHTML = `
+        <div class="admin-card success-card">
+            <strong>✅ Status geändert</strong><br>
+            ${escapeHtml(displayName)} ist jetzt: ${escapeHtml(newStatus)}
+        </div>
+    `;
+
+    if (typeof loadAdminTimeStats === "function") {
+        loadAdminTimeStats();
+    }
+}
 
 startAdmin();
