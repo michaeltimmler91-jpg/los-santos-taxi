@@ -2488,3 +2488,75 @@ body[data-company-theme="rainbow"] button {
 
     pointer-events: none;
 }
+/* =========================
+   WORKSHOP PLZ MAP
+========================= */
+
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: stretch;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.compact-invoice-box {
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+.workshop-map-card {
+    min-height: 420px;
+}
+
+.workshop-map-card h2 {
+    margin-bottom: 16px;
+}
+
+.workshop-mini-map-box {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin-top: 14px;
+    overflow: hidden;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(5,15,35,0.95);
+}
+
+.workshop-mini-map-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
+    transition: transform 0.15s ease;
+}
+
+.workshop-mini-map-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    user-select: none;
+}
+
+.workshop-map-marker {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 3px solid rgba(255,20,147,0.9);
+    border-radius: 50%;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    box-shadow:
+        0 0 6px rgba(255,20,147,0.8),
+        0 0 12px rgba(255,20,147,0.45);
+    z-index: 50;
+    pointer-events: none;
+}
+
+@media (max-width: 1100px) {
+    .workshop-top-grid {
+        grid-template-columns: 1fr;
+    }
+}
