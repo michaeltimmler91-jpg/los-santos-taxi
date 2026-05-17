@@ -343,18 +343,39 @@ async function loadDriverStatus() {
     }
 
     const activeDrivers = drivers.filter(d => d.status === "Im Dienst");
-    const pausedDrivers = drivers.filter(d => d.status === "Pause");
+const pausedDrivers = drivers.filter(d => d.status === "Pause");
+
+const { data: takenJobs } = await client
+    .from("taxi_jobs")
+    .select("assigned_driver")
+    .eq("job_status", "Übernommen");
+
+const busyDriverNames = (takenJobs || [])
+    .map(job => job.assigned_driver)
+    .filter(Boolean);
+
+const freeDrivers = activeDrivers.filter(driver =>
+    !busyDriverNames.includes(driver.display_name)
+);
+
+const busyDrivers = activeDrivers.filter(driver =>
+    busyDriverNames.includes(driver.display_name)
+);
 
     let html = `
         <div class="driver-mini-stats">
             <div>
-                <strong>${activeDrivers.length}</strong>
-                <span>Im Dienst</span>
+                <strong>${freeDrivers.length}</strong>
+                <span>Frei</span>
             </div>
 
             <div>
                 <strong>${pausedDrivers.length}</strong>
                 <span>Pause</span>
+            </div>
+            <div>
+                <strong>${busyDrivers.length}</strong>
+                <span>Auf Fahrt</span>
             </div>
         </div>
     `;
