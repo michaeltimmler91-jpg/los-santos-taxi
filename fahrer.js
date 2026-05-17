@@ -270,6 +270,9 @@ async function mobileLoadDispatchers() {
     mobileDispatchers = data || [];
 
     mobileRenderDispatchers();
+
+    mobileLoadOpenJobs();
+    mobileLoadMyJobs();
 }
 
 function mobileIsDispatcher() {
