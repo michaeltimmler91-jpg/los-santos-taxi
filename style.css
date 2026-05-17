@@ -3234,3 +3234,42 @@ body[data-company-theme="rainbow"] button {
     color: #cbd5e1;
     font-size: 13px;
 }
+.dashboard-sidebar .sidebar-card {
+    padding: 18px;
+}
+
+.sidebar-title {
+    margin-bottom: 12px;
+}
+
+.status-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.status-buttons button {
+    margin-top: 0;
+}
+
+#active_drivers_list,
+#dispatcher_status,
+#my_time_stats {
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(15,23,42,0.62);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+
+#driver_status_text {
+    font-weight: 900;
+    color: #facc15;
+    margin-bottom: 8px;
+}
+
+.sound-card {
+    opacity: 0.92;
+}
