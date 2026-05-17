@@ -1,1 +1,20 @@
+.admin-driver-name-cell strong {
+    display: block;
+}
 
+.admin-driver-name-cell small {
+    display: block;
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.driver-inactive-row {
+    border-left-color: #ef4444 !important;
+    background: rgba(69,10,10,0.42) !important;
+}
+
+.driver-inactive-row .admin-driver-name-cell small {
+    color: #f87171;
+    font-weight: 800;
+}
