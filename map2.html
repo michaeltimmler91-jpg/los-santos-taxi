@@ -1,229 +1,79 @@
-let mapScale = 1;
-let mapX = 0;
-let mapY = 0;
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi PLZ Karte</title>
 
-let isDragging = false;
-let mouseDownX = 0;
-let mouseDownY = 0;
-let dragStartX = 0;
-let dragStartY = 0;
+    <link rel="stylesheet" href="style.css?v=15">
+</head>
+<body>
 
-const box = document.getElementById("gtaMapBox");
-const inner = document.getElementById("gtaMapInner");
-const img = document.querySelector(".gta-map-img");
+<div class="container">
 
-let debugBox = document.getElementById("map_debug");
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🗺️</div>
 
-if (debugBox) {
-    document.body.appendChild(debugBox);
-}
-
-function showDebug(text) {
-    if (debugBox) {
-        debugBox.innerText = text;
-        debugBox.style.display = "block";
-    }
-
-    console.log(text);
-}
-
-function placeMarker(pixelX, pixelY) {
-    const marker = document.getElementById("map_marker");
-
-    marker.style.display = "block";
-    marker.style.left = `${pixelX}px`;
-    marker.style.top = `${pixelY}px`;
-}
-
-function searchPlz() {
-    const input = document.getElementById("plz_search").value.trim();
-    const result = document.getElementById("plz_result");
-    const marker = document.getElementById("map_marker");
-
-    if (!input) {
-        result.innerHTML = "";
-        marker.style.display = "none";
-        return;
-    }
-
-    let foundPlz = input;
-    let location = PLZ_MAP[input];
-
-    if (!location) {
-        const search = input.toLowerCase();
-
-        for (const [plz, data] of Object.entries(PLZ_MAP)) {
-            if (
-                data.name.toLowerCase().includes(search) ||
-                (data.aliases || []).some(alias =>
-                    alias.toLowerCase().includes(search)
-                )
-            ) {
-                foundPlz = plz;
-                location = data;
-                break;
-            }
-        }
-    }
-
-    if (!location) {
-        result.innerHTML = `
-            <div class="admin-card">
-                ❌ PLZ nicht gefunden.
+            <div>
+                <div class="main-title">PLZ Karte</div>
+                <div class="sub-title">Los Santos Taxi • PLZ Suche</div>
             </div>
-        `;
-
-        marker.style.display = "none";
-        return;
-    }
-
-    result.innerHTML = `
-        <div class="admin-card">
-            <strong>${location.name}</strong><br>
-            PLZ: ${foundPlz}<br>
-            X: ${location.x} | Y: ${location.y}
-        </div>
-    `;
-
-    const pixelX = (location.x / 100) * img.clientWidth;
-    const pixelY = (location.y / 100) * img.clientHeight;
-
-    placeMarker(pixelX, pixelY);
-    zoomToLocation(pixelX, pixelY);
-}
-
-function updateMapTransform() {
-    inner.style.transform =
-        `translate(${mapX}px, ${mapY}px) scale(${mapScale})`;
-}
-
-function zoomMap(factor) {
-    mapScale *= factor;
-
-    if (mapScale < 1) mapScale = 1;
-    if (mapScale > 6) mapScale = 6;
-
-    updateMapTransform();
-}
-
-function resetMap() {
-    mapScale = 1;
-    mapX = 0;
-    mapY = 0;
-
-    updateMapTransform();
-}
-
-box.addEventListener("mousedown", e => {
-    isDragging = false;
-
-    mouseDownX = e.clientX;
-    mouseDownY = e.clientY;
-
-    dragStartX = e.clientX - mapX;
-    dragStartY = e.clientY - mapY;
-
-    window.addEventListener("mousemove", dragMap);
-});
-
-function dragMap(e) {
-    const moved =
-        Math.abs(e.clientX - mouseDownX) +
-        Math.abs(e.clientY - mouseDownY);
-
-    if (moved < 5) return;
-
-    isDragging = true;
-
-    mapX = e.clientX - dragStartX;
-    mapY = e.clientY - dragStartY;
-
-    updateMapTransform();
-}
-
-window.addEventListener("mouseup", () => {
-    window.removeEventListener("mousemove", dragMap);
-});
-
-box.addEventListener("click", function(e) {
-    if (isDragging) return;
-
-    const boxRect = box.getBoundingClientRect();
-
-    const rawX =
-        (e.clientX - boxRect.left - mapX) / mapScale;
-
-    const rawY =
-        (e.clientY - boxRect.top - mapY) / mapScale;
-
-    const percentX =
-        (rawX / img.clientWidth) * 100;
-
-    const percentY =
-        (rawY / img.clientHeight) * 100;
-
-    const debugText =
-        `x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}`;
-
-    showDebug(debugText);
-
-    document.getElementById("plz_result").innerHTML = `
-    <div class="admin-card">
-
-        <strong>Klick-Position</strong><br><br>
-
-        <div style="
-            font-size:20px;
-            color:#facc15;
-            font-weight:900;
-            margin-bottom:14px;
-        ">
-            X: ${percentX.toFixed(2)}
-            <br>
-            Y: ${percentY.toFixed(2)}
         </div>
 
-        <div
-            id="click_coords"
-            style="
-                background:rgba(0,0,0,0.35);
-                padding:12px;
-                border-radius:12px;
-                font-family:monospace;
-                margin-bottom:14px;
-            "
-        >
-x: ${percentX.toFixed(2)}, y: ${percentY.toFixed(2)}
+        <div class="header-right">
+            <a href="index.html">
+                <button class="small-btn">← Leitstelle</button>
+            </a>
+        </div>
+    </div>
+
+    <div class="section-card">
+
+        <div class="form-grid">
+            <div class="field">
+                <label>PLZ eingeben</label>
+                <input
+                    type="text"
+                    id="plz_search"
+                    placeholder="z.B. 8054 oder MD"
+                    oninput="searchPlz()"
+                >
+            </div>
         </div>
 
-        <button
-            class="small-btn"
-            onclick="copyCoords()"
-        >
-            📋 Kopieren
-        </button>
+        <div class="map-controls">
+            <button class="small-btn" onclick="zoomMap(1.2)">➕ Zoom</button>
+            <button class="small-btn" onclick="zoomMap(0.8)">➖ Zoom</button>
+            <button class="small-btn secondary-btn" onclick="resetMap()">Reset</button>
+        </div>
+
+        <div id="plz_result" style="margin-top:18px;"></div>
+
+        <div class="gta-map-box" id="gtaMapBox">
+            <div class="gta-map-inner" id="gtaMapInner">
+
+                <img
+                    src="gta-map.png"
+                    class="gta-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div id="map_marker" class="map-marker" style="display:none;"></div>
+
+                <div id="map_debug" class="map-debug">
+                    X: 0 | Y: 0
+                </div>
+
+            </div>
+        </div>
 
     </div>
-`;
 
-    placeMarker(rawX, rawY);
-});
+</div>
 
-function zoomToLocation(pixelX, pixelY) {
-    mapScale = 4;
+<script src="plz2.js?v=2"></script>
+<script src="map2.js?v=2"></script>
 
-    mapX = (box.clientWidth / 2) - (pixelX * mapScale);
-    mapY = (box.clientHeight / 2) - (pixelY * mapScale);
-
-    updateMapTransform();
-}
-function copyCoords() {
-
-    const text =
-        document.getElementById("click_coords")
-        .innerText;
-
-    navigator.clipboard.writeText(text);
-
-   
-}
+</body>
+</html>

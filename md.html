@@ -1,54 +1,82 @@
-let workshopMapScale = 1;
-let workshopMapX = 0;
-let workshopMapY = 0;
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSMD PLZ-Finder</title>
 
-function searchWorkshopPlz() {
-    const input = document.getElementById("workshop_plz_search").value.trim();
-    const result = document.getElementById("workshop_plz_result");
-    const marker = document.getElementById("workshop_map_marker");
+    <link rel="stylesheet" href="style.css?v=21">
+</head>
+<body>
 
-    const box = document.getElementById("workshopMapBox");
-    const inner = document.getElementById("workshopMapInner");
-    const img = document.querySelector(".workshop-mini-map-img");
+<div class="container">
 
-    if (!input) {
-        result.innerHTML = "";
-        marker.style.display = "none";
-        return;
-    }
-
-    const location = PLZ_MAP[input];
-
-    if (!location) {
-        result.innerHTML = `
-            <div class="admin-card">
-                ❌ PLZ nicht gefunden.
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🩺</div>
+            <div>
+                <div class="main-title">LSMD PLZ-Finder</div>
+                <div class="sub-title">Einsatzorte schneller finden</div>
             </div>
-        `;
-
-        marker.style.display = "none";
-        return;
-    }
-
-    result.innerHTML = `
-        <div class="admin-card">
-            <strong>${location.name}</strong><br>
-            PLZ: ${input}
         </div>
-    `;
+    </div>
 
-    const pixelX = (location.x / 100) * img.clientWidth;
-    const pixelY = (location.y / 100) * img.clientHeight;
+    <div
+        class="card service-map-card"
+        data-map-theme="md"
+    >
+        <h2>🩺 Einsatzort suchen</h2>
 
-    marker.style.display = "block";
-    marker.style.left = `${pixelX}px`;
-    marker.style.top = `${pixelY}px`;
+        <div class="admin-card" style="margin-bottom:16px;">
+            <strong>🗺️ Einsatzort finden</strong><br>
+            Für alle Medics, die „Patient bei 3027“ hören und erstmal den Defibrillator suchen 😄
+        </div>
 
-    workshopMapScale = 5;
+        <div class="plz-search-row">
+            <div class="field plz-search-field">
+                <label>PLZ eingeben</label>
+                <input
+                    type="text"
+                    id="service_plz_search"
+                    placeholder="z.B. 3027"
+                    oninput="searchServicePlz()"
+                >
+            </div>
 
-    workshopMapX = (box.clientWidth / 2) - (pixelX * workshopMapScale);
-    workshopMapY = (box.clientHeight / 2) - (pixelY * workshopMapScale);
+            <a
+                href="plz_melden.html"
+                target="_blank"
+                class="small-btn secondary-btn plz-report-link"
+            >
+                📍 Fehler melden
+            </a>
+        </div>
 
-    inner.style.transform =
-        `translate(${workshopMapX}px, ${workshopMapY}px) scale(${workshopMapScale})`;
-}
+        <div id="service_plz_result" style="margin-top:14px;"></div>
+
+        <div class="service-map-box" id="serviceMapBox">
+            <div class="service-map-inner" id="serviceMapInner">
+
+                <img
+                    src="gta-map.png"
+                    class="service-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div
+                    id="service_map_marker"
+                    class="service-map-marker service-marker-md"
+                    style="display:none;"
+                ></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="plz.js?v=10"></script>
+<script src="map-service.js?v=1"></script>
+
+</body>
+</html>

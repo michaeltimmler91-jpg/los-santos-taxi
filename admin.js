@@ -1,409 +1,1200 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taxi Adminbereich</title>
+let currentUser = null;
 
-    <link rel="stylesheet" href="style.css?v=14">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+async function startAdmin() {
+    const savedUser = localStorage.getItem("taxiUser");
 
-<div class="admin-shell">
+    if (!savedUser) {
+        location.href = "index.html";
+        return;
+    }
 
-    <aside class="admin-sidebar-nav">
+    currentUser = JSON.parse(savedUser);
 
-        <div class="admin-brand">
-            <div class="admin-brand-icon">🚕</div>
-            <div>
-                <div class="admin-brand-title">Taxi Admin</div>
-                <div class="admin-brand-sub">Los Santos Taxi</div>
-            </div>
-        </div>
+    if (currentUser.role !== "admin") {
+        document.getElementById("adminAccessDenied").style.display = "block";
+        return;
+    }
 
-        <nav class="admin-nav">
+    document.getElementById("adminApp").style.display = "block";
+    document.getElementById("adminUserName").innerText = currentUser.display_name;
 
-            <button onclick="showAdminTab('tab_dashboard')" class="admin-nav-btn active">
-                📊 Übersicht
-            </button>
+    await loadAdminStats();
+    await loadUsers();
+    await loadCompanies();
+    await loadTipsStats();
+    await loadDealerStats();
+    await loadAnnouncements();
+    await loadAdminDoneJobs();
+    await loadAdminTimeStats();
 
-            <button onclick="showAdminTab('tab_users')" class="admin-nav-btn">
-                👥 Benutzer
-            </button>
+    loadDashboardOverview();
+}
 
-            <button onclick="showAdminTab('tab_companies')" class="admin-nav-btn">
-                🏢 Firmen
-            </button>
-            
-            <button onclick="showAdminTab('tab_workshops')" class="admin-nav-btn">
-    🔧         Werkstätten
-            </button>
-            
-            <button onclick="showAdminTab('tab_rides')" class="admin-nav-btn">
-                🚕 Fahrten
-            </button>
+function logoutAdmin() {
+    localStorage.removeItem("taxiUser");
+    location.href = "index.html";
+}
 
-            <button onclick="showAdminTab('tab_tips')" class="admin-nav-btn">
-                🎁 Trinkgeld
-            </button>
-            <button onclick="showAdminTab('tab_times')" class="admin-nav-btn">
-                ⏱️ Dienstzeiten
-            </button>
-            <button onclick="showAdminTab('tab_dealer')" class="admin-nav-btn">
-                🚗 Händler
-            </button>
-            <button onclick="showAdminTab('tab_announcements')" class="admin-nav-btn">
-                📢 Infos
-            </button>
-        </nav>
+function showAdminTab(tabId) {
+    document.querySelectorAll(".admin-tab-content").forEach(tab => {
+        tab.style.display = "none";
+    });
 
-        <div class="admin-sidebar-footer">
-            <a href="index.html">
-                <button class="small-btn">← Leitstelle</button>
-            </a>
+    document.querySelectorAll(".admin-nav-btn").forEach(btn => {
+        btn.classList.remove("active");
+    });
 
-            <button class="small-btn danger-btn" onclick="logoutAdmin()">
-                Logout
-            </button>
-        </div>
+    document.getElementById(tabId).style.display = "block";
+    event.target.classList.add("active");
+}
 
-    </aside>
+async function loadAdminStats() {
 
-    <main class="admin-main">
+    const users = await getTaxiUsers();
+    const companies = await getTaxiCompanies();
+    const jobs = await getTaxiJobs();
 
-        <div class="admin-page-header">
+    const drivers =
+        users.filter(user => user.role === "fahrer").length;
 
-            <div>
-                <h1>👑 Taxi Adminbereich</h1>
-                <p>Benutzer, Firmen, Fahrten & Trinkgeld verwalten</p>
-            </div>
+    const companyCount =
+        companies.length;
 
-            <div class="admin-user-pill">
-                Eingeloggt als<br>
-                <strong id="adminUserName">-</strong>
-            </div>
+    const openJobs =
+        jobs.filter(job => job.job_status === "Offen").length;
 
-        </div>
+    const openTips =
+        jobs
+            .filter(job =>
+                job.job_status === "Erledigt" &&
+                job.tip_paid !== true
+            )
+            .reduce((sum, job) => {
+                return sum + Number(job.tip_amount || 0);
+            }, 0);
 
-        <div id="adminAccessDenied" class="admin-section" style="display:none;">
-            <h2>Kein Zugriff</h2>
-            <p>Du bist kein Admin.</p>
+    document.getElementById("adminStatDrivers").innerText =
+        drivers;
 
-            <a href="index.html">
-                <button>Zurück zur Leitstelle</button>
-            </a>
-        </div>
+    document.getElementById("adminStatCompanies").innerText =
+        companyCount;
 
-        <div id="adminApp" style="display:none;">
+    document.getElementById("adminStatOpenJobs").innerText =
+        openJobs;
 
-            <div class="admin-dashboard-grid">
+    document.getElementById("adminStatTips").innerText =
+        `${openTips}$`;
+}
 
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Fahrer</div>
-                    <div class="admin-kpi-value" id="adminStatDrivers">0</div>
-                </div>
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Firmen</div>
-                    <div class="admin-kpi-value" id="adminStatCompanies">0</div>
-                </div>
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Offene Aufträge</div>
-                    <div class="admin-kpi-value" id="adminStatOpenJobs">0</div>
-                </div>
-
-                <div class="admin-kpi">
-                    <div class="admin-kpi-label">Offenes Trinkgeld</div>
-                    <div class="admin-kpi-value" id="adminStatTips">0$</div>
-                </div>
-
-            </div>
-
-            <!-- DASHBOARD -->
-            <div class="admin-tab-content" id="tab_workshops" style="display:none;">
-
-    <div class="admin-section">
-        <h2>🔧 Werkstattlisten</h2>
-
+function loadDashboardOverview() {
+    document.getElementById("dashboard_overview").innerHTML = `
         <div class="admin-card">
-            <strong>Benny's</strong><br>
-            Firmencode: <strong>Benny2026</strong><br>
-            Zahlungs-Code: <strong>Benny2026-PAY</strong><br><br>
-
-            <a href="werkstatt.html?firma=Benny2026" target="_blank">
-                <button class="small-btn">Benny's öffnen</button>
-            </a>
+            <strong>📊 Adminübersicht</strong><br><br>
+            Hier kannst du Fahrer, Firmen, Fahrten und Trinkgeld verwalten.<br><br>
+            Der Wert <strong>Trinkgeld Gesamt</strong> zeigt jetzt nur noch offenes,
+            noch nicht ausgezahltes Trinkgeld.
         </div>
+    `;
+}
 
-        <div class="admin-card">
-            <strong>Blackline</strong><br>
-            Firmencode: <strong>Blackline2026</strong><br>
-            Zahlungs-Code: <strong>Blackline2026-PAY</strong><br><br>
+async function createUser() {
+    const username = document.getElementById("new_username").value.trim();
+    const display_name = document.getElementById("new_display_name").value.trim();
+    const password = document.getElementById("new_password").value.trim();
+    const role = document.getElementById("new_role").value;
 
-            <a href="werkstatt.html?firma=Blackline2026" target="_blank">
-                <button class="small-btn">Blackline öffnen</button>
-            </a>
-        </div>
+    if (!username || !display_name || !password) {
+        alert("Bitte alles ausfüllen.");
+        return;
+    }
 
-        <div class="admin-card">
-            <strong>WCP</strong><br>
-            Firmencode: <strong>WCP2026</strong><br>
-            Zahlungs-Code: <strong>WCP2026-PAY</strong><br><br>
+    const { error } = await client
+        .from("taxi_users")
+        .insert([{ username, display_name, password, role }]);
 
-            <a href="werkstatt.html?firma=WCP2026" target="_blank">
-                <button class="small-btn">WCP öffnen</button>
-            </a>
-        </div>
+    if (error) {
+        alert("Benutzer konnte nicht erstellt werden.");
+        console.error(error);
+        return;
+    }
 
-        <div class="admin-card">
-            <strong>LSC</strong><br>
-            Firmencode: <strong>LSC2026</strong><br>
-            Zahlungs-Code: <strong>LSC2026-PAY</strong><br><br>
+    alert("Benutzer erstellt.");
 
-            <a href="werkstatt.html?firma=LSC2026" target="_blank">
-                <button class="small-btn">LSC öffnen</button>
-            </a>
-        </div>
+    document.getElementById("new_username").value = "";
+    document.getElementById("new_display_name").value = "";
+    document.getElementById("new_password").value = "";
 
-    </div>
+    loadUsers();
+    loadAdminStats();
+}
 
-</div>
+async function loadUsers() {
+    const box = document.getElementById("users_list");
+    const data = await getTaxiUsers();
 
-            <div class="admin-tab-content" id="tab_dashboard">
+data.sort((a, b) =>
+    String(a.company_name || "").localeCompare(
+        String(b.company_name || "")
+    )
+);
 
-                <div class="admin-layout">
+    box.innerHTML = "";
+
+    data.forEach(user => {
+        box.innerHTML += `
+            <div class="admin-card">
+                <strong>${escapeHtml(user.display_name)}</strong><br>
+                Benutzername: ${escapeHtml(user.username)}<br>
+                Rolle: ${escapeHtml(user.role)}
+
+                <div class="admin-actions">
+                    <button class="small-btn" onclick="changeRole('${user.id}', '${user.role}')">
+                        Rolle ändern
+                    </button>
+
+                    <button class="small-btn" onclick="changePassword('${user.id}')">
+                        Passwort ändern
+                    </button>
+
+                    <button class="small-btn danger-btn" onclick="deleteUser('${user.id}')">
+                        Löschen
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+}
+
+async function changeRole(id, currentRole) {
+    const newRole = currentRole === "admin" ? "fahrer" : "admin";
+
+    const { error } = await client
+        .from("taxi_users")
+        .update({ role: newRole })
+        .eq("id", id);
+
+    if (error) {
+        alert("Rolle konnte nicht geändert werden.");
+        console.error(error);
+        return;
+    }
+
+    loadUsers();
+    loadAdminStats();
+}
+
+async function changePassword(id) {
+    const newPassword = prompt("Neues Passwort:");
+
+    if (!newPassword) return;
+
+    const { error } = await client
+        .from("taxi_users")
+        .update({ password: newPassword })
+        .eq("id", id);
+
+    if (error) {
+        alert("Passwort konnte nicht geändert werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Passwort geändert.");
+}
+
+async function deleteUser(id) {
+    const ok = confirm("Benutzer wirklich löschen?");
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_users")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        alert("Benutzer konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    loadUsers();
+    loadAdminStats();
+}
+
+async function createCompany() {
+    const company_name = document.getElementById("new_company_name").value.trim();
+    const themeColor = document.getElementById("new_company_color").value;
+
+    if (!company_name) {
+        alert("Bitte Firmenname eingeben.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_companies")
+        .insert([{ company_name, theme_color: themeColor, active: true }]);
+
+    if (error) {
+        alert("Firma konnte nicht erstellt werden.");
+        console.error(error);
+        return;
+    }
+
+    document.getElementById("new_company_name").value = "";
+
+    loadCompanies();
+    loadAdminStats();
+}
+
+async function loadCompanies() {
+    const box = document.getElementById("companies_list");
+    const data = await getTaxiCompanies();
+
+data.sort((a, b) =>
+    String(a.display_name || "").localeCompare(
+        String(b.display_name || "")
+    )
+);
+
+    box.innerHTML = "";
+
+    data.forEach(company => {
+
+        const companyLink = `https://los-santos-taxi.michaeltimmler91.workers.dev/firma.html?id=${company.id}`;
+
+        box.innerHTML += `
+            <div class="admin-card">
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:20px;
+                        align-items:flex-start;
+                        flex-wrap:wrap;
+                    "
+                >
 
                     <div>
-                        <div class="admin-section">
-                            <h2>📊 Übersicht</h2>
-                            <div id="dashboard_overview"></div>
-                        </div>
 
-                        <div class="admin-section">
-                            <h2>🚕 Letzte Fahrten</h2>
-                            <div id="admin_done_jobs"></div>
-                        </div>
+                        <strong>
+                            ${escapeHtml(company.company_name || "Unbekannte Firma")}
+                        </strong>
+
+                        <br>
+
+                        🎨 Farbe:
+                        <strong>
+                            ${escapeHtml(company.theme_color || "yellow")}
+                        </strong>
+
+                        <br>
+
+                        🔑 Firmen-Code:
+                        <strong>
+                            ${escapeHtml(
+                                company.company_code && company.company_code.trim() !== ""
+                                    ? company.company_code
+                                    : "Kein Code gesetzt"
+                            )}
+                        </strong>
+
+                        <br><br>
+
+                        🔗 Firmenlink:
+
+                        <br>
+
+                        <input
+                            type="text"
+                            readonly
+                            value="${companyLink}"
+                        >
+
+                    </div>
+
+                    <div class="admin-actions">
+
+                        <button
+                            class="small-btn"
+                            onclick="copyCompanyLink('${escapeAttr(companyLink)}')"
+                        >
+                            📋 Link kopieren
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="editCompany('${company.id}', '${escapeAttr(company.company_name)}')"
+                        >
+                            Namen ändern
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="editCompanyCode('${company.id}', '${escapeAttr(company.company_code || "")}')"
+                        >
+                            Code ändern
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="editCompanyColor('${company.id}', '${escapeAttr(company.theme_color || "yellow")}')"
+                        >
+                            Farbe ändern
+                        </button>
+
+                        <button
+                            class="small-btn danger-btn"
+                            onclick="deleteCompany('${company.id}')"
+                        >
+                            Löschen
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+    });
+}
+
+async function editCompanyCode(id, oldCode) {
+    const newCode = prompt("Neuer Firmen-Code:", oldCode);
+
+    if (newCode === null) return;
+
+    const { error } = await client
+        .from("taxi_companies")
+        .update({
+            company_code: newCode.trim()
+        })
+        .eq("id", id);
+
+    if (error) {
+        alert("Firmen-Code konnte nicht geändert werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Firmen-Code gespeichert.");
+    loadCompanies();
+}
+
+async function editCompany(id, oldName) {
+    const newName = prompt("Neuer Firmenname:", oldName);
+
+    if (!newName) return;
+
+    const { error } = await client
+        .from("taxi_companies")
+        .update({ company_name: newName })
+        .eq("id", id);
+
+    if (error) {
+        alert("Firma konnte nicht bearbeitet werden.");
+        console.error(error);
+        return;
+    }
+
+    loadCompanies();
+}
+
+async function deleteCompany(id) {
+    const ok = confirm("Firma wirklich löschen?");
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_companies")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        alert("Firma konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    loadCompanies();
+    loadAdminStats();
+}
+
+async function loadTipsStats() {
+    const data = await getDoneJobs(500);
+
+    const grouped = {};
+
+    data.forEach(job => {
+        const driver = job.assigned_driver || "Unbekannt";
+
+        if (!grouped[driver]) {
+            grouped[driver] = {
+                rides: 0,
+                openTips: 0,
+                paidTips: 0,
+                totalTips: 0,
+                fares: 0,
+                invoices: 0,
+                food: 0
+            };
+        }
+
+        const tip = Number(job.tip_amount || 0);
+
+        grouped[driver].rides++;
+        grouped[driver].totalTips += tip;
+
+        if (job.tip_paid === true) {
+            grouped[driver].paidTips += tip;
+        } else {
+            grouped[driver].openTips += tip;
+        }
+
+        grouped[driver].fares += Number(job.fare_amount || 0);
+        grouped[driver].invoices += Number(job.invoice_amount || 0);
+        grouped[driver].food += Number(job.food_cost || 0);
+    });
+
+    const html = Object.entries(grouped).map(([driver, stats]) => `
+        <div class="admin-card">
+            <strong>${escapeHtml(driver)}</strong><br><br>
+
+            🚕 Fahrten gesamt: ${stats.rides}<br>
+            🎁 Offenes Trinkgeld: <strong>${stats.openTips}$</strong><br>
+            💸 Bereits ausgezahlt: ${stats.paidTips}$<br>
+            📦 Trinkgeld gesamt: ${stats.totalTips}$<br>
+            💰 Fahrtkosten: ${stats.fares}$<br>
+            🧾 Rechnungen: ${stats.invoices}$<br>
+            🍔 Essenskosten: ${stats.food}$
+
+            <div class="admin-actions">
+                <button
+                    class="small-btn danger-btn"
+                    onclick="payTipsForDriver('${escapeAttr(driver)}', ${stats.openTips})"
+                    ${stats.openTips <= 0 ? "disabled" : ""}
+                >
+                    💸 Trinkgeld auszahlen
+                </button>
+            </div>
+        </div>
+    `).join("");
+
+    document.getElementById("tips_stats").innerHTML = html || "Keine Daten vorhanden.";
+    document.getElementById("tips_stats_full").innerHTML = html || "Keine Daten vorhanden.";
+}
+
+async function payTipsForDriver(driverName, amount) {
+    if (amount <= 0) {
+        alert("Dieser Fahrer hat kein offenes Trinkgeld.");
+        return;
+    }
+
+    const ok = confirm(
+        `Offenes Trinkgeld für ${driverName} wirklich als ausgezahlt markieren?\n\nBetrag: ${amount}$`
+    );
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({ tip_paid: true })
+        .eq("job_status", "Erledigt")
+        .eq("assigned_driver", driverName)
+        .neq("tip_paid", true);
+
+    if (error) {
+        alert("Trinkgeld konnte nicht ausgezahlt werden.");
+        console.error(error);
+        return;
+    }
+
+    alert(`Trinkgeld für ${driverName} wurde als ausgezahlt markiert.`);
+
+    await loadTipsStats();
+    await loadAdminStats();
+}
+
+async function loadAdminDoneJobs() {
+    const data = await getDoneJobs(50);
+
+    const html = data.map(job => `
+        <div class="admin-card">
+            <strong>${escapeHtml(job.assigned_driver || "-")}</strong><br><br>
+
+            🚕 Fahrtart: ${escapeHtml(job.ride_type || "-")}<br>
+            👤 Kunde/Empfänger: ${escapeHtml(job.customer_name || "-")}<br>
+            📍 Strecke: ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}<br>
+            🚕 KM: ${job.kilometers || 0}<br>
+            💰 Fahrtkosten: ${job.fare_amount || 0}$<br>
+            🧾 Rechnung: ${job.invoice_amount || 0}$<br>
+            🎁 Trinkgeld: ${job.tip_amount || 0}$<br>
+            💸 Trinkgeldstatus: ${job.tip_paid === true ? "Ausgezahlt" : "Offen"}<br>
+            🍔 Essenskosten: ${job.food_cost || 0}$<br>
+            📝 Notiz: ${escapeHtml(job.notes || "-")}
+
+            <div class="admin-actions">
+                <button class="small-btn" onclick="toggleJobEdit('${job.id}')">
+                    Bearbeiten
+                </button>
+
+                <button class="small-btn danger-btn" onclick="deleteJob('${job.id}')">
+                    Löschen
+                </button>
+            </div>
+
+            <div id="edit_job_${job.id}" style="display:none; margin-top:18px;">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Kunde / Empfänger</label>
+                        <input type="text" id="edit_customer_${job.id}" value="${escapeAttr(job.customer_name || "")}">
+                    </div>
+
+                    <div class="field">
+                        <label>Start / Abholung</label>
+                        <input type="text" id="edit_pickup_${job.id}" value="${escapeAttr(job.pickup_location || "")}">
+                    </div>
+
+                    <div class="field">
+                        <label>Ziel</label>
+                        <input type="text" id="edit_destination_${job.id}" value="${escapeAttr(job.destination || "")}">
+                    </div>
+
+                    <div class="field">
+                        <label>Kilometer</label>
+                        <input type="number" id="edit_km_${job.id}" value="${job.kilometers || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Ausgestellte Rechnung</label>
+                        <input type="number" id="edit_invoice_${job.id}" value="${job.invoice_amount || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Essenskosten</label>
+                        <input type="number" id="edit_food_${job.id}" value="${job.food_cost || 0}">
+                    </div>
+
+                    <div class="field">
+                        <label>Trinkgeld ausgezahlt?</label>
+                        <select id="edit_tip_paid_${job.id}">
+                            <option value="false" ${job.tip_paid !== true ? "selected" : ""}>Nein</option>
+                            <option value="true" ${job.tip_paid === true ? "selected" : ""}>Ja</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Notiz</label>
+                        <input type="text" id="edit_notes_${job.id}" value="${escapeAttr(job.notes || "")}">
+                    </div>
+                </div>
+
+                <button onclick="saveJobEdit('${job.id}', '${job.ride_type}')">
+                    Änderungen speichern
+                </button>
+            </div>
+        </div>
+    `).join("");
+
+document.getElementById("admin_done_jobs").innerHTML =
+    html || "Keine erledigten Fahrten.";
+
+document.getElementById("admin_done_jobs_full").innerHTML =
+    html
+        .replaceAll('id="edit_job_', 'id="full_edit_job_')
+        .replaceAll('id="edit_customer_', 'id="full_edit_customer_')
+        .replaceAll('id="edit_pickup_', 'id="full_edit_pickup_')
+        .replaceAll('id="edit_destination_', 'id="full_edit_destination_')
+        .replaceAll('id="edit_km_', 'id="full_edit_km_')
+        .replaceAll('id="edit_invoice_', 'id="full_edit_invoice_')
+        .replaceAll('id="edit_food_', 'id="full_edit_food_')
+        .replaceAll('id="edit_tip_paid_', 'id="full_edit_tip_paid_')
+        .replaceAll('id="edit_notes_', 'id="full_edit_notes_')
+        .replaceAll("toggleJobEdit('", "toggleFullJobEdit('")
+        || "Keine erledigten Fahrten.";
+}
+
+function toggleFullJobEdit(id) {
+    const box = document.getElementById(`full_edit_job_${id}`);
+    if (!box) return;
+
+    box.style.display =
+        box.style.display === "none"
+            ? "block"
+            : "none";
+}
+
+function toggleJobEdit(id) {
+    const box = document.getElementById(`edit_job_${id}`);
+    if (!box) return;
+
+    box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+function recalculateJob(rideType, km, invoice, food) {
+    let fare = km * 5;
+    let tip = 0;
+    let billedTo = "Kunde";
+
+    if (rideType === "Bambi-Tour") {
+        fare = 0;
+        billedTo = "Kostenlos";
+        tip = invoice;
+    }
+
+    if (rideType === "Normale Fahrt") {
+        tip = invoice - fare;
+    }
+
+    if (rideType === "Essenslieferung") {
+        tip = invoice - food - fare;
+    }
+
+    if (rideType === "EMS") {
+        billedTo = "EMS";
+        tip = invoice;
+    }
+
+    if (rideType === "Gebrauchtwagenhändler") {
+        billedTo = "Gebrauchtwagenhändler";
+        tip = invoice;
+    }
+
+    return {
+        fare,
+        tip,
+        billedTo
+    };
+}
+
+async function saveJobEdit(id, rideType) {
+    const customer = document.getElementById(`edit_customer_${id}`).value.trim();
+    const pickup = document.getElementById(`edit_pickup_${id}`).value.trim();
+    const destination = document.getElementById(`edit_destination_${id}`).value.trim();
+    const km = Number(document.getElementById(`edit_km_${id}`).value);
+    const invoice = Number(document.getElementById(`edit_invoice_${id}`).value);
+    const food = Number(document.getElementById(`edit_food_${id}`).value);
+    const tipPaid = document.getElementById(`edit_tip_paid_${id}`).value === "true";
+    const notes = document.getElementById(`edit_notes_${id}`).value.trim();
+
+    if (!pickup || !destination) {
+        alert("Start und Ziel müssen eingetragen sein.");
+        return;
+    }
+
+    if (km < 0 || invoice < 0 || food < 0) {
+        alert("Negative Werte sind nicht erlaubt.");
+        return;
+    }
+
+    const result = recalculateJob(rideType, km, invoice, food);
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+            customer_name: customer,
+            pickup_location: pickup,
+            destination: destination,
+            kilometers: km,
+            fare_amount: result.fare,
+            invoice_amount: invoice,
+            tip_amount: result.tip,
+            food_cost: food,
+            tip_paid: tipPaid,
+            billed_to: result.billedTo,
+            notes: notes
+        })
+        .eq("id", id);
+
+    if (error) {
+        alert("Fahrt konnte nicht gespeichert werden.");
+        console.error(error);
+        return;
+    }
+
+    alert("Fahrt gespeichert.");
+
+    await loadAdminDoneJobs();
+    await loadTipsStats();
+    await loadAdminStats();
+}
+
+async function deleteJob(id) {
+    const ok = confirm("Fahrt wirklich endgültig löschen?");
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        alert("Fahrt konnte nicht gelöscht werden.");
+        console.error(error);
+        return;
+    }
+
+    await loadAdminDoneJobs();
+    await loadAdminStats();
+    await loadTipsStats();
+}
+
+
+
+
+async function editCompanyColor(id, oldColor) {
+
+    const newColor = prompt(
+        "Neue Firmenfarbe:",
+        oldColor || "yellow"
+    );
+
+    if (newColor === null) return;
+
+    const { error } = await client
+        .from("taxi_companies")
+        .update({
+            theme_color: newColor.trim()
+        })
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Farbe konnte nicht gespeichert werden.");
+        return;
+    }
+
+    loadCompanies();
+}
+
+function copyCompanyLink(link) {
+
+    navigator.clipboard.writeText(link);
+
+    alert("Firmenlink kopiert.");
+}
+async function loadDealerStats() {
+    const box = document.getElementById("dealer_stats");
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("ride_type", "Gebrauchtwagenhändler")
+        .eq("job_status", "Erledigt")
+        .neq("dealer_paid", true)
+        .order("completed_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine offenen Händlerfahrten vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    const total = data.reduce((sum, job) => {
+        return sum + Number(job.invoice_amount || 0);
+    }, 0);
+
+    let html = `
+        <div class="admin-card">
+            <strong>Offene Monatssumme</strong><br><br>
+            <span style="font-size:42px;color:#facc15;font-weight:900;">
+                ${total}$
+            </span>
+            <br><br>
+            🚗 Offene Fahrten: ${data.length}
+        </div>
+    `;
+
+    data.forEach(job => {
+        html += `
+            <div class="admin-card">
+                <strong>${escapeHtml(job.assigned_driver || "-")}</strong><br><br>
+
+                👤 Kunde: ${escapeHtml(job.customer_name || "-")}<br>
+                📍 Strecke: ${escapeHtml(job.pickup_location || "-")} → ${escapeHtml(job.destination || "-")}<br>
+                🚕 KM: ${job.kilometers || 0}<br>
+                🧾 Rechnung: ${job.invoice_amount || 0}$<br>
+                📝 Notiz: ${escapeHtml(job.notes || "-")}
+            </div>
+        `;
+    });
+
+    box.innerHTML = html;
+}
+
+async function payDealerMonth() {
+    const ok = confirm(
+        "Alle offenen Gebrauchtwagenhändler-Fahrten wirklich als bezahlt markieren?"
+    );
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_jobs")
+        .update({
+    dealer_paid: true,
+    dealer_paid_at: new Date().toISOString()
+})
+        .eq("ride_type", "Gebrauchtwagenhändler")
+        .eq("job_status", "Erledigt")
+        .neq("dealer_paid", true);
+
+    if (error) {
+        console.error(error);
+        alert("Abrechnung konnte nicht zurückgesetzt werden.");
+        return;
+    }
+
+    alert("Händlerabrechnung wurde zurückgesetzt.");
+
+    await loadDealerStats();
+    await loadAdminStats();
+}
+
+async function createAnnouncement() {
+    const title = document.getElementById("announcement_title").value.trim();
+    const message = document.getElementById("announcement_message").value.trim();
+    const mustConfirm = document.getElementById("announcement_confirm").value === "true";
+
+    if (!title || !message) {
+        alert("Bitte Titel und Nachricht eintragen.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_announcements")
+        .insert([{
+            title,
+            message,
+            active: true,
+            must_confirm: mustConfirm
+        }]);
+
+    if (error) {
+        console.error(error);
+        alert("Info konnte nicht erstellt werden.");
+        return;
+    }
+
+    document.getElementById("announcement_title").value = "";
+    document.getElementById("announcement_message").value = "";
+    document.getElementById("announcement_confirm").value = "true";
+
+    await loadAnnouncements();
+}
+
+async function loadAnnouncements() {
+    const box = document.getElementById("announcements_list");
+    const data = await getAnnouncements();
+
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine Infos vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    box.innerHTML = "";
+
+    for (const info of data) {
+        const reads = await loadAnnouncementReads(info.id);
+
+        box.innerHTML += `
+            <div class="admin-card">
+                <strong>${escapeHtml(info.title)}</strong><br><br>
+
+                ${escapeHtml(info.message).replaceAll("\n", "<br>")}
+
+                <br><br>
+
+                Status:
+                <strong>${info.active ? "Aktiv" : "Inaktiv"}</strong><br>
+
+                Pflicht:
+                <strong>${info.must_confirm ? "Ja" : "Nein"}</strong><br>
+
+                Bestätigt von:
+                <strong>${reads.length}</strong>
+
+                <div style="margin-top:12px;color:#cbd5e1;">
+                    ${reads.length > 0
+                        ? reads.map(r => `✅ ${escapeHtml(r.display_name)}`).join("<br>")
+                        : "Noch niemand bestätigt."
+                    }
+                </div>
+
+                <div class="admin-actions">
+                    <button
+                        class="small-btn secondary-btn"
+                        onclick="toggleAnnouncement('${info.id}', ${info.active})"
+                    >
+                        ${info.active ? "Deaktivieren" : "Aktivieren"}
+                    </button>
+
+                    <button
+                        class="small-btn danger-btn"
+                        onclick="deleteAnnouncement('${info.id}')"
+                    >
+                        Löschen
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
+async function loadAnnouncementReads(announcementId) {
+    const { data, error } = await client
+        .from("taxi_announcement_reads")
+        .select("*")
+        .eq("announcement_id", announcementId)
+        .order("display_name");
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    return data || [];
+}
+
+async function toggleAnnouncement(id, active) {
+    const { error } = await client
+        .from("taxi_announcements")
+        .update({
+            active: !active
+        })
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Status konnte nicht geändert werden.");
+        return;
+    }
+
+    await loadAnnouncements();
+}
+
+async function deleteAnnouncement(id) {
+    const ok = confirm("Info wirklich löschen?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_announcements")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Info konnte nicht gelöscht werden.");
+        return;
+    }
+
+    await loadAnnouncements();
+}
+async function loadAdminTimeStats() {
+
+    const box = document.getElementById("admin_time_stats");
+
+    if (!box) return;
+
+    const { data: users, error: usersError } = await client
+    .from("taxi_users")
+    .select("username, display_name, role")
+    .in("role", ["fahrer", "admin"]);
+
+if (usersError) {
+    console.error(usersError);
+    box.innerHTML = "Fehler beim Laden der Fahrer.";
+    return;
+}
+
+const activeUsers = {};
+
+(users || []).forEach(user => {
+    activeUsers[user.username] = user.display_name;
+});
+
+    const { data, error } = await client
+        .from("taxi_status_logs")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler";
+        return;
+    }
+
+    const now = new Date();
+
+    const startToday = new Date();
+    startToday.setHours(0, 0, 0, 0);
+
+    const startWeek = new Date();
+    const day = startWeek.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+
+    startWeek.setDate(startWeek.getDate() - diff);
+    startWeek.setHours(0, 0, 0, 0);
+
+    const startMonth = new Date();
+    startMonth.setDate(1);
+    startMonth.setHours(0, 0, 0, 0);
+
+    const groupedLogs = {};
+
+    (data || []).forEach(log => {
+
+    if (!activeUsers[log.username]) {
+        return;
+    }
+
+    if (!groupedLogs[log.username]) {
+        groupedLogs[log.username] = {
+            display_name: activeUsers[log.username],
+            logs: []
+        };
+    }
+
+    groupedLogs[log.username].logs.push(log);
+});
+
+    const rows = Object.values(groupedLogs).map(driver => {
+        const stats = {
+            display_name: driver.display_name,
+
+            todayDuty: 0,
+            todayPause: 0,
+
+            weekDuty: 0,
+            weekPause: 0,
+
+            monthDuty: 0,
+            monthPause: 0,
+
+            totalDuty: 0,
+            totalPause: 0
+        };
+
+        for (let i = 0; i < driver.logs.length; i++) {
+            const current = driver.logs[i];
+            const next = driver.logs[i + 1];
+
+            const start = new Date(current.created_at);
+            const end = next
+                ? new Date(next.created_at)
+                : now;
+
+            if (end <= start) continue;
+
+            addStatusTime(stats, current.new_status, start, end, startToday, "today");
+            addStatusTime(stats, current.new_status, start, end, startWeek, "week");
+            addStatusTime(stats, current.new_status, start, end, startMonth, "month");
+
+            const totalSeconds = Math.floor((end - start) / 1000);
+
+            if (current.new_status === "Im Dienst") {
+                stats.totalDuty += totalSeconds;
+            }
+
+            if (current.new_status === "Pause") {
+                stats.totalPause += totalSeconds;
+            }
+        }
+
+        return stats;
+    });
+
+    if (rows.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Noch keine Dienstzeiten vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    box.innerHTML = `
+        <div class="admin-time-table admin-time-table-wide">
+
+            <div class="admin-time-head admin-time-head-wide">
+                <div>Fahrer</div>
+                <div>Heute</div>
+                <div>Woche</div>
+                <div>Monat</div>
+                <div>Gesamt</div>
+            </div>
+
+            ${rows.map(driver => `
+                <div class="admin-time-row admin-time-row-wide">
+
+                    <div>
+                        <strong>${escapeHtml(driver.display_name)}</strong>
                     </div>
 
                     <div>
-                        <div class="admin-section">
-                            <h2>🎁 Trinkgeld Übersicht</h2>
-                            <div id="tips_stats"></div>
-                        </div>
+                        🟢 ${formatSeconds(driver.todayDuty)}<br>
+                        🟡 ${formatSeconds(driver.todayPause)}
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.weekDuty)}<br>
+                        🟡 ${formatSeconds(driver.weekPause)}
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.monthDuty)}<br>
+                        🟡 ${formatSeconds(driver.monthPause)}
+                    </div>
+
+                    <div>
+                        🟢 ${formatSeconds(driver.totalDuty)}<br>
+                        🟡 ${formatSeconds(driver.totalPause)}
                     </div>
 
                 </div>
-
-            </div>
-
-            <!-- BENUTZER -->
-
-            <div class="admin-tab-content" id="tab_users" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>👥 Benutzer erstellen</h2>
-
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Benutzername</label>
-                            <input type="text" id="new_username">
-                        </div>
-
-                        <div class="field">
-                            <label>Anzeigename</label>
-                            <input type="text" id="new_display_name">
-                        </div>
-
-                        <div class="field">
-                            <label>Passwort</label>
-                            <input type="text" id="new_password">
-                        </div>
-
-                        <div class="field">
-                            <label>Rolle</label>
-                            <select id="new_role">
-                                <option value="fahrer">Fahrer</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button onclick="createUser()">Benutzer erstellen</button>
-                </div>
-
-                <div class="admin-section">
-                    <h2>👥 Benutzerverwaltung</h2>
-                    <div id="users_list"></div>
-                </div>
-
-            </div>
-
-            <!-- FIRMEN -->
-
-            <div class="admin-tab-content" id="tab_companies" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>🏢 Liefer-Unternehmen</h2>
-
-                    <div class="form-grid">
-                        <div class="field">
-                            <label>Neues Unternehmen</label>
-                            <input type="text" id="new_company_name">
-                        </div>
-                       <div class="field">
-    <label>Firmenfarbe</label>
-
-    <select id="new_company_color">
-
-        <option value="yellow">🟡 Gelb</option>
-        <option value="orange">🟠 Orange</option>
-        <option value="red">🔴 Rot</option>
-        <option value="darkred">🟥 Dunkelrot</option>
-
-        <option value="blue">🔵 Blau</option>
-        <option value="darkblue">🌌 Dunkelblau</option>
-        <option value="cyan">🩵 Cyan</option>
-        <option value="turquoise">🌊 Türkis</option>
-
-        <option value="green">🟢 Grün</option>
-        <option value="lime">🟩 Lime</option>
-        <option value="darkgreen">🌲 Dunkelgrün</option>
-
-        <option value="purple">🟣 Lila</option>
-        <option value="violet">💜 Violett</option>
-        <option value="pink">🌸 Pink</option>
-        <option value="magenta">💖 Magenta</option>
-
-        <option value="white">⚪ Weiß</option>
-        <option value="silver">🪙 Silber</option>
-        <option value="gray">⚫ Grau</option>
-        <option value="black">⬛ Schwarz</option>
-
-        <option value="gold">✨ Gold</option>
-        <option value="bronze">🥉 Bronze</option>
-
-        <option value="rainbow">🌈 Rainbow</option>
-        <option value="neon">⚡ Neon</option>
-        <option value="fire">🔥 Feuer</option>
-        <option value="ice">❄️ Eis</option>
-
-    </select>
-</div>
-                    </div>
-
-                    <button onclick="createCompany()">Unternehmen hinzufügen</button>
-
-                    <br><br>
-
-                    <div id="companies_list"></div>
-                </div>
-
-            </div>
-
-            <!-- FAHRTEN -->
-
-            <div class="admin-tab-content" id="tab_rides" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>🚕 Erledigte Fahrten</h2>
-                    <div id="admin_done_jobs_full"></div>
-                </div>
-
-            </div>
-
-            <div class="admin-tab-content" id="tab_dealer" style="display:none;">
-
-    <div class="admin-section">
-        <h2>🚗 Gebrauchtwagenhändler-Abrechnung</h2>
-
-        <div id="dealer_stats"></div>
-
-        <br>
-
-        <button class="danger-btn" onclick="payDealerMonth()">
-            💰 Monat abrechnen / zurücksetzen
-        </button>
-    </div>
-
-</div>
-          <div class="admin-tab-content" id="tab_announcements" style="display:none;">
-
-    <div class="admin-section">
-        <h2>📢 Wichtige Infos</h2>
-
-        <div class="form-grid">
-
-            <div class="field">
-                <label>Titel</label>
-                <input type="text" id="announcement_title">
-            </div>
-
-            <div class="field">
-                <label>Pflichtbestätigung</label>
-
-                <select id="announcement_confirm">
-                    <option value="true">Ja</option>
-                    <option value="false">Nein</option>
-                </select>
-            </div>
+            `).join("")}
 
         </div>
+    `;
+}
 
-        <div class="field">
-            <label>Nachricht</label>
+function addStatusTime(stats, status, start, end, rangeStart, key) {
 
-            <textarea
-                id="announcement_message"
-                rows="6"
-            ></textarea>
-        </div>
+    if (end <= rangeStart) return;
 
-        <button onclick="createAnnouncement()">
-            📢 Info veröffentlichen
-        </button>
+    const effectiveStart =
+        start < rangeStart
+            ? rangeStart
+            : start;
 
-    </div>
+    const seconds =
+        Math.floor((end - effectiveStart) / 1000);
 
-    <div class="admin-section">
-        <h2>📋 Aktive Infos</h2>
+    if (seconds <= 0) return;
 
-        <div id="announcements_list"></div>
-    </div>
+    if (status === "Im Dienst") {
+        stats[`${key}Duty`] += seconds;
+    }
 
-</div>  
-<div class="admin-tab-content" id="tab_times" style="display:none;">
+    if (status === "Pause") {
+        stats[`${key}Pause`] += seconds;
+    }
+}
 
-    <div class="admin-section">
-        <h2>⏱️ Fahrer Dienstzeiten</h2>
 
-        <div id="admin_time_stats"></div>
-    </div>
-
-</div>
-            
-            <!-- TRINKGELD -->
-
-            <div class="admin-tab-content" id="tab_tips" style="display:none;">
-
-                <div class="admin-section">
-                    <h2>🎁 Trinkgeld-Auszahlung</h2>
-                    <div id="tips_stats_full"></div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
-<script src="config.js?v=2"></script>
-<script src="utils.js?v=2"></script>
-<script src="api.js?v=1"></script>
-<script src="admin.js?v=15"></script>
-
-</body>
-</html>
+startAdmin();

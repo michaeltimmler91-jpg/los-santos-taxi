@@ -1,15 +1,15 @@
-let serviceMapScale = 1;
-let serviceMapX = 0;
-let serviceMapY = 0;
+let workshopMapScale = 1;
+let workshopMapX = 0;
+let workshopMapY = 0;
 
-function searchServicePlz() {
-    const input = document.getElementById("service_plz_search").value.trim();
-    const result = document.getElementById("service_plz_result");
-    const marker = document.getElementById("service_map_marker");
+function searchWorkshopPlz() {
+    const input = document.getElementById("workshop_plz_search").value.trim();
+    const result = document.getElementById("workshop_plz_result");
+    const marker = document.getElementById("workshop_map_marker");
 
-    const box = document.getElementById("serviceMapBox");
-    const inner = document.getElementById("serviceMapInner");
-    const img = document.querySelector(".service-map-img");
+    const box = document.getElementById("workshopMapBox");
+    const inner = document.getElementById("workshopMapInner");
+    const img = document.querySelector(".workshop-mini-map-img");
 
     if (!input) {
         result.innerHTML = "";
@@ -44,11 +44,11 @@ function searchServicePlz() {
     marker.style.left = `${pixelX}px`;
     marker.style.top = `${pixelY}px`;
 
-    serviceMapScale = 5;
+    workshopMapScale = 5;
 
-    serviceMapX = (box.clientWidth / 2) - (pixelX * serviceMapScale);
-    serviceMapY = (box.clientHeight / 2) - (pixelY * serviceMapScale);
+    workshopMapX = (box.clientWidth / 2) - (pixelX * workshopMapScale);
+    workshopMapY = (box.clientHeight / 2) - (pixelY * workshopMapScale);
 
     inner.style.transform =
-        `translate(${serviceMapX}px, ${serviceMapY}px) scale(${serviceMapScale})`;
+        `translate(${workshopMapX}px, ${workshopMapY}px) scale(${workshopMapScale})`;
 }

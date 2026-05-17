@@ -1,272 +1,144 @@
-const supabaseClient =
-supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-);
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-let plzReportsCache = [];
+    <title>PLZ Fehler melden</title>
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadPlzReports();
-});
+    <link rel="stylesheet" href="style.css?v=20">
 
-async function loadPlzReports() {
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
-    const list =
-    document.getElementById("plz_reports_list");
+<div class="container">
 
-    list.innerHTML = "L&auml;dt...";
+    <div class="modern-header">
+        <div class="header-left">
 
-    const { data, error } =
-    await supabaseClient
-    .from("plz_reports")
-    .select("*")
-    .order("created_at", {
-        ascending: false
-    });
-
-    if (error) {
-
-        console.error(error);
-
-        list.innerHTML = `
-            <div class="admin-card">
-                ❌ Meldungen konnten nicht geladen werden.
+            <div class="logo-icon">
+                🗺️
             </div>
-        `;
 
-        return;
-    }
+            <div>
+                <div class="main-title">
+                    PLZ Fehler melden
+                </div>
 
-    plzReportsCache = data || [];
-
-    renderPlzReports();
-}
-
-function renderPlzReports() {
-
-    const list =
-    document.getElementById("plz_reports_list");
-
-    const search =
-    document
-    .getElementById("plz_admin_search")
-    .value
-    .trim()
-    .toLowerCase();
-
-    const statusFilter =
-    document
-    .getElementById("plz_admin_status_filter")
-    .value;
-
-    let filtered =
-    plzReportsCache.filter(report => {
-
-        const matchesSearch =
-        !search ||
-        String(report.plz || "")
-        .toLowerCase()
-        .includes(search);
-
-        const matchesStatus =
-        statusFilter === "alle" ||
-        (report.status || "offen") === statusFilter;
-
-        return matchesSearch && matchesStatus;
-    });
-
-    if (filtered.length === 0) {
-
-        list.innerHTML = `
-            <div class="admin-card">
-                Keine passenden Meldungen gefunden.
+                <div class="sub-title">
+                    Los Santos Kartenservice
+                </div>
             </div>
-        `;
 
-        return;
-    }
+        </div>
+    </div>
 
-    list.innerHTML =
-    filtered.map(report => {
+    <div
+        class="card"
+        style="
+            max-width:850px;
+            margin:auto;
+        "
+    >
 
-        const status =
-        report.status || "offen";
+        <h2>
+            📍 Kartenfehler melden
+        </h2>
 
-        const created =
-        report.created_at
-        ? new Date(report.created_at).toLocaleString("de-DE")
-        : "-";
+        <div class="admin-card" style="margin-bottom:20px;">
 
-        return `
-            <div class="admin-card plz-report-card">
+            <strong>
+                🗺️ Kartenfehler gefunden?
+            </strong>
+            <br>
 
-                <div class="plz-report-top">
-                    <div>
-                        <strong>PLZ ${escapeHtml(report.plz || "-")}</strong><br>
-                        <span>${escapeHtml(report.type || "-")}</span>
-                    </div>
+            Falls eine PLZ im Meer schwimmt,
+            mitten im Berg steckt oder komplett
+            verschwunden ist:
+            Hier kannst du es melden 👀
 
-                    <div class="plz-status-badge status-${status}">
-                        ${statusLabel(status)}
-                    </div>
-                </div>
+        </div>
 
-                <div class="plz-report-meta">
-                    📅 ${created}
-                    ${report.reporter ? " • 👤 " + escapeHtml(report.reporter) : ""}
-                </div>
+        <div class="form-grid">
 
-                <div class="plz-report-text">
-                    ${escapeHtml(report.text || "Keine Beschreibung angegeben.")}
-                </div>
+            <div class="field">
+                <label>
+                    PLZ
+                </label>
 
-                <div class="form-grid" style="margin-top:16px;">
-
-                    <div class="field">
-                        <label>Status</label>
-                        <select onchange="updatePlzReportStatus(${report.id}, this.value)">
-                            <option value="offen" ${status === "offen" ? "selected" : ""}>Offen</option>
-                            <option value="bearbeitung" ${status === "bearbeitung" ? "selected" : ""}>In Bearbeitung</option>
-                            <option value="erledigt" ${status === "erledigt" ? "selected" : ""}>Erledigt</option>
-                        </select>
-                    </div>
-
-                    <div class="field">
-                        <label>Admin-Notiz</label>
-                        <input
-                            type="text"
-                            id="note_${report.id}"
-                            value="${escapeAttr(report.admin_note || "")}"
-                            placeholder="z.B. erledigt / Wert angepasst"
-                        >
-                    </div>
-
-                </div>
-
-                <div class="admin-actions">
-                    <button class="small-btn" onclick="savePlzReportNote(${report.id})">
-                        💾 Notiz speichern
-                    </button>
-
-                    <button class="small-btn danger-btn" onclick="deletePlzReport(${report.id})">
-                        🗑️ L&ouml;schen
-                    </button>
-                </div>
-
+                <input
+                    type="text"
+                    id="report_plz"
+                    placeholder="z.B. 1037"
+                >
             </div>
-        `;
-    }).join("");
-}
 
-async function updatePlzReportStatus(id, status) {
+            <div class="field">
+                <label>
+                    Problem
+                </label>
 
-    const { error } =
-    await supabaseClient
-    .from("plz_reports")
-    .update({
-        status: status
-    })
-    .eq("id", id);
+                <select id="report_type">
 
-    if (error) {
-        console.error(error);
-        alert("Status konnte nicht gespeichert werden.");
-        return;
-    }
+                    <option value="fehlt">
+                        PLZ fehlt
+                    </option>
 
-    const report =
-    plzReportsCache.find(item => item.id === id);
+                    <option value="falsch">
+                        PLZ sitzt falsch
+                    </option>
 
-    if (report) {
-        report.status = status;
-    }
+                    <option value="doppelt">
+                        Doppelte PLZ
+                    </option>
 
-    renderPlzReports();
-}
+                    <option value="sonstiges">
+                        Sonstiges
+                    </option>
 
-async function savePlzReportNote(id) {
+                </select>
+            </div>
 
-    const note =
-    document
-    .getElementById(`note_${id}`)
-    .value
-    .trim();
+            <div class="field" style="grid-column:1/-1;">
+                <label>
+                    Beschreibung
+                </label>
 
-    const { error } =
-    await supabaseClient
-    .from("plz_reports")
-    .update({
-        admin_note: note
-    })
-    .eq("id", id);
+                <textarea
+                    id="report_text"
+                    placeholder="Was stimmt nicht?"
+                    rows="5"
+                ></textarea>
+            </div>
 
-    if (error) {
-        console.error(error);
-        alert("Notiz konnte nicht gespeichert werden.");
-        return;
-    }
+            <div class="field">
+                <label>
+                    Dein Name (optional)
+                </label>
 
-    const report =
-    plzReportsCache.find(item => item.id === id);
+                <input
+                    type="text"
+                    id="report_name"
+                    placeholder="z.B. Lennox"
+                >
+            </div>
 
-    if (report) {
-        report.admin_note = note;
-    }
+        </div>
 
-    alert("Notiz gespeichert.");
-}
+        <button onclick="sendPlzReport()">
+            📍 Fehler melden
+        </button>
 
-async function deletePlzReport(id) {
+        <div
+            id="report_result"
+            style="margin-top:20px;"
+        ></div>
 
-    const ok =
-    confirm("Diese Meldung wirklich l&ouml;schen?");
+    </div>
 
-    if (!ok) {
-        return;
-    }
-
-    const { error } =
-    await supabaseClient
-    .from("plz_reports")
-    .delete()
-    .eq("id", id);
-
-    if (error) {
-        console.error(error);
-        alert("Meldung konnte nicht gel&ouml;scht werden.");
-        return;
-    }
-
-    plzReportsCache =
-    plzReportsCache.filter(item => item.id !== id);
-
-    renderPlzReports();
-}
-
-function statusLabel(status) {
-
-    if (status === "bearbeitung") {
-        return "In Bearbeitung";
-    }
-
-    if (status === "erledigt") {
-        return "Erledigt";
-    }
-
-    return "Offen";
-}
-
-function escapeHtml(value) {
-
-    return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function escapeAttr(value) {
-    return escapeHtml(value);
-}
+</div>
+<script src="config.js?v=1"></script>
+<script src="plz_melden.js?v=1"></script>
+</body>
+</html>

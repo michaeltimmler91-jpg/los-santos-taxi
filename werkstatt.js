@@ -1,191 +1,406 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Werkstatt Abrechnung</title>
+const params = new URLSearchParams(window.location.search);
+const WORKSHOP_CODE = params.get("firma") || "";
+const PAY_CODE = `${WORKSHOP_CODE}-PAY`;
 
-    <link rel="stylesheet" href="style.css?v=20">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+if (!WORKSHOP_CODE) {
+    alert("Kein Werkstatt-Code im Link gefunden.");
+}
 
-<div class="container">
+async function loadDrivers() {
+    const select = document.getElementById("taxi_driver");
 
-    <div class="modern-header">
-        <div class="header-left">
-            <div class="logo-icon">🔧</div>
+    const { data, error } = await client
+        .from("taxi_users")
+        .select("*")
+        .order("display_name", { ascending: true });
 
-            <div>
-                <div class="main-title">Werkstatt Abrechnung</div>
-                <div class="sub-title">Taxi • Reparatur & Tuning</div>
+    if (error) {
+        console.error(error);
+        select.innerHTML = `<option>Fehler beim Laden</option>`;
+        return;
+    }
+
+    select.innerHTML = "";
+
+    (data || []).forEach(user => {
+        select.innerHTML += `
+            <option value="${escapeAttr(user.display_name)}">
+                ${escapeHtml(user.display_name)}
+            </option>
+        `;
+    });
+}
+
+async function saveWorkshopCost() {
+    const firmCode = document.getElementById("firm_code").value.trim();
+    const taxiDriver = document.getElementById("taxi_driver").value;
+    const mechanicName = document.getElementById("mechanic_name").value.trim();
+    const workType = document.getElementById("work_type").value;
+    const amount = Number(document.getElementById("amount").value || 0);
+    const notes = document.getElementById("notes").value.trim();
+    const resultBox = document.getElementById("workshop_result");
+
+    resultBox.innerHTML = "";
+
+    if (firmCode !== WORKSHOP_CODE) {
+        resultBox.innerHTML = `
+            <div class="admin-card">
+                ❌ Firmencode ist falsch.
             </div>
+        `;
+        return;
+    }
+
+    if (!taxiDriver || !mechanicName || !workType || amount <= 0) {
+        resultBox.innerHTML = `
+            <div class="admin-card">
+                ❌ Bitte Fahrer, Mechaniker, Art und Betrag eintragen.
+            </div>
+        `;
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_workshop_costs")
+        .insert([{
+            firm_code: firmCode,
+            taxi_driver: taxiDriver,
+            mechanic_name: mechanicName,
+            work_type: workType,
+            amount: amount,
+            notes: notes,
+            paid: false
+        }]);
+
+    if (error) {
+        console.error(error);
+
+        resultBox.innerHTML = `
+            <div class="admin-card">
+                ❌ Rechnung konnte nicht gespeichert werden.
+            </div>
+        `;
+        return;
+    }
+
+    resultBox.innerHTML = `
+        <div class="admin-card success-card">
+            ✅ Rechnung wurde gespeichert.
         </div>
+    `;
+
+    document.getElementById("mechanic_name").value = "";
+    document.getElementById("amount").value = "0";
+    document.getElementById("notes").value = "";
+
+    await loadWorkshopData();
+}
+
+async function loadWorkshopData() {
+    await loadOpenWorkshopBills();
+    await loadWorkshopArchive();
+}
+
+async function loadOpenWorkshopBills() {
+    const box = document.getElementById("open_workshop_list");
+
+    const { data, error } = await client
+        .from("taxi_workshop_costs")
+        .select("*")
+        .eq("firm_code", WORKSHOP_CODE)
+        .eq("paid", false)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
+
+    const bills = data || [];
+
+    const total = bills.reduce((sum, bill) => {
+        return sum + Number(bill.amount || 0);
+    }, 0);
+
+    document.getElementById("open_count").innerText = bills.length;
+    document.getElementById("open_total").innerText = `${total}$`;
+
+    if (bills.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine offenen Werkstattrechnungen vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div class="admin-card">
+            <strong>Offene Gesamtrechnung</strong><br><br>
+            <span style="font-size:42px;color:#facc15;font-weight:900;">
+                ${total}$
+            </span>
+            <br><br>
+            🔧 Offene Einträge: ${bills.length}
+        </div>
+    `;
+
+    bills.forEach(bill => {
+        const date = bill.created_at
+            ? new Date(bill.created_at).toLocaleString("de-DE")
+            : "-";
+
+        html += `
+    <div class="done-row">
+
+        <div class="done-line-top">
+            <strong>${escapeHtml(bill.taxi_driver || "-")}</strong>
+
+            <span class="done-dot">•</span>
+
+            <span>${escapeHtml(bill.work_type || "-")}</span>
+
+            <span class="done-dot">•</span>
+
+            <span>👨‍🔧 ${escapeHtml(bill.mechanic_name || "-")}</span>
+
+            <span class="done-dot">•</span>
+
+            <span>🕒 ${date}</span>
+        </div>
+
+        <div class="done-line-bottom">
+
+            <span>💰 ${bill.amount || 0}$</span>
+
+            <span>📝 ${escapeHtml(bill.notes || "-")}</span>
+
+            ${bill.staff_note
+                ? `<span>⚠ ${escapeHtml(bill.staff_note)}</span>`
+                : ""
+            }
+
+        </div>
+
+        <div class="admin-actions">
+
+            <input
+                type="text"
+                id="staff_note_${bill.id}"
+                value="${escapeAttr(bill.staff_note || "")}"
+                placeholder="Mitarbeiter-Anmerkung..."
+            >
+
+            <button
+                class="small-btn secondary-btn"
+                onclick="saveWorkshopNote('${bill.id}')"
+            >
+                📝 Speichern
+            </button>
+
+            <button
+                class="small-btn danger-btn"
+                onclick="deleteWorkshopBill('${bill.id}')"
+            >
+                🗑 Löschen
+            </button>
+
+        </div>
+
     </div>
+`;
+    });
 
-    <div class="workshop-top-grid">
+    box.innerHTML = html;
+}
 
-        <div class="workshop-left-column">
+async function loadWorkshopArchive() {
+    const box = document.getElementById("archive_workshop_list");
 
-            <div class="card compact-invoice-box">
-                <h2>🔧 Neue Rechnung eintragen</h2>
+    const { data, error } = await client
+        .from("taxi_workshop_costs")
+        .select("*")
+        .eq("firm_code", WORKSHOP_CODE)
+        .eq("paid", true)
+        .order("paid_at", { ascending: false })
+        .limit(50);
 
-                <div class="form-grid">
-                    <div class="field">
-                        <label>Firmencode</label>
-                        <input type="password" id="firm_code">
-                    </div>
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
 
-                    <div class="field">
-                        <label>Taxifahrer</label>
-                        <select id="taxi_driver"></select>
-                    </div>
+    const bills = data || [];
 
-                    <div class="field">
-                        <label>Mechaniker</label>
-                        <input type="text" id="mechanic_name">
-                    </div>
+    document.getElementById("archive_count").innerText = bills.length;
 
-                    <div class="field">
-                        <label>Art</label>
-                        <select id="work_type">
-                            <option>Reparatur</option>
-                            <option>Tuning</option>
-                        </select>
-                    </div>
+    if (bills.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Noch keine bezahlten Werkstattrechnungen vorhanden.
+            </div>
+        `;
+        return;
+    }
 
-                    <div class="field">
-                        <label>Betrag</label>
-                        <input type="number" id="amount" value="0">
-                    </div>
+    let html = "";
 
-                    <div class="field">
-                        <label>Bemerkung</label>
-                        <input type="text" id="notes">
-                    </div>
+    bills.forEach(bill => {
+        const date = bill.created_at
+            ? new Date(bill.created_at).toLocaleString("de-DE")
+            : "-";
+
+        const paidDate = bill.paid_at
+            ? new Date(bill.paid_at).toLocaleString("de-DE")
+            : "-";
+
+        html += `
+            <div class="done-row">
+
+                <div class="done-line-top">
+                    <strong>${escapeHtml(bill.taxi_driver || "-")}</strong>
+                    <span class="done-dot">•</span>
+                    <span>${escapeHtml(bill.work_type || "-")}</span>
+                    <span class="done-dot">•</span>
+                    <span>✅ Bezahlt</span>
                 </div>
 
-                <button onclick="saveWorkshopCost()">
-                    Rechnung speichern
-                </button>
-
-                <div id="workshop_result" style="margin-top:20px;"></div>
-            </div>
-
-            <div class="stats-grid workshop-stats-vertical">
-                <div class="stat-card stat-open">
-                    <div class="stat-title">Offene Rechnungen</div>
-                    <div class="stat-value" id="open_count">0</div>
+                <div class="done-line-bottom">
+                    <span>🕒 ${date}</span>
+                    <span>💰 ${bill.amount || 0}$</span>
+                    <span>👨‍🔧 ${escapeHtml(bill.mechanic_name || "-")}</span>
+                    <span title="Bezahlt am: ${paidDate}">📦 Archiv</span>
+                    <span>📝 ${escapeHtml(bill.staff_note || "-")}</span>
                 </div>
 
-                <div class="stat-card stat-taken">
-                    <div class="stat-title">Offene Summe</div>
-                    <div class="stat-value" id="open_total">0$</div>
-                </div>
-
-                <div class="stat-card stat-done">
-                    <div class="stat-title">Archiv</div>
-                    <div class="stat-value" id="archive_count">0</div>
-                </div>
             </div>
+        `;
+    });
 
-        </div>
+    box.innerHTML = html;
+}
 
-        <div class="card workshop-map-card">
+async function payWorkshopBills() {
+    const payCode = document.getElementById("pay_code").value.trim();
 
-            <h2>🗺️ Werkstatt PLZ-Finder</h2>
+    if (payCode !== PAY_CODE) {
+        alert("Zahlungs-Code ist falsch.");
+        return;
+    }
 
-            <div class="map-feedback-mini">
-                <strong>🗺️ Kartenfehler gefunden?</strong>
-                <span>PLZ schwimmt im Meer, steckt im Berg oder ist verschwunden?</span>
+    const ok = confirm(
+        "Alle offenen Werkstattrechnungen wirklich als bezahlt markieren?"
+    );
 
-                <button
-                    class="small-btn secondary-btn"
-                    onclick="window.open('https://los-santos-taxi.michaeltimmler91.workers.dev/plz_melden', '_blank')"
-                >
-                    📍 Melden
-                </button>
-            </div>
+    if (!ok) return;
 
-            <div class="admin-card" style="margin-bottom:16px;">
-                <strong>Los Santos PLZ Karte</strong><br>
-                Für alle Mechaniker, die „komm mal 1037“ hören und erstmal den Schraubenschlüssel fallen lassen. 😄
-            </div>
+    const { error } = await client
+        .from("taxi_workshop_costs")
+        .update({
+            paid: true,
+            paid_at: new Date().toISOString()
+        })
+        .eq("firm_code", WORKSHOP_CODE)
+        .eq("paid", false);
 
-            <div class="field">
-                <label>PLZ suchen</label>
-                <input
-                    type="text"
-                    id="workshop_plz_search"
-                    placeholder="z.B. 1002"
-                    oninput="searchWorkshopPlz()"
-                >
-            </div>
+    if (error) {
+        console.error(error);
+        alert("Wochenabrechnung konnte nicht abgeschlossen werden.");
+        return;
+    }
 
-            <div id="workshop_plz_result" style="margin-top:14px;"></div>
+    alert("Wochenabrechnung abgeschlossen.");
 
-            <div class="workshop-mini-map-box" id="workshopMapBox">
-                <div class="workshop-mini-map-inner" id="workshopMapInner">
+    document.getElementById("pay_code").value = "";
 
-                    <img
-                        src="gta-map.png"
-                        class="workshop-mini-map-img"
-                        alt="GTA Karte"
-                    >
+    await loadWorkshopData();
+}
 
-                    <div
-                        id="workshop_map_marker"
-                        class="workshop-map-marker"
-                        style="display:none;"
-                    ></div>
+async function deleteWorkshopBill(id) {
 
-                </div>
-            </div>
+    const code =
+        prompt("Lösch-Code eingeben:");
 
-        </div>
+    if (code !== PAY_CODE) {
+        alert("Falscher Code.");
+        return;
+    }
 
-    </div>
+    const ok =
+        confirm("Rechnung wirklich löschen?");
 
-    <div class="section-card" style="margin-top:24px;">
-        <div class="section-header">
-            <h2>🔴 Offene Rechnungen</h2>
-        </div>
+    if (!ok) return;
 
-        <div id="open_workshop_list"></div>
+    const { error } = await client
+        .from("taxi_workshop_costs")
+        .delete()
+        .eq("id", id);
 
-        <hr style="border:0;border-top:1px solid rgba(255,255,255,0.08);margin:22px 0;">
+    if (error) {
+        console.error(error);
+        alert("Rechnung konnte nicht gelöscht werden.");
+        return;
+    }
 
-        <h2>✅ Wochenabrechnung</h2>
+    await loadWorkshopData();
+}
 
-        <div class="form-grid">
-            <div class="field">
-                <label>Zahlungs-Code</label>
-                <input type="password" id="pay_code">
-            </div>
-        </div>
+async function saveWorkshopNote(id) {
 
-        <button class="danger-btn" onclick="payWorkshopBills()">
-            Als bezahlt markieren / auf 0 setzen
-        </button>
-    </div>
+    const noteInput =
+        document.getElementById(`staff_note_${id}`);
 
-    <div class="section-card" style="margin-top:24px;">
-        <div class="section-header collapsible-header" onclick="toggleArchive()">
-            <h2>📦 Archiv</h2>
-            <span class="section-arrow" id="archive_arrow">▶</span>
-        </div>
+    if (!noteInput) return;
 
-        <div id="archive_workshop_list" style="display:none;"></div>
-    </div>
+    const { error } = await client
+        .from("taxi_workshop_costs")
+        .update({
+            staff_note: noteInput.value.trim()
+        })
+        .eq("id", id);
 
-</div>
+    if (error) {
+        console.error(error);
+        alert("Anmerkung konnte nicht gespeichert werden.");
+        return;
+    }
 
-<script src="config.js?v=2"></script>
-<script src="utils.js?v=2"></script>
-<script src="api.js?v=1"></script>
-<script src="werkstatt.js?v=19"></script>
-<script src="plz.js?v=10"></script>
-<script src="map-workshop.js?v=1"></script>
+    alert("Anmerkung gespeichert.");
+}
 
-</body>
-</html>
+function toggleArchive() {
+    const box = document.getElementById("archive_workshop_list");
+    const arrow = document.getElementById("archive_arrow");
+
+    if (!box || !arrow) return;
+
+    if (box.style.display === "none") {
+        box.style.display = "block";
+        arrow.innerText = "▼";
+    } else {
+        box.style.display = "none";
+        arrow.innerText = "▶";
+    }
+}
+
+function escapeHtml(value) {
+    return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+}
+
+function escapeAttr(value) {
+    return escapeHtml(value);
+}
+
+async function startWorkshopPage() {
+    await loadDrivers();
+    await loadWorkshopData();
+}
+
+startWorkshopPage();

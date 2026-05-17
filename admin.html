@@ -1,1 +1,409 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxi Adminbereich</title>
 
+    <link rel="stylesheet" href="style.css?v=14">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="admin-shell">
+
+    <aside class="admin-sidebar-nav">
+
+        <div class="admin-brand">
+            <div class="admin-brand-icon">🚕</div>
+            <div>
+                <div class="admin-brand-title">Taxi Admin</div>
+                <div class="admin-brand-sub">Los Santos Taxi</div>
+            </div>
+        </div>
+
+        <nav class="admin-nav">
+
+            <button onclick="showAdminTab('tab_dashboard')" class="admin-nav-btn active">
+                📊 Übersicht
+            </button>
+
+            <button onclick="showAdminTab('tab_users')" class="admin-nav-btn">
+                👥 Benutzer
+            </button>
+
+            <button onclick="showAdminTab('tab_companies')" class="admin-nav-btn">
+                🏢 Firmen
+            </button>
+            
+            <button onclick="showAdminTab('tab_workshops')" class="admin-nav-btn">
+    🔧         Werkstätten
+            </button>
+            
+            <button onclick="showAdminTab('tab_rides')" class="admin-nav-btn">
+                🚕 Fahrten
+            </button>
+
+            <button onclick="showAdminTab('tab_tips')" class="admin-nav-btn">
+                🎁 Trinkgeld
+            </button>
+            <button onclick="showAdminTab('tab_times')" class="admin-nav-btn">
+                ⏱️ Dienstzeiten
+            </button>
+            <button onclick="showAdminTab('tab_dealer')" class="admin-nav-btn">
+                🚗 Händler
+            </button>
+            <button onclick="showAdminTab('tab_announcements')" class="admin-nav-btn">
+                📢 Infos
+            </button>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+            <a href="index.html">
+                <button class="small-btn">← Leitstelle</button>
+            </a>
+
+            <button class="small-btn danger-btn" onclick="logoutAdmin()">
+                Logout
+            </button>
+        </div>
+
+    </aside>
+
+    <main class="admin-main">
+
+        <div class="admin-page-header">
+
+            <div>
+                <h1>👑 Taxi Adminbereich</h1>
+                <p>Benutzer, Firmen, Fahrten & Trinkgeld verwalten</p>
+            </div>
+
+            <div class="admin-user-pill">
+                Eingeloggt als<br>
+                <strong id="adminUserName">-</strong>
+            </div>
+
+        </div>
+
+        <div id="adminAccessDenied" class="admin-section" style="display:none;">
+            <h2>Kein Zugriff</h2>
+            <p>Du bist kein Admin.</p>
+
+            <a href="index.html">
+                <button>Zurück zur Leitstelle</button>
+            </a>
+        </div>
+
+        <div id="adminApp" style="display:none;">
+
+            <div class="admin-dashboard-grid">
+
+                <div class="admin-kpi">
+                    <div class="admin-kpi-label">Fahrer</div>
+                    <div class="admin-kpi-value" id="adminStatDrivers">0</div>
+                </div>
+
+                <div class="admin-kpi">
+                    <div class="admin-kpi-label">Firmen</div>
+                    <div class="admin-kpi-value" id="adminStatCompanies">0</div>
+                </div>
+
+                <div class="admin-kpi">
+                    <div class="admin-kpi-label">Offene Aufträge</div>
+                    <div class="admin-kpi-value" id="adminStatOpenJobs">0</div>
+                </div>
+
+                <div class="admin-kpi">
+                    <div class="admin-kpi-label">Offenes Trinkgeld</div>
+                    <div class="admin-kpi-value" id="adminStatTips">0$</div>
+                </div>
+
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="admin-tab-content" id="tab_workshops" style="display:none;">
+
+    <div class="admin-section">
+        <h2>🔧 Werkstattlisten</h2>
+
+        <div class="admin-card">
+            <strong>Benny's</strong><br>
+            Firmencode: <strong>Benny2026</strong><br>
+            Zahlungs-Code: <strong>Benny2026-PAY</strong><br><br>
+
+            <a href="werkstatt.html?firma=Benny2026" target="_blank">
+                <button class="small-btn">Benny's öffnen</button>
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <strong>Blackline</strong><br>
+            Firmencode: <strong>Blackline2026</strong><br>
+            Zahlungs-Code: <strong>Blackline2026-PAY</strong><br><br>
+
+            <a href="werkstatt.html?firma=Blackline2026" target="_blank">
+                <button class="small-btn">Blackline öffnen</button>
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <strong>WCP</strong><br>
+            Firmencode: <strong>WCP2026</strong><br>
+            Zahlungs-Code: <strong>WCP2026-PAY</strong><br><br>
+
+            <a href="werkstatt.html?firma=WCP2026" target="_blank">
+                <button class="small-btn">WCP öffnen</button>
+            </a>
+        </div>
+
+        <div class="admin-card">
+            <strong>LSC</strong><br>
+            Firmencode: <strong>LSC2026</strong><br>
+            Zahlungs-Code: <strong>LSC2026-PAY</strong><br><br>
+
+            <a href="werkstatt.html?firma=LSC2026" target="_blank">
+                <button class="small-btn">LSC öffnen</button>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+            <div class="admin-tab-content" id="tab_dashboard">
+
+                <div class="admin-layout">
+
+                    <div>
+                        <div class="admin-section">
+                            <h2>📊 Übersicht</h2>
+                            <div id="dashboard_overview"></div>
+                        </div>
+
+                        <div class="admin-section">
+                            <h2>🚕 Letzte Fahrten</h2>
+                            <div id="admin_done_jobs"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="admin-section">
+                            <h2>🎁 Trinkgeld Übersicht</h2>
+                            <div id="tips_stats"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- BENUTZER -->
+
+            <div class="admin-tab-content" id="tab_users" style="display:none;">
+
+                <div class="admin-section">
+                    <h2>👥 Benutzer erstellen</h2>
+
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Benutzername</label>
+                            <input type="text" id="new_username">
+                        </div>
+
+                        <div class="field">
+                            <label>Anzeigename</label>
+                            <input type="text" id="new_display_name">
+                        </div>
+
+                        <div class="field">
+                            <label>Passwort</label>
+                            <input type="text" id="new_password">
+                        </div>
+
+                        <div class="field">
+                            <label>Rolle</label>
+                            <select id="new_role">
+                                <option value="fahrer">Fahrer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="createUser()">Benutzer erstellen</button>
+                </div>
+
+                <div class="admin-section">
+                    <h2>👥 Benutzerverwaltung</h2>
+                    <div id="users_list"></div>
+                </div>
+
+            </div>
+
+            <!-- FIRMEN -->
+
+            <div class="admin-tab-content" id="tab_companies" style="display:none;">
+
+                <div class="admin-section">
+                    <h2>🏢 Liefer-Unternehmen</h2>
+
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Neues Unternehmen</label>
+                            <input type="text" id="new_company_name">
+                        </div>
+                       <div class="field">
+    <label>Firmenfarbe</label>
+
+    <select id="new_company_color">
+
+        <option value="yellow">🟡 Gelb</option>
+        <option value="orange">🟠 Orange</option>
+        <option value="red">🔴 Rot</option>
+        <option value="darkred">🟥 Dunkelrot</option>
+
+        <option value="blue">🔵 Blau</option>
+        <option value="darkblue">🌌 Dunkelblau</option>
+        <option value="cyan">🩵 Cyan</option>
+        <option value="turquoise">🌊 Türkis</option>
+
+        <option value="green">🟢 Grün</option>
+        <option value="lime">🟩 Lime</option>
+        <option value="darkgreen">🌲 Dunkelgrün</option>
+
+        <option value="purple">🟣 Lila</option>
+        <option value="violet">💜 Violett</option>
+        <option value="pink">🌸 Pink</option>
+        <option value="magenta">💖 Magenta</option>
+
+        <option value="white">⚪ Weiß</option>
+        <option value="silver">🪙 Silber</option>
+        <option value="gray">⚫ Grau</option>
+        <option value="black">⬛ Schwarz</option>
+
+        <option value="gold">✨ Gold</option>
+        <option value="bronze">🥉 Bronze</option>
+
+        <option value="rainbow">🌈 Rainbow</option>
+        <option value="neon">⚡ Neon</option>
+        <option value="fire">🔥 Feuer</option>
+        <option value="ice">❄️ Eis</option>
+
+    </select>
+</div>
+                    </div>
+
+                    <button onclick="createCompany()">Unternehmen hinzufügen</button>
+
+                    <br><br>
+
+                    <div id="companies_list"></div>
+                </div>
+
+            </div>
+
+            <!-- FAHRTEN -->
+
+            <div class="admin-tab-content" id="tab_rides" style="display:none;">
+
+                <div class="admin-section">
+                    <h2>🚕 Erledigte Fahrten</h2>
+                    <div id="admin_done_jobs_full"></div>
+                </div>
+
+            </div>
+
+            <div class="admin-tab-content" id="tab_dealer" style="display:none;">
+
+    <div class="admin-section">
+        <h2>🚗 Gebrauchtwagenhändler-Abrechnung</h2>
+
+        <div id="dealer_stats"></div>
+
+        <br>
+
+        <button class="danger-btn" onclick="payDealerMonth()">
+            💰 Monat abrechnen / zurücksetzen
+        </button>
+    </div>
+
+</div>
+          <div class="admin-tab-content" id="tab_announcements" style="display:none;">
+
+    <div class="admin-section">
+        <h2>📢 Wichtige Infos</h2>
+
+        <div class="form-grid">
+
+            <div class="field">
+                <label>Titel</label>
+                <input type="text" id="announcement_title">
+            </div>
+
+            <div class="field">
+                <label>Pflichtbestätigung</label>
+
+                <select id="announcement_confirm">
+                    <option value="true">Ja</option>
+                    <option value="false">Nein</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="field">
+            <label>Nachricht</label>
+
+            <textarea
+                id="announcement_message"
+                rows="6"
+            ></textarea>
+        </div>
+
+        <button onclick="createAnnouncement()">
+            📢 Info veröffentlichen
+        </button>
+
+    </div>
+
+    <div class="admin-section">
+        <h2>📋 Aktive Infos</h2>
+
+        <div id="announcements_list"></div>
+    </div>
+
+</div>  
+<div class="admin-tab-content" id="tab_times" style="display:none;">
+
+    <div class="admin-section">
+        <h2>⏱️ Fahrer Dienstzeiten</h2>
+
+        <div id="admin_time_stats"></div>
+    </div>
+
+</div>
+            
+            <!-- TRINKGELD -->
+
+            <div class="admin-tab-content" id="tab_tips" style="display:none;">
+
+                <div class="admin-section">
+                    <h2>🎁 Trinkgeld-Auszahlung</h2>
+                    <div id="tips_stats_full"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="config.js?v=2"></script>
+<script src="utils.js?v=2"></script>
+<script src="api.js?v=1"></script>
+<script src="admin.js?v=15"></script>
+
+</body>
+</html>
