@@ -1,1 +1,44 @@
+.firma-page-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr;
+    gap: 24px;
+    align-items: start;
+    max-width: 1400px;
+    margin: 0 auto;
+}
 
+#company_form_card {
+    max-width: none !important;
+    margin: 0 !important;
+}
+
+.firma-map-card {
+    min-height: 100%;
+}
+
+.firma-map-card .admin-card {
+    margin-bottom: 16px;
+}
+
+.firma-last-jobs-card {
+    max-width: 1400px;
+    margin: 24px auto 0 auto;
+}
+
+.firma-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.firma-card-head h2 {
+    margin: 0;
+}
+
+@media (max-width: 1050px) {
+    .firma-page-grid {
+        grid-template-columns: 1fr;
+    }
+}
