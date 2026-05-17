@@ -999,16 +999,18 @@ async function loadDoneJobs() {
     const box = document.getElementById("done_jobs_list");
     const data = await getDoneJobs(20);
 
-    if (!data || data.length === 0) {
-    box.innerHTML = `
-        <div class="admin-card empty-state-card">
-            <strong>📦 Keine letzten Fahrten</strong><br>
-            Hier erscheinen später abgeschlossene Fahrten.
-        </div>
-    `;
+    box.innerHTML = "";
 
-    return;
-}
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card empty-state-card">
+                <strong>📦 Keine letzten Fahrten</strong><br>
+                Hier erscheinen sp&auml;ter abgeschlossene Fahrten.
+            </div>
+        `;
+
+        return;
+    }
 
     data.forEach(job => {
 
@@ -1034,28 +1036,30 @@ async function loadDoneJobs() {
             ? new Date(job.completed_at).toLocaleString("de-DE")
             : "-";
 
+        const notesLine = job.notes
+            ? `<span>📝 ${escapeHtml(job.notes)}</span>`
+            : "";
+
         box.innerHTML += `
-            <div class="done-row">
+            <div class="done-row done-row-modern">
 
                 <div class="done-line-top">
                     <strong>${escapeHtml(job.assigned_driver || "-")}</strong>
 
-                    <span class="done-dot">•</span>
-
-                    <span>${escapeHtml(job.ride_type || "-")}</span>
-
-                    <span class="done-dot">•</span>
-
-                    <span>
-                        📍 ${escapeHtml(job.pickup_location || "-")}
-                        →
-                        ${escapeHtml(job.destination || "-")}
+                    <span class="done-type">
+                        ${escapeHtml(job.ride_type || "Fahrt")}
                     </span>
+                </div>
+
+                <div class="done-route">
+                    📍 ${escapeHtml(job.pickup_location || "-")}
+                    <span>→</span>
+                    ${escapeHtml(job.destination || "-")}
                 </div>
 
                 <div class="done-line-bottom">
                     <span
-                        title="Übernommen: ${assignedFull}
+                        title="&Uuml;bernommen: ${assignedFull}
 Abgeschlossen: ${completedFull}"
                     >
                         🕒 ${assignedTime} → ${completedTime}
@@ -1064,6 +1068,7 @@ Abgeschlossen: ${completedFull}"
                     <span>🚕 ${job.kilometers || 0} KM</span>
                     <span>🧾 ${job.invoice_amount || 0}$</span>
                     <span>🎁 ${job.tip_amount || 0}$</span>
+                    ${notesLine}
                 </div>
 
             </div>
