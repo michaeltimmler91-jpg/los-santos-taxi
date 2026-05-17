@@ -25,6 +25,8 @@
 
     <div class="workshop-top-grid">
 
+    <div class="workshop-left-column">
+
     <div class="card compact-invoice-box">
         <h2>🔧 Neue Rechnung eintragen</h2>
 
@@ -67,9 +69,24 @@
             Rechnung speichern
         </button>
 
-        <div id="workshop_result" style="margin-top:20px;"></div>
+                <div id="workshop_result" style="margin-top:20px;"></div>
     </div>
-    <div class="card workshop-map-card">
+        <div class="stats-grid" style="margin-top:28px;">
+        <div class="stat-card stat-open">
+            <div class="stat-title">Offene Rechnungen</div>
+            <div class="stat-value" id="open_count">0</div>
+        </div>
+
+        <div class="stat-card stat-taken">
+            <div class="stat-title">Offene Summe</div>
+            <div class="stat-value" id="open_total">0$</div>
+        </div>
+
+        <div class="stat-card stat-done">
+            <div class="stat-title">Archiv</div>
+            <div class="stat-value" id="archive_count">0</div>
+        </div>
+    </div>
 
         <h2>🗺️ Werkstatt PLZ-Finder</h2>
         <div class="map-feedback-mini">
@@ -124,22 +141,7 @@
     </div>
 
 </div>
-    <div class="stats-grid" style="margin-top:28px;">
-        <div class="stat-card stat-open">
-            <div class="stat-title">Offene Rechnungen</div>
-            <div class="stat-value" id="open_count">0</div>
-        </div>
-
-        <div class="stat-card stat-taken">
-            <div class="stat-title">Offene Summe</div>
-            <div class="stat-value" id="open_total">0$</div>
-        </div>
-
-        <div class="stat-card stat-done">
-            <div class="stat-title">Archiv</div>
-            <div class="stat-value" id="archive_count">0</div>
-        </div>
-    </div>
+    
 
     <div class="section-card" style="margin-top:24px;">
         <div class="section-header">
