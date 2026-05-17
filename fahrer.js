@@ -3,6 +3,7 @@ let mobileCurrentStatus = "Offline";
 let mobileDispatchers = [];
 let mobileRealtimeStarted = false;
 let mobileMode = "driver";
+let lastKnownOpenJobIds = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     mobileStart();
@@ -457,7 +458,27 @@ async function mobileLoadOpenJobs() {
         box.innerHTML = "Fehler beim Laden.";
         return;
     }
+    const currentIds =
+(data || []).map(job => job.id);
 
+const newJobs =
+(data || []).filter(
+    job => !lastKnownOpenJobIds.includes(job.id)
+);
+
+if (lastKnownOpenJobIds.length > 0) {
+
+    newJobs.forEach(job => {
+
+        showMobileToast(
+            `📞 Neuer Auftrag: ${job.pickup_location || "Unbekannt"}`
+        );
+
+        playNewJobSound();
+    });
+}
+
+lastKnownOpenJobIds = currentIds;
     if (!data || data.length === 0) {
         box.innerHTML = "Keine offenen Fahrten.";
         return;
@@ -696,4 +717,43 @@ async function mobileReleaseJob(jobId) {
     }
 
     await mobileLoadAll();
+}
+function showMobileToast(text) {
+
+    const container =
+    document.getElementById("toastContainer");
+
+    const toast =
+    document.createElement("div");
+
+    toast.className = "mobile-toast";
+    toast.innerText = text;
+
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 50);
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+
+    }, 4000);
+}
+
+function playNewJobSound() {
+
+    const audio =
+    new Audio(
+        "https://cdn.freesound.org/previews/242/242501_4284968-lq.mp3"
+    );
+
+    audio.volume = 0.35;
+
+    audio.play().catch(() => {});
 }
