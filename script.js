@@ -823,27 +823,6 @@ async function loadOpenJobs() {
     const box = document.getElementById("open_jobs_list");
     const data = await getOpenJobs();
 
-    const createdAt = new Date(job.created_at);
-const now = new Date();
-
-const diffMinutes =
-Math.floor((now - createdAt) / 1000 / 60);
-
-let waitingText = "Gerade eben";
-let waitingClass = "wait-good";
-
-if (diffMinutes >= 1) {
-    waitingText = `${diffMinutes} Min`;
-}
-
-if (diffMinutes >= 5) {
-    waitingClass = "wait-medium";
-}
-
-if (diffMinutes >= 10) {
-    waitingClass = "wait-bad";
-}
-    
     box.innerHTML = "";
 
     if (!data || data.length === 0) {
@@ -859,6 +838,27 @@ if (diffMinutes >= 10) {
 
     data.forEach(job => {
 
+        const createdAt = new Date(job.created_at);
+        const now = new Date();
+
+        const diffMinutes =
+        Math.floor((now - createdAt) / 1000 / 60);
+
+        let waitingText = "Gerade eben";
+        let waitingClass = "wait-good";
+
+        if (diffMinutes >= 1) {
+            waitingText = `${diffMinutes} Min`;
+        }
+
+        if (diffMinutes >= 5) {
+            waitingClass = "wait-medium";
+        }
+
+        if (diffMinutes >= 10) {
+            waitingClass = "wait-bad";
+        }
+
         const companyLine =
         job.company_name
         ? `<div>🏢 ${escapeHtml(job.company_name)}</div>`
@@ -866,56 +866,7 @@ if (diffMinutes >= 10) {
 
         const emsLine =
         job.ems_staff_name
-        ? `<div>🚑 ${escapeHtml(job.ems_staff_name)}</div>`
-        : "";
-
-        const notesLine =
-        job.notes
-        ? `<div>📝 ${escapeHtml(job.notes)}</div>`
-        : "";
-
-        box.innerHTML += `
-            <div class="ride-card ride-card-modern">
-                <div class="ride-top">
-                    <span class="ride-type-badge">${escapeHtml(job.ride_type || "Fahrt")}</span>
-                    <div class="ride-top-right">
-                        <span class="ride-status-badge">Offen</span>
-                        <span class="wait-badge ${waitingClass}">
-                        ⏱️ ${waitingText}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="ride-route">
-                    <div>
-                        <small>Abholung</small>
-                        <strong>${escapeHtml(job.pickup_location || "-")}</strong>
-                    </div>
-
-                    <div class="ride-arrow">→</div>
-
-                    <div>
-                        <small>Ziel</small>
-                        <strong>${escapeHtml(job.destination || "-")}</strong>
-                    </div>
-                </div>
-
-                <div class="ride-info-grid">
-                    <div>👤 ${escapeHtml(job.customer_name || "-")}</div>
-                    ${companyLine}
-                    ${emsLine}
-                    ${notesLine}
-                </div>
-
-                <div class="ride-actions">
-                    <button class="small-btn" onclick="takeJob('${job.id}')">
-                        🚕 Auftrag übernehmen
-                    </button>
-                </div>
-            </div>
-        `;
-    });
-}
+        ?
 
 async function loadMyJobs() {
     const box = document.getElementById("my_jobs_list");
