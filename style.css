@@ -2698,3 +2698,20 @@ body[data-company-theme="rainbow"] button {
         min-height: auto;
     }
 }
+.workshop-top-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.workshop-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.workshop-left-column .stats-grid {
+    grid-template-columns: 1fr;
+    margin-top: 0 !important;
+}
