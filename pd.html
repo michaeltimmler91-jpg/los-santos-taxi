@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSPD PLZ-Finder</title>
+
+    <link rel="stylesheet" href="style.css?v=21">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="modern-header">
+        <div class="header-left">
+            <div class="logo-icon">🚔</div>
+            <div>
+                <div class="main-title">LSPD PLZ-Finder</div>
+                <div class="sub-title">Einsatzorte • Fahndungen • Streifenhilfe</div>
+            </div>
+        </div>
+    </div>
+
+    <div
+        class="card service-map-card"
+        data-map-theme="pd"
+    >
+        <h2>🚔 Einsatzort suchen</h2>
+
+        <div class="admin-card" style="margin-bottom:16px;">
+            <strong>🗺️ Streifenkarte</strong><br>
+            Damit aus einer Verfolgung nicht plötzlich eine Stadtrundfahrt wird 😄
+        </div>
+
+        <div class="plz-search-row">
+            <div class="field plz-search-field">
+                <label>PLZ eingeben</label>
+                <input
+                    type="text"
+                    id="service_plz_search"
+                    placeholder="z.B. 1041"
+                    oninput="searchServicePlz()"
+                >
+            </div>
+
+            <a
+                href="plz_melden.html"
+                target="_blank"
+                class="small-btn secondary-btn plz-report-link"
+            >
+                📍 Fehler melden
+            </a>
+        </div>
+
+        <div id="service_plz_result" style="margin-top:14px;"></div>
+
+        <div class="service-map-box" id="serviceMapBox">
+            <div class="service-map-inner" id="serviceMapInner">
+
+                <img
+                    src="gta-map.png"
+                    class="service-map-img"
+                    alt="GTA Karte"
+                >
+
+                <div
+                    id="service_map_marker"
+                    class="service-map-marker service-marker-pd"
+                    style="display:none;"
+                ></div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="plz.js?v=10"></script>
+<script src="map-service.js?v=1"></script>
+
+</body>
+</html>
