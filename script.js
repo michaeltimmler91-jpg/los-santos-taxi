@@ -717,13 +717,13 @@ async function markNoShow(jobId) {
 }
 
 async function loadJobs() {
-    await loadOpenJobs();
-    await loadMyJobs();
-    await loadDoneJobs();
-    await loadDispatchers();
-    await loadDriverStatus();
-    await loadDashboardStats();
-    await loadMyTimeStats();
+    await Promise.all([
+        loadOpenJobs(),
+        loadMyJobs(),
+        loadDoneJobs(),
+        loadDashboardStats(),
+        loadMyTimeStats()
+    ]);
 }
 
 async function loadDashboardStats() {
@@ -750,8 +750,16 @@ async function loadOpenJobs() {
     const box = document.getElementById("open_jobs_list");
     const data = await getOpenJobs();
 
-    box.innerHTML = "";
+if (!data || data.length === 0) {
+    box.innerHTML = `
+        <div class="admin-card empty-state-card">
+            <strong>📭 Keine offenen Fahrten</strong><br>
+            Aktuell ist alles ruhig. Noch.
+        </div>
+    `;
 
+    return;
+}
     data.forEach(job => {
         box.innerHTML += `
     <div class="ride-card ride-card-modern">
@@ -806,7 +814,16 @@ async function loadMyJobs() {
         return;
     }
 
-    box.innerHTML = "";
+    if (!data || data.length === 0) {
+    box.innerHTML = `
+        <div class="admin-card empty-state-card">
+            <strong>🚕 Keine eigene Fahrt</strong><br>
+            Du hast aktuell keinen Auftrag übernommen.
+        </div>
+    `;
+
+    return;
+}
 
     data.forEach(job => {
        const foodFields = job.ride_type === "Essenslieferung" ? `
@@ -919,7 +936,16 @@ async function loadDoneJobs() {
     const box = document.getElementById("done_jobs_list");
     const data = await getDoneJobs(20);
 
-    box.innerHTML = "";
+    if (!data || data.length === 0) {
+    box.innerHTML = `
+        <div class="admin-card empty-state-card">
+            <strong>📦 Keine letzten Fahrten</strong><br>
+            Hier erscheinen später abgeschlossene Fahrten.
+        </div>
+    `;
+
+    return;
+}
 
     data.forEach(job => {
 
