@@ -380,10 +380,10 @@ const busyDrivers = activeDrivers.filter(driver =>
         </div>
     `;
 
-    if (activeDrivers.length > 0) {
+    if (freeDrivers.length > 0) {
         html += `<div class="driver-group-title">🟢 Verf&uuml;gbar</div>`;
 
-        activeDrivers.forEach(driver => {
+        freeDrivers.forEach(driver => {
             html += `
                 <div class="driver-row driver-online">
                     <span>${escapeHtml(driver.display_name)}</span>
@@ -392,6 +392,19 @@ const busyDrivers = activeDrivers.filter(driver =>
             `;
         });
     }
+
+    if (busyDrivers.length > 0) {
+    html += `<div class="driver-group-title">🚕 Auf Fahrt</div>`;
+
+    busyDrivers.forEach(driver => {
+        html += `
+            <div class="driver-row driver-busy">
+                <span>${escapeHtml(driver.display_name)}</span>
+                <small>Fahrt</small>
+            </div>
+        `;
+    });
+}
 
     if (pausedDrivers.length > 0) {
         html += `<div class="driver-group-title">🟡 Pause</div>`;
