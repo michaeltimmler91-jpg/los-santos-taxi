@@ -1246,15 +1246,6 @@ body[data-company-theme="rainbow"] button {
    WORKSHOP PLZ MAP
 ========================= */
 
-.workshop-top-grid {
-    display: grid;
-    grid-template-columns: 1fr 0.9fr;
-    gap: 22px;
-    align-items: stretch;
-    max-width: 1400px;
-    margin: auto;
-}
-
 .compact-invoice-box {
     max-width: none !important;
     margin: 0 !important;
@@ -1345,13 +1336,7 @@ body[data-company-theme="rainbow"] button {
    WORKSHOP PAGE FINAL POLISH
 ========================= */
 
-.workshop-top-grid {
-    display: grid;
-    grid-template-columns: 1fr 0.9fr;
-    gap: 22px;
-    align-items: stretch;
-    margin-top: 10px;
-}
+
 
 .compact-invoice-box,
 .workshop-map-card {
@@ -1469,12 +1454,7 @@ body[data-company-theme="rainbow"] button {
     grid-template-columns: 1fr;
     margin-top: 0 !important;
 }
-.workshop-top-grid {
-    display: grid;
-    grid-template-columns: 1fr 0.9fr;
-    gap: 22px;
-    align-items: start;
-}
+
 
 .workshop-left-column {
     display: flex;
