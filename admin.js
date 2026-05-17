@@ -1012,21 +1012,21 @@ async function loadAdminTimeStats() {
     if (!box) return;
 
     const { data: users, error: usersError } = await client
-    .from("taxi_users")
-    .select("username, display_name, role")
-    .in("role", ["fahrer", "admin"]);
+        .from("taxi_users")
+        .select("username, display_name, role")
+        .in("role", ["fahrer", "admin"]);
 
-if (usersError) {
-    console.error(usersError);
-    box.innerHTML = "Fehler beim Laden der Fahrer.";
-    return;
-}
+    if (usersError) {
+        console.error(usersError);
+        box.innerHTML = "Fehler beim Laden der Fahrer.";
+        return;
+    }
 
-const activeUsers = {};
+    const activeUsers = {};
 
-(users || []).forEach(user => {
-    activeUsers[user.username] = user.display_name;
-});
+    (users || []).forEach(user => {
+        activeUsers[user.username] = user.display_name;
+    });
 
     const { data, error } = await client
         .from("taxi_status_logs")
@@ -1037,6 +1037,15 @@ const activeUsers = {};
         console.error(error);
         box.innerHTML = "Fehler";
         return;
+    }
+
+    const { data: absences, error: absencesError } = await client
+        .from("taxi_driver_absences")
+        .select("*")
+        .eq("active", true);
+
+    if (absencesError) {
+        console.error(absencesError);
     }
 
     const now = new Date();
@@ -1057,24 +1066,23 @@ const activeUsers = {};
 
     const groupedLogs = {};
 
-    (data || []).forEach(log => {
-
-    if (!activeUsers[log.username]) {
-        return;
-    }
-
-    if (!groupedLogs[log.username]) {
-        groupedLogs[log.username] = {
-            display_name: activeUsers[log.username],
+    Object.keys(activeUsers).forEach(username => {
+        groupedLogs[username] = {
+            username: username,
+            display_name: activeUsers[username],
             logs: []
         };
-    }
+    });
 
-    groupedLogs[log.username].logs.push(log);
-});
+    (data || []).forEach(log => {
+        if (!activeUsers[log.username]) return;
+
+        groupedLogs[log.username].logs.push(log);
+    });
 
     const rows = Object.values(groupedLogs).map(driver => {
         const stats = {
+            username: driver.username,
             display_name: driver.display_name,
 
             todayDuty: 0,
@@ -1087,8 +1095,51 @@ const activeUsers = {};
             monthPause: 0,
 
             totalDuty: 0,
-            totalPause: 0
+            totalPause: 0,
+
+            lastSeen: null,
+            lastStatus: "Unbekannt",
+            absenceText: "",
+            inactiveWarning: false
         };
+
+        if (driver.logs.length > 0) {
+            const lastLog = driver.logs[driver.logs.length - 1];
+
+            stats.lastSeen = new Date(lastLog.created_at);
+            stats.lastStatus = lastLog.new_status || "Unbekannt";
+        }
+
+        const activeAbsence = (absences || []).find(absence => {
+            if (absence.username !== driver.username) return false;
+
+            const start = new Date(absence.start_date);
+            const end = new Date(absence.end_date);
+            end.setHours(23, 59, 59, 999);
+
+            return now >= start && now <= end;
+        });
+
+        if (activeAbsence) {
+            const endDate = new Date(activeAbsence.end_date);
+
+            stats.absenceText =
+                "🏖️ Urlaub bis " +
+                endDate.toLocaleDateString("de-DE", {
+                    day: "2-digit",
+                    month: "2-digit"
+                });
+        }
+
+        if (!stats.absenceText && stats.lastSeen) {
+            const daysInactive =
+                Math.floor((now - stats.lastSeen) / 1000 / 60 / 60 / 24);
+
+            if (daysInactive >= 7) {
+                stats.inactiveWarning = true;
+                stats.absenceText = `⚠️ Seit ${daysInactive} Tagen nicht aktiv`;
+            }
+        }
 
         for (let i = 0; i < driver.logs.length; i++) {
             const current = driver.logs[i];
@@ -1140,10 +1191,19 @@ const activeUsers = {};
             </div>
 
             ${rows.map(driver => `
-                <div class="admin-time-row admin-time-row-wide">
+                <div class="admin-time-row admin-time-row-wide ${driver.inactiveWarning ? "driver-inactive-row" : ""}">
 
-                    <div>
+                    <div class="admin-driver-name-cell">
                         <strong>${escapeHtml(driver.display_name)}</strong>
+
+                        <small>
+                            ${driver.absenceText
+                                ? escapeHtml(driver.absenceText)
+                                : driver.lastSeen
+                                    ? "🕓 Zuletzt aktiv: " + formatLastSeen(driver.lastSeen)
+                                    : "🕓 Noch keine Aktivität"
+                            }
+                        </small>
                     </div>
 
                     <div>
