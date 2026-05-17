@@ -248,9 +248,7 @@ button {
 }
 
 .ride-actions button,
-.admin-actions button {
-    margin-top: 0;
-}
+
 
 button:disabled {
     opacity: 0.45;
@@ -888,16 +886,7 @@ body[data-company-theme="rainbow"] button {
    WORKSHOP ACTIONS
 ========================= */
 
-.admin-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-    flex-wrap: wrap;
-}
 
-.admin-actions button {
-    margin-top: 0;
-}
 
 #open_workshop_list .field {
     margin-top: 10px;
