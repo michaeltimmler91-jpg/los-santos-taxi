@@ -1,15 +1,1 @@
-Los Santos Taxi – aufgeräumte CSS-Struktur
-
-Wichtig:
-- style.css importiert nur noch die einzelnen CSS-Dateien.
-- Neue Styles ab jetzt NICHT mehr in legacy.css schreiben.
-- Jobs/Offene Fahrten -> css/jobs.css
-- Sidebar/Fahrerstatus/Leitstelle -> css/sidebar.css
-- Mobile Fahreransicht -> css/mobile.css
-- PLZ/Karten -> css/maps.css
-- Werkstatt -> css/workshop.css
-- Admin -> css/admin.css
-
-Wenn nach Upload etwas gecached ist:
-- HTML-Version der CSS erhöhen, z.B. style.css?v=31
-- STRG+F5 drücken
+# los-santos-taxi

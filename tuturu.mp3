@@ -1,4 +1,6 @@
 @import url("css/legacy.css");
+
+/* Ab hier ziehen wir nach und nach saubere Bereiche raus */
 @import url("css/jobs.css");
 @import url("css/sidebar.css");
 @import url("css/mobile.css");
