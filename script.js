@@ -64,6 +64,7 @@ async function startApp() {
     setupRealtime();
     loadSoundSettings();
     startIdleWatcher();
+    startEasterEggs();
 }
 
 function setupRealtime() {
@@ -1499,5 +1500,50 @@ function updateLiveClock() {
 }
 
 setInterval(updateLiveClock, 1000);
+function startEasterEggs() {
+    setInterval(() => {
+        const chance = Math.random();
+
+        if (chance < 0.03) {
+            runTaxiEgg();
+        } else if (chance < 0.05) {
+            runCrashEgg();
+        } else if (chance < 0.07) {
+            runDiscoEgg();
+        }
+    }, 5 * 60 * 1000);
+}
+
+function runTaxiEgg() {
+    const taxi = document.getElementById("taxiEgg");
+    if (!taxi) return;
+
+    taxi.classList.remove("drive");
+    void taxi.offsetWidth;
+    taxi.classList.add("drive");
+
+    setTimeout(() => {
+        taxi.classList.remove("drive");
+    }, 5500);
+}
+
+function runCrashEgg() {
+    const crash = document.getElementById("crashEgg");
+    if (!crash) return;
+
+    crash.style.display = "flex";
+
+    setTimeout(() => {
+        crash.style.display = "none";
+    }, 3500);
+}
+
+function runDiscoEgg() {
+    document.body.classList.add("disco-mode");
+
+    setTimeout(() => {
+        document.body.classList.remove("disco-mode");
+    }, 5000);
+}
 
 startApp();
