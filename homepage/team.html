@@ -1,71 +1,95 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Unser Team - Los Santos Taxi</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
-  <link rel="stylesheet" href="style.css?v=2" />
+  <title>
+    Unser Team - Los Santos Taxi
+  </title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link
+    rel="stylesheet"
+    href="style.css?v=2"
+  />
+
 </head>
 <body>
 
   <header class="page-hero small-hero">
+
     <nav class="navbar">
-      <a href="index.html" class="brand">
-        <div class="brand-icon">LS</div>
-        <div>
-          <strong>Los Santos Taxi</strong>
-          <span>Premium Fahrservice</span>
+
+      <a
+        href="index.html"
+        class="brand"
+      >
+
+        <div class="brand-icon">
+          LS
         </div>
+
+        <div>
+
+          <strong>
+            Los Santos Taxi
+          </strong>
+
+          <span>
+            Premium Fahrservice
+          </span>
+
+        </div>
+
       </a>
 
-      <div class="nav-links">
-        <a href="index.html">Start</a>
-        <a href="index.html#service">Service</a>
-        <a href="index.html#auftrag">Fahrt anfragen</a>
-        <a href="index.html#bewertungen">Bewertungen</a>
-      </div>
     </nav>
 
     <section class="page-title">
-      <span class="eyebrow">Unser Team</span>
-      <h1>Die Fahrer von Los Santos Taxi</h1>
-      <p>
-        Lerne unser Team kennen. Hier findest du sp&auml;ter Fahrerprofile,
-        Bewertungen und kurze Informationen zu unseren Fahrern.
-      </p>
+
+      <span class="eyebrow">
+        Unser Team
+      </span>
+
+      <h1>
+        Die Fahrer von Los Santos Taxi
+      </h1>
+
     </section>
+
   </header>
 
   <main>
-    <section class="section">
-      <div class="section-head">
-        <span class="eyebrow">Fahrerprofile</span>
-        <h2>Unser aktuelles Team</h2>
-        <p>
-          Die Profile werden automatisch aus dem System geladen, sobald sie
-          f&uuml;r die &ouml;ffentliche Anzeige freigegeben sind.
-        </p>
-      </div>
 
-      <div id="teamGrid" class="team-grid">
-        <article class="driver-card muted">
-          <div class="driver-avatar placeholder">LS</div>
-          <h3>Team wird geladen...</h3>
-          <p>Bitte einen Moment Geduld.</p>
-        </article>
-      </div>
+    <section class="section">
+
+      <div
+        id="teamGrid"
+        class="team-grid"
+      ></div>
+
     </section>
+
   </main>
 
   <footer class="footer">
-    <strong>Los Santos Taxi</strong>
-    <span>Dein Fahrservice f&uuml;r Los Santos, Sandy Shores und Paleto.</span>
+
+    <strong>
+      Los Santos Taxi
+    </strong>
+
   </footer>
 
-  <script src="team.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="config.js"></script>
+
+  <script src="team.js?v=2"></script>
+
 </body>
 </html>
