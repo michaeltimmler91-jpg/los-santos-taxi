@@ -1139,3 +1139,55 @@ option {
     align-items: flex-start;
   }
 }
+
+/* TEAM CARDS CLEAN FIX */
+
+.team-grid {
+  align-items: stretch;
+}
+
+.driver-card {
+  min-height: 430px;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.driver-avatar {
+  flex: 0 0 auto;
+}
+
+.driver-card h3 {
+  margin-top: 0;
+}
+
+.driver-text {
+  max-height: 115px;
+  overflow: hidden;
+  padding-right: 0;
+  margin-bottom: 20px;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
+
+.driver-meta {
+  margin-top: auto;
+  margin-bottom: 18px;
+}
+
+.driver-profile-btn {
+  width: 100%;
+  margin-top: 0;
+}
+
+.driver-card-link,
+.driver-card-link:hover {
+  transform: none;
+}
+
+.driver-card::after {
+  content: none !important;
+}
