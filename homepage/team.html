@@ -90,6 +90,64 @@
   <script src="config.js"></script>
 
   <script src="team.js?v=2"></script>
+<div
+  id="driverModal"
+  class="driver-modal"
+>
+  <div
+    class="driver-modal-backdrop"
+    onclick="closeDriverModal()"
+  ></div>
 
+  <div class="driver-modal-box">
+
+    <button
+      class="driver-modal-close"
+      onclick="closeDriverModal()"
+    >
+      ×
+    </button>
+
+    <div class="driver-modal-header">
+
+      <div class="driver-modal-avatar">
+        <img
+          id="modalDriverImage"
+          src=""
+          alt=""
+        >
+        <span id="modalDriverPlaceholder">
+          LS
+        </span>
+      </div>
+
+      <div>
+        <span class="eyebrow">
+          Fahrerprofil
+        </span>
+
+        <h2 id="modalDriverName">
+          Fahrer
+        </h2>
+
+        <div
+          id="modalDriverStatus"
+          class="driver-pill offline"
+        >
+          Nicht verf&uuml;gbar
+        </div>
+      </div>
+
+    </div>
+
+    <div
+      id="modalDriverBio"
+      class="driver-modal-bio"
+    >
+      Noch keine Beschreibung vorhanden.
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
