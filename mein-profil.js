@@ -132,8 +132,15 @@ function updateProfilePreview() {
 }
 
 async function saveMyProfile() {
-    const imageUrl =
-        document.getElementById("profile_image_url").value.trim();
+    let profileImageUrl =
+    currentProfile.profile_image_url || "";
+
+const uploadedImage =
+    await uploadProfileImage();
+
+if (uploadedImage) {
+    profileImageUrl = uploadedImage;
+}
 
     const bioHtml =
         profileBioEditor.root.innerHTML.trim();
@@ -216,4 +223,46 @@ if (profileBioEditor) {
             updateProfileBioPreview();
         }
     );
+}
+async function uploadProfileImage() {
+
+    const input =
+        document.getElementById(
+            "profile_image_upload"
+        );
+
+    if (!input || !input.files[0]) {
+        return null;
+    }
+
+    const file = input.files[0];
+
+    const extension =
+        file.name.split(".").pop();
+
+    const fileName =
+        `${currentUser.username}_${Date.now()}.${extension}`;
+
+    const { error } = await client.storage
+        .from("driver-profile-images")
+        .upload(fileName, file, {
+            upsert: true
+        });
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Profilbild konnte nicht hochgeladen werden."
+        );
+
+        return null;
+    }
+
+    const { data } = client.storage
+        .from("driver-profile-images")
+        .getPublicUrl(fileName);
+
+    return data.publicUrl;
 }
