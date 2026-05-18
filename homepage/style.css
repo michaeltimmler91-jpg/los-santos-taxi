@@ -526,7 +526,7 @@ textarea:focus {
 
 .public-features {
   max-width: 1180px;
-  margin: -70px auto 0;
+  margin: 0 auto 100px;
   padding: 0 24px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -560,7 +560,7 @@ textarea:focus {
 }
 .live-banner {
   max-width: 1180px;
-  margin: -110px auto 26px;
+  margin: -70px auto 70px;
   padding: 24px 28px;
   border-radius: 30px;
   background: rgba(12,12,12,0.92);
