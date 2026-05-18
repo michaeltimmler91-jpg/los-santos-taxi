@@ -1,3 +1,18 @@
+const liveIndicator =
+document.getElementById(
+  "liveIndicator"
+);
+
+const liveBannerTitle =
+document.getElementById(
+  "liveBannerTitle"
+);
+
+const liveBannerDrivers =
+document.getElementById(
+  "liveBannerDrivers"
+);
+
 const taxiStatusText =
 document.getElementById(
   "taxiStatusText"
@@ -49,6 +64,41 @@ async function loadTaxiStatus() {
 
     const count =
     data ? data.length : 0;
+
+    if(count > 0){
+
+  liveIndicator.classList.remove(
+    "offline"
+  );
+
+  liveIndicator.classList.add(
+    "online"
+  );
+
+  liveBannerTitle.innerHTML =
+  "Fahrer aktuell verf&uuml;gbar";
+
+  liveBannerDrivers.innerHTML =
+  count === 1
+  ? "1 Fahrer im Dienst"
+  : count + " Fahrer im Dienst";
+
+} else {
+
+  liveIndicator.classList.remove(
+    "online"
+  );
+
+  liveIndicator.classList.add(
+    "offline"
+  );
+
+  liveBannerTitle.innerHTML =
+  "Aktuell keine Fahrer verf&uuml;gbar";
+
+  liveBannerDrivers.innerHTML =
+  "Bitte sp&auml;ter erneut versuchen";
+}
 
     taxiStatusDot.classList.remove(
       "loading",
