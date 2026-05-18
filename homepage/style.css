@@ -569,3 +569,118 @@ a {
     border-radius: 24px;
   }
 }
+/* FORMULAR */
+
+.split-section {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 34px;
+  align-items: center;
+}
+
+.order-card {
+  padding: 32px;
+  display: grid;
+  gap: 18px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #e7e7e7;
+  font-weight: 700;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  border-radius: 16px;
+  padding: 15px 16px;
+  font: inherit;
+  outline: none;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #ffcc00;
+  box-shadow: 0 0 0 3px rgba(255,204,0,0.12);
+}
+
+.form-message {
+  min-height: 24px;
+  margin: 0;
+  color: #ffcc00;
+  font-weight: 700;
+}
+
+/* SERVICE / BEWERTUNGEN */
+
+.info-card {
+  padding: 28px;
+}
+
+.info-card .icon {
+  font-size: 34px;
+  margin-bottom: 18px;
+}
+
+.info-card h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.review-stars {
+  color: #ffcc00;
+  letter-spacing: 2px;
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+
+.review-driver {
+  color: #a9a9a9;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+
+.driver-answer {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,204,0,0.08);
+  border: 1px solid rgba(255,204,0,0.15);
+  color: #e7e7e7;
+}
+
+/* FOOTER */
+
+.footer {
+  padding: 28px 24px;
+  text-align: center;
+  color: #aaa;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: #070707;
+  display: grid;
+  gap: 6px;
+}
+
+.footer strong {
+  color: #ffcc00;
+}
+
+/* MOBILE FIX */
+
+@media (max-width: 900px) {
+  .split-section {
+    grid-template-columns: 1fr;
+  }
+}
