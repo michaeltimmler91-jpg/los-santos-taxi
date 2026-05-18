@@ -108,6 +108,7 @@ async function loadMyProfile() {
         profile.bio_html || profile.bio || "";
 
     updateProfilePreview();
+    updateProfileBioPreview();
 }
 
 function updateProfilePreview() {
@@ -182,3 +183,37 @@ document.addEventListener("input", event => {
         updateProfilePreview();
     }
 });
+
+function updateProfileBioPreview() {
+
+    const bioHtml =
+        profileBioEditor.root.innerHTML.trim();
+
+    const preview =
+        document.getElementById("profile_preview_bio");
+
+    if (!preview) {
+        return;
+    }
+
+    if (
+        !bioHtml ||
+        bioHtml === "<p><br></p>"
+    ) {
+        preview.innerHTML =
+            "Noch keine Beschreibung vorhanden.";
+
+        return;
+    }
+
+    preview.innerHTML = DOMPurify.sanitize(bioHtml);
+}
+if (profileBioEditor) {
+
+    profileBioEditor.on(
+        "text-change",
+        () => {
+            updateProfileBioPreview();
+        }
+    );
+}
