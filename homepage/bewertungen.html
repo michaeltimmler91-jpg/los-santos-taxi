@@ -15,7 +15,7 @@
 
   <link
     rel="stylesheet"
-    href="style.css?v=3"
+    href="style.css?v=4"
   >
 
 </head>
@@ -70,20 +70,33 @@
 
     </nav>
 
-    <section class="page-title">
+    <section class="page-title reviews-hero-title">
 
       <span class="eyebrow">
-        Bewertungen
+        Kundenmeinungen
       </span>
 
       <h1>
-        Das sagen unsere Fahrgäste
+        Gute Fahrten sprechen f&uuml;r sich.
       </h1>
 
       <p>
-        Erfahrungen, Bewertungen
-        und Feedback unserer Kunden.
+        Erfahrungen unserer Fahrg&auml;ste,
+        ehrliches Feedback und Antworten
+        vom Team von Los Santos Taxi.
       </p>
+
+      <div class="reviews-hero-rating">
+
+        <div class="big-stars">
+          ★★★★★
+        </div>
+
+        <span>
+          Bewertungen direkt von unseren Fahrg&auml;sten
+        </span>
+
+      </div>
 
     </section>
 
@@ -91,32 +104,114 @@
 
   <main>
 
+    <section class="review-highlight-section">
+
+      <div class="review-highlight-card">
+
+        <span class="eyebrow">
+          Fahrgast Feedback
+        </span>
+
+        <h2>
+          Deine Meinung hilft uns,
+          noch besser zu fahren.
+        </h2>
+
+        <p>
+          Ob kurze Stadtfahrt, l&auml;ngere Strecke
+          oder spontane Abholung: Jede Bewertung
+          zeigt, was bei Los Santos Taxi gut l&auml;uft
+          und wo wir noch besser werden k&ouml;nnen.
+        </p>
+
+      </div>
+
+      <div class="review-mini-stats">
+
+        <div class="review-mini-card">
+
+          <strong>
+            ★★★★★
+          </strong>
+
+          <span>
+            Sternebewertung
+          </span>
+
+        </div>
+
+        <div class="review-mini-card">
+
+          <strong>
+            Live
+          </strong>
+
+          <span>
+            Neue Bewertungen
+          </span>
+
+        </div>
+
+        <div class="review-mini-card">
+
+          <strong>
+            Team
+          </strong>
+
+          <span>
+            Fahrerantworten
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
     <section class="section">
 
       <div class="section-head">
 
         <span class="eyebrow">
-          Bewertung schreiben
+          Aktuelle Bewertungen
         </span>
 
         <h2>
-          Teile deine Erfahrung
+          Was Fahrg&auml;ste sagen
         </h2>
+
+        <p>
+          Hier findest du aktuelle Bewertungen,
+          Kommentare und Antworten unserer Fahrer.
+        </p>
 
       </div>
 
-      <div class="split-section">
+      <div
+        id="reviewsGrid"
+        class="review-grid"
+      ></div>
+
+    </section>
+
+    <section class="section">
+
+      <div class="review-form-panel">
 
         <div class="section-text">
 
+          <span class="eyebrow">
+            Bewertung schreiben
+          </span>
+
           <h2>
-            Fahrer direkt bewerten
+            Eigene Erfahrung teilen
           </h2>
 
           <p>
-            Bewerte deine letzte Fahrt
-            und teile deine Erfahrung
-            mit anderen Fahrgästen.
+            Hattest du eine gute Fahrt?
+            Dann hinterlasse eine Bewertung
+            f&uuml;r den jeweiligen Fahrer.
           </p>
 
         </div>
@@ -136,7 +231,7 @@
             >
 
               <option value="">
-                Fahrer auswählen
+                Fahrer ausw&auml;hlen
               </option>
 
             </select>
@@ -150,6 +245,7 @@
             <input
               type="text"
               id="reviewName"
+              placeholder="Dein Name"
               required
             >
 
@@ -165,23 +261,23 @@
             >
 
               <option value="5">
-                ★★★★★
+                ★★★★★ - Sehr gut
               </option>
 
               <option value="4">
-                ★★★★☆
+                ★★★★☆ - Gut
               </option>
 
               <option value="3">
-                ★★★☆☆
+                ★★★☆☆ - Okay
               </option>
 
               <option value="2">
-                ★★☆☆☆
+                ★★☆☆☆ - Ausbauf&auml;hig
               </option>
 
               <option value="1">
-                ★☆☆☆☆
+                ★☆☆☆☆ - Schlecht
               </option>
 
             </select>
@@ -194,6 +290,7 @@
 
             <textarea
               id="reviewText"
+              placeholder="Wie war deine Fahrt?"
               required
             ></textarea>
 
@@ -217,27 +314,6 @@
 
     </section>
 
-    <section class="section">
-
-      <div class="section-head">
-
-        <span class="eyebrow">
-          Kundenmeinungen
-        </span>
-
-        <h2>
-          Aktuelle Bewertungen
-        </h2>
-
-      </div>
-
-      <div
-        id="reviewsGrid"
-        class="review-grid"
-      ></div>
-
-    </section>
-
   </main>
 
   <footer class="footer">
@@ -247,7 +323,7 @@
     </strong>
 
     <p class="footer-note">
-      Diese Website dient ausschließlich
+      Diese Website dient ausschlie&szlig;lich
       als virtuelle Projekt- und Rollenspielseite
       innerhalb eines GTA-basierten Spiels.
       Es handelt sich nicht um ein reales Taxiunternehmen.
@@ -258,7 +334,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script src="config.js"></script>
-  <script src="bewertungen.js?v=1"></script>
+  <script src="bewertungen.js?v=2"></script>
 
 </body>
 </html>
