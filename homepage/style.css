@@ -1,0 +1,423 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255, 204, 0, 0.16), transparent 30%),
+    linear-gradient(135deg, #070707, #111111 45%, #070707);
+  color: #f5f5f5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hero {
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.86)),
+    url("bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.navbar {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 16px 18px;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  background: rgba(10,10,10,0.72);
+  backdrop-filter: blur(18px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffcc00, #ff8c00);
+  color: #080808;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 35px rgba(255, 204, 0, 0.35);
+}
+
+.brand strong {
+  display: block;
+  font-size: 18px;
+}
+
+.brand span {
+  display: block;
+  font-size: 12px;
+  color: #bdbdbd;
+  margin-top: 3px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 22px;
+  color: #dcdcdc;
+  font-size: 14px;
+}
+
+.nav-links a:hover {
+  color: #ffcc00;
+}
+
+.hero-content {
+  max-width: 1180px;
+  min-height: calc(100vh - 120px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: #ffcc00;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hero h1 {
+  font-size: clamp(42px, 7vw, 86px);
+  line-height: 0.95;
+  margin: 18px 0;
+  max-width: 780px;
+}
+
+.hero p,
+.section-head p,
+.section-text p,
+.info-card p,
+.team-placeholder p {
+  color: #c9c9c9;
+  line-height: 1.65;
+}
+
+.hero-text p {
+  max-width: 620px;
+  font-size: 18px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 22px;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: 0.2s ease;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #ffcc00, #ff9500);
+  color: #080808;
+  box-shadow: 0 12px 38px rgba(255, 183, 0, 0.28);
+}
+
+.btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 46px rgba(255, 183, 0, 0.38);
+}
+
+.btn.ghost {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #f5f5f5;
+}
+
+.btn.ghost:hover {
+  background: rgba(255,255,255,0.14);
+}
+
+.btn.full {
+  width: 100%;
+}
+
+.status-card,
+.order-card,
+.info-card,
+.team-placeholder {
+  background: rgba(18,18,18,0.82);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 32px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.38);
+  backdrop-filter: blur(16px);
+}
+
+.status-card {
+  padding: 32px;
+}
+
+.card-label {
+  color: #ffcc00;
+  font-weight: 800;
+  margin: 0 0 16px;
+}
+
+.status-card h2 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.status-dot-row {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #d7d7d7;
+}
+
+.status-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #999;
+  box-shadow: 0 0 20px currentColor;
+}
+
+.status-dot.online {
+  background: #3cff7b;
+  color: #3cff7b;
+}
+
+.status-dot.offline {
+  background: #ff4d4d;
+  color: #ff4d4d;
+}
+
+.status-dot.loading {
+  background: #ffcc00;
+  color: #ffcc00;
+}
+
+.section {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 90px 24px;
+}
+
+.section-head {
+  max-width: 720px;
+  margin-bottom: 34px;
+}
+
+.section-head h2,
+.section-text h2 {
+  font-size: clamp(32px, 5vw, 56px);
+  margin: 12px 0;
+}
+
+.grid {
+  display: grid;
+  gap: 22px;
+}
+
+.cards-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.info-card {
+  padding: 28px;
+}
+
+.info-card .icon {
+  font-size: 34px;
+  margin-bottom: 18px;
+}
+
+.info-card h3 {
+  margin: 0 0 12px;
+  font-size: 22px;
+}
+
+.info-card.muted {
+  opacity: 0.75;
+}
+
+.split-section {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 34px;
+  align-items: center;
+}
+
+.mini-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+  color: #e8e8e8;
+}
+
+.order-card {
+  padding: 28px;
+  display: grid;
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  color: #e7e7e7;
+  font-weight: 700;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  border-radius: 16px;
+  padding: 15px 16px;
+  font: inherit;
+  outline: none;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #ffcc00;
+  box-shadow: 0 0 0 3px rgba(255,204,0,0.12);
+}
+
+.form-message {
+  min-height: 24px;
+  margin: 0;
+  color: #ffcc00;
+  font-weight: 700;
+}
+
+.review-stars {
+  color: #ffcc00;
+  letter-spacing: 2px;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.review-driver {
+  color: #a9a9a9;
+  font-size: 14px;
+}
+
+.driver-answer {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255,204,0,0.08);
+  border: 1px solid rgba(255,204,0,0.15);
+  color: #e7e7e7;
+}
+
+.team-placeholder {
+  padding: 32px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+}
+
+.footer {
+  padding: 28px 24px;
+  text-align: center;
+  color: #aaa;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: #070707;
+  display: grid;
+  gap: 6px;
+}
+
+.footer strong {
+  color: #ffcc00;
+}
+
+@media (max-width: 900px) {
+  .nav-links {
+    display: none;
+  }
+
+  .hero-content,
+  .split-section,
+  .cards-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 16px;
+  }
+
+  .hero-content {
+    padding-top: 54px;
+  }
+
+  .status-card {
+    padding: 24px;
+  }
+
+  .team-placeholder {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .navbar {
+    border-radius: 20px;
+  }
+
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .hero h1 {
+    font-size: 42px;
+  }
+
+  .section {
+    padding: 64px 18px;
+  }
+
+  .info-card,
+  .order-card,
+  .team-placeholder {
+    border-radius: 24px;
+  }
+}
