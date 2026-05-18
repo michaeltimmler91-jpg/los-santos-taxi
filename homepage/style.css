@@ -971,3 +971,178 @@ option {
   font-weight: 800;
   font-size: 14px;
 }
+/* DRIVER MODAL */
+
+.driver-profile-btn {
+  margin-top: auto;
+
+  border: 0;
+  border-radius: 999px;
+
+  padding: 12px 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffcc00,
+      #ff9500
+    );
+
+  color: #080808;
+
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+.driver-modal {
+  position: fixed;
+  inset: 0;
+
+  display: none;
+
+  z-index: 9999;
+}
+
+.driver-modal.open {
+  display: block;
+}
+
+.driver-modal-backdrop {
+  position: absolute;
+  inset: 0;
+
+  background:
+    rgba(0,0,0,0.78);
+
+  backdrop-filter: blur(10px);
+}
+
+.driver-modal-box {
+  position: relative;
+
+  max-width: 760px;
+  max-height: 86vh;
+
+  margin: 7vh auto;
+
+  padding: 34px;
+
+  overflow-y: auto;
+
+  border-radius: 34px;
+
+  background:
+    rgba(14,14,14,0.96);
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,0.65);
+}
+
+.driver-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+
+  width: 42px;
+  height: 42px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  color: #fff;
+
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.driver-modal-header {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+
+  margin-bottom: 32px;
+}
+
+.driver-modal-avatar {
+  width: 120px;
+  height: 120px;
+
+  border-radius: 32px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffcc00,
+      #ff8c00
+    );
+
+  color: #080808;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 38px;
+  font-weight: 900;
+}
+
+.driver-modal-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.driver-modal-avatar span {
+  display: grid;
+  place-items: center;
+}
+
+.driver-modal-header h2 {
+  margin: 10px 0 14px;
+
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 0.95;
+}
+
+.driver-modal-bio {
+  color: #e8e8e8;
+
+  line-height: 1.8;
+
+  font-size: 17px;
+}
+
+.driver-modal-bio p {
+  margin-top: 0;
+}
+
+.driver-modal-bio h2,
+.driver-modal-bio h3 {
+  color: #ffcc00;
+}
+
+@media (max-width: 700px) {
+
+  .driver-modal-box {
+    margin: 0;
+    min-height: 100vh;
+    max-height: 100vh;
+
+    border-radius: 0;
+
+    padding: 28px 20px;
+  }
+
+  .driver-modal-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
