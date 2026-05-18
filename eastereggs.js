@@ -33,7 +33,9 @@ function runDiscoEgg() {
 }
 
 function startEasterEggs() {
+
     setInterval(() => {
+
         const chance = Math.random();
 
         if (chance < 0.10) {
@@ -45,5 +47,6 @@ function startEasterEggs() {
         else if (chance < 0.22) {
             runDiscoEgg();
         }
+
     }, 5 * 60 * 1000);
 }
