@@ -475,26 +475,33 @@ textarea:focus {
   margin-top: -40px;
   }
 
-  .hero {
-    padding: 16px;
-  }
+.hero {
+  min-height: 100vh;
+  padding: 24px;
+  background:
+    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.72)),
+    url("bg.jpg");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+  .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at left,
+      rgba(255,204,0,0.16),
+      transparent 38%
+    );
+  pointer-events: none;
+}
 
-  .hero-content {
-    padding-top: 54px;
-  }
-
-  .status-card {
-    padding: 24px;
-  }
-
-  .page-title {
-    padding: 80px 0 60px;
-  }
-  .live-banner {
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: -70px;
-  }
+.hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 
