@@ -916,3 +916,33 @@ option {
   max-width: 900px;
   margin-inline: auto;
 }
+
+.driver-card {
+  min-height: 360px;
+  max-height: 520px;
+  display: flex;
+  flex-direction: column;
+}
+
+.driver-text {
+  max-height: 210px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.driver-meta {
+  margin-top: auto;
+}
+
+.driver-text::-webkit-scrollbar {
+  width: 6px;
+}
+
+.driver-text::-webkit-scrollbar-thumb {
+  background: rgba(255,204,0,0.35);
+  border-radius: 999px;
+}
+
+.driver-text::-webkit-scrollbar-track {
+  background: rgba(255,255,255,0.05);
+}
