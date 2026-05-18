@@ -1,4 +1,3 @@
-let currentUser = null;
 let currentProfile = null;
 let profileUser = null;
 let profileBioEditor = null;
@@ -16,12 +15,24 @@ async function startMyProfile() {
     }
 }
 
-async function profileLogin() {
-    const username =
-        document.getElementById("profile_login_username").value.trim();
+function getEl(id) {
+    return document.getElementById(id);
+}
 
-    const password =
-        document.getElementById("profile_login_password").value.trim();
+function setValue(id, value) {
+    const el = getEl(id);
+
+    if (!el) {
+        console.warn("Feld nicht gefunden:", id);
+        return;
+    }
+
+    el.value = value || "";
+}
+
+async function profileLogin() {
+    const username = getEl("profile_login_username").value.trim();
+    const password = getEl("profile_login_password").value.trim();
 
     const { data, error } = await client
         .from("taxi_users")
@@ -46,8 +57,8 @@ async function profileLogin() {
 }
 
 async function loadMyProfile() {
-    document.getElementById("profile_login_box").style.display = "none";
-    document.getElementById("profile_edit_box").style.display = "grid";
+    getEl("profile_login_box").style.display = "none";
+    getEl("profile_edit_box").style.display = "grid";
 
     if (!profileBioEditor) {
         profileBioEditor = new Quill("#profile_bio_editor", {
@@ -64,18 +75,15 @@ async function loadMyProfile() {
                 ]
             }
         });
-        profileBioEditor.on(
-    "text-change",
-    () => {
-        updateProfileBioPreview();
-    }
-);
+
+        profileBioEditor.on("text-change", () => {
+            updateProfileBioPreview();
+        });
     }
 
-    document.getElementById("profile_preview_name").innerText =
-        profileUser.display_name;
+    getEl("profile_preview_name").innerText = profileUser.display_name;
 
-    document.getElementById("profile_public_link").href =
+    getEl("profile_public_link").href =
         `profil.html?fahrer=${encodeURIComponent(profileUser.username)}`;
 
     let { data: profile, error } = await client
@@ -107,29 +115,30 @@ async function loadMyProfile() {
         }
 
         profile = inserted;
-        currentProfile = profile;
     }
 
-    document.getElementById("profile_image_url").value =
-        profile.profile_image_url || "";
+    currentProfile = profile;
+
+    setValue("profile_image_url", profile.profile_image_url);
 
     profileBioEditor.root.innerHTML =
         profile.bio_html || profile.bio || "";
 
     updateProfilePreview();
     updateProfileBioPreview();
-    currentProfile = profile;
 }
 
 function updateProfilePreview() {
+    const imageField = getEl("profile_image_url");
+    const img = getEl("profile_preview_img");
+    const placeholder = getEl("profile_preview_placeholder");
+
+    if (!img || !placeholder) {
+        return;
+    }
+
     const imageUrl =
-        document.getElementById("profile_image_url").value.trim();
-
-    const img =
-        document.getElementById("profile_preview_img");
-
-    const placeholder =
-        document.getElementById("profile_preview_placeholder");
+        imageField ? imageField.value.trim() : currentProfile?.profile_image_url || "";
 
     if (imageUrl) {
         img.src = imageUrl;
@@ -142,15 +151,26 @@ function updateProfilePreview() {
 }
 
 async function saveMyProfile() {
+    if (!currentProfile) {
+        alert("Profil wurde noch nicht geladen.");
+        return;
+    }
+
     let profileImageUrl =
-    currentProfile.profile_image_url || "";
+        currentProfile.profile_image_url || "";
 
-const uploadedImage =
-    await uploadProfileImage();
+    const imageField = getEl("profile_image_url");
 
-if (uploadedImage) {
-    profileImageUrl = uploadedImage;
-}
+    if (imageField && imageField.value.trim()) {
+        profileImageUrl = imageField.value.trim();
+    }
+
+    const uploadedImage =
+        await uploadProfileImage();
+
+    if (uploadedImage) {
+        profileImageUrl = uploadedImage;
+    }
 
     const bioHtml =
         profileBioEditor.root.innerHTML.trim();
@@ -159,7 +179,7 @@ if (uploadedImage) {
         profileBioEditor.getText().trim();
 
     const result =
-        document.getElementById("profile_save_result");
+        getEl("profile_save_result");
 
     const { error } = await client
         .from("taxi_driver_profiles")
@@ -177,13 +197,17 @@ if (uploadedImage) {
 
     if (error) {
         console.error(error);
+
         result.innerHTML = `
             <div class="admin-card">
                 ❌ Profil konnte nicht gespeichert werden.
             </div>
         `;
+
         return;
     }
+
+    currentProfile.profile_image_url = profileImageUrl;
 
     updateProfilePreview();
 
@@ -202,35 +226,30 @@ document.addEventListener("input", event => {
 });
 
 function updateProfileBioPreview() {
+    const preview =
+        getEl("profile_preview_bio");
+
+    if (!preview || !profileBioEditor) {
+        return;
+    }
 
     const bioHtml =
         profileBioEditor.root.innerHTML.trim();
 
-    const preview =
-        document.getElementById("profile_preview_bio");
-
-    if (!preview) {
-        return;
-    }
-
-    if (
-        !bioHtml ||
-        bioHtml === "<p><br></p>"
-    ) {
+    if (!bioHtml || bioHtml === "<p><br></p>") {
         preview.innerHTML =
             "Noch keine Beschreibung vorhanden.";
 
         return;
     }
 
-    preview.innerHTML = DOMPurify.sanitize(bioHtml);
+    preview.innerHTML =
+        DOMPurify.sanitize(bioHtml);
 }
-async function uploadProfileImage() {
 
+async function uploadProfileImage() {
     const input =
-        document.getElementById(
-            "profile_image_upload"
-        );
+        getEl("profile_image_upload");
 
     if (!input || !input.files[0]) {
         return null;
@@ -251,13 +270,8 @@ async function uploadProfileImage() {
         });
 
     if (error) {
-
         console.error(error);
-
-        alert(
-            "Profilbild konnte nicht hochgeladen werden."
-        );
-
+        alert("Profilbild konnte nicht hochgeladen werden.");
         return null;
     }
 
