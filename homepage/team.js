@@ -3,6 +3,9 @@ document.getElementById(
   "teamGrid"
 );
 
+let allDrivers = [];
+let allStatuses = [];
+
 async function loadTeam() {
 
   try {
@@ -20,26 +23,51 @@ async function loadTeam() {
     }
 
     const {
-      data:statusData
+      data: statusData
     } = await supabaseClient
       .from("taxi_driver_status")
       .select("*");
 
+    allDrivers =
+    data || [];
+
+    allStatuses =
+    statusData || [];
+
+    if (!allDrivers.length) {
+
+      teamGrid.innerHTML = `
+        <article class="driver-card">
+          <h3>
+            Keine Fahrer gefunden
+          </h3>
+        </article>
+      `;
+
+      return;
+    }
+
     teamGrid.innerHTML =
-    data.map(driver => {
+    allDrivers.map(driver => {
 
       const statusEntry =
-      statusData.find(
+      allStatuses.find(
         s => s.username === driver.username
       );
 
       const isOnline =
       statusEntry &&
-      statusEntry.status ===
-      "Im Dienst";
+      statusEntry.status === "Im Dienst";
+
+      const shortBio =
+      stripHtml(
+        driver.bio_html ||
+        driver.bio ||
+        "Noch keine Beschreibung vorhanden."
+      );
 
       return `
-        <a class="driver-card driver-card-link" href="../profil?fahrer=${encodeURIComponent(driver.username)}">
+        <article class="driver-card">
 
           <div class="driver-avatar">
 
@@ -47,7 +75,8 @@ async function loadTeam() {
               driver.profile_image_url
               ? `
                 <img
-                  src="${driver.profile_image_url}"
+                  src="${escapeAttribute(driver.profile_image_url)}"
+                  alt="${escapeAttribute(driver.display_name)}"
                 >
               `
               : "LS"
@@ -56,9 +85,7 @@ async function loadTeam() {
           </div>
 
           <h3>
-            ${escapeHtml(
-              driver.display_name
-            )}
+            ${escapeHtml(driver.display_name)}
           </h3>
 
           <div class="driver-role">
@@ -66,36 +93,32 @@ async function loadTeam() {
           </div>
 
           <p class="driver-text">
-            ${
-              escapeHtml(
-                driver.bio ||
-                "Noch keine Beschreibung vorhanden."
-              )
-            }
+            ${escapeHtml(shortBio)}
           </p>
 
           <div class="driver-meta">
 
             <span class="
               driver-pill
-              ${
-                isOnline
-                ? "online"
-                : "offline"
-              }
+              ${isOnline ? "online" : "offline"}
             ">
-
               ${
                 isOnline
                 ? "Verf&uuml;gbar"
-                : "Offline"
+                : "Nicht verf&uuml;gbar"
               }
-
             </span>
 
           </div>
 
-        </a>
+          <button
+            class="driver-profile-btn"
+            onclick="openDriverModal('${escapeAttribute(driver.username)}')"
+          >
+            Profil ansehen
+          </button>
+
+        </article>
       `;
 
     }).join("");
@@ -104,17 +127,141 @@ async function loadTeam() {
 
     console.error(err);
 
+    teamGrid.innerHTML = `
+      <article class="driver-card">
+        <h3>
+          Team konnte nicht geladen werden
+        </h3>
+      </article>
+    `;
   }
+}
+
+function openDriverModal(username) {
+
+  const driver =
+  allDrivers.find(
+    d => d.username === username
+  );
+
+  if (!driver) {
+    return;
+  }
+
+  const statusEntry =
+  allStatuses.find(
+    s => s.username === driver.username
+  );
+
+  const isOnline =
+  statusEntry &&
+  statusEntry.status === "Im Dienst";
+
+  const modal =
+  document.getElementById("driverModal");
+
+  const image =
+  document.getElementById("modalDriverImage");
+
+  const placeholder =
+  document.getElementById("modalDriverPlaceholder");
+
+  document.getElementById("modalDriverName").innerHTML =
+  escapeHtml(driver.display_name || "Fahrer");
+
+  const status =
+  document.getElementById("modalDriverStatus");
+
+  status.classList.remove(
+    "online",
+    "offline"
+  );
+
+  status.classList.add(
+    isOnline ? "online" : "offline"
+  );
+
+  status.innerHTML =
+  isOnline
+  ? "Verf&uuml;gbar"
+  : "Nicht verf&uuml;gbar";
+
+  if (driver.profile_image_url) {
+
+    image.src =
+    driver.profile_image_url;
+
+    image.style.display =
+    "block";
+
+    placeholder.style.display =
+    "none";
+
+  } else {
+
+    image.style.display =
+    "none";
+
+    placeholder.style.display =
+    "grid";
+  }
+
+  const bioHtml =
+  driver.bio_html ||
+  escapeHtml(
+    driver.bio ||
+    "Noch keine Beschreibung vorhanden."
+  );
+
+  document.getElementById("modalDriverBio").innerHTML =
+  DOMPurify
+  ? DOMPurify.sanitize(bioHtml)
+  : bioHtml;
+
+  modal.classList.add("open");
+
+  document.body.style.overflow =
+  "hidden";
+}
+
+function closeDriverModal() {
+
+  document
+    .getElementById("driverModal")
+    .classList.remove("open");
+
+  document.body.style.overflow =
+  "";
+}
+
+function stripHtml(value) {
+
+  const div =
+  document.createElement("div");
+
+  div.innerHTML =
+  value;
+
+  return div.textContent || div.innerText || "";
 }
 
 function escapeHtml(value) {
 
-  return String(value)
+  return String(value || "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function escapeAttribute(value) {
+
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
 
 loadTeam();
