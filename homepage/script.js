@@ -148,58 +148,69 @@ async function loadReviews() {
     }
 
     reviewsGrid.innerHTML =
-    data.map(review => {
+data.map(review => {
 
-      return `
-        <article class="info-card">
+  return `
 
-          <div class="review-stars">
-            ${createStars(review.rating)}
+    <article
+      class="glass-card review-card"
+    >
+
+      <div class="review-top">
+
+        <div class="review-driver">
+          ${escapeHtml(
+            review.driver_display_name
+          )}
+        </div>
+
+        <div class="review-stars">
+          ${createStars(review.rating)}
+        </div>
+
+      </div>
+
+      <div class="review-text">
+        "${escapeHtml(
+          review.review_text
+        )}"
+      </div>
+
+      <div class="review-author">
+        ${escapeHtml(
+          review.reviewer_name
+        )}
+      </div>
+
+      ${
+        review.driver_reply
+        ? `
+          <div class="driver-answer">
+
+            <div
+              class="driver-answer-title"
+            >
+              Antwort vom Fahrer
+            </div>
+
+            <div
+              class="driver-answer-text"
+            >
+              ${escapeHtml(
+                review.driver_reply
+              )}
+            </div>
+
           </div>
+        `
+        : ""
+      }
 
-          <h3>
-            ${escapeHtml(
-              review.driver_display_name
-            )}
-          </h3>
+    </article>
 
-          <div class="review-driver">
-            Bewertung von
-            ${escapeHtml(
-              review.reviewer_name
-            )}
-          </div>
+  `;
 
-          <p>
-            ${escapeHtml(
-              review.review_text
-            )}
-          </p>
-
-          ${
-            review.driver_reply
-            ? `
-              <div class="driver-answer">
-
-                <strong>
-                  Antwort:
-                </strong>
-
-                <br>
-
-                ${escapeHtml(
-                  review.driver_reply
-                )}
-
-              </div>
-            `
-            : ""
-          }
-
-        </article>
-      `;
-
-    }).join("");
+}).join("");
 
   } catch (err) {
 
