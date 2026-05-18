@@ -1609,7 +1609,9 @@ async function loadDriverReviewsAdmin(username) {
         .from("taxi_driver_reviews")
         .select("*")
         .eq("driver_username", username)
+        .eq("visible", true)
         .order("created_at", { ascending: false });
+        
 
     if (error) {
         console.error(error);
@@ -1654,20 +1656,24 @@ async function loadDriverReviewsAdmin(username) {
 }
 
 async function deleteDriverReview(id, username) {
-    const ok = confirm("Bewertung wirklich löschen?");
+    const ok = confirm("Bewertung wirklich ausblenden?");
 
     if (!ok) return;
 
     const { error } = await client
         .from("taxi_driver_reviews")
-        .delete()
+        .update({
+            visible: false
+        })
         .eq("id", id);
 
     if (error) {
         console.error(error);
-        alert("Bewertung konnte nicht gelöscht werden.");
+        alert("Bewertung konnte nicht ausgeblendet werden.");
         return;
     }
+
+    alert("Bewertung wurde ausgeblendet.");
 
     await loadDriverReviewsAdmin(username);
 }
