@@ -1,4 +1,5 @@
 let profileUser = null;
+let profileBioEditor = null;
 
 document.addEventListener("DOMContentLoaded", () => {
     startMyProfile();
@@ -46,6 +47,23 @@ async function loadMyProfile() {
     document.getElementById("profile_login_box").style.display = "none";
     document.getElementById("profile_edit_box").style.display = "grid";
 
+    if (!profileBioEditor) {
+        profileBioEditor = new Quill("#profile_bio_editor", {
+            theme: "snow",
+            placeholder: "Schreib etwas über deinen Fahrer...",
+            modules: {
+                toolbar: [
+                    ["bold", "italic", "underline"],
+                    [{ "header": [2, 3, false] }],
+                    [{ "color": [] }],
+                    [{ "list": "ordered" }, { "list": "bullet" }],
+                    ["link"],
+                    ["clean"]
+                ]
+            }
+        });
+    }
+
     document.getElementById("profile_preview_name").innerText =
         profileUser.display_name;
 
@@ -86,8 +104,8 @@ async function loadMyProfile() {
     document.getElementById("profile_image_url").value =
         profile.profile_image_url || "";
 
-    document.getElementById("profile_bio").value =
-        profile.bio || "";
+    profileBioEditor.root.innerHTML =
+        profile.bio_html || profile.bio || "";
 
     updateProfilePreview();
 }
@@ -116,8 +134,11 @@ async function saveMyProfile() {
     const imageUrl =
         document.getElementById("profile_image_url").value.trim();
 
-    const bio =
-        document.getElementById("profile_bio").value.trim();
+    const bioHtml =
+        profileBioEditor.root.innerHTML.trim();
+
+    const bioText =
+        profileBioEditor.getText().trim();
 
     const result =
         document.getElementById("profile_save_result");
@@ -128,7 +149,8 @@ async function saveMyProfile() {
             username: profileUser.username,
             display_name: profileUser.display_name,
             profile_image_url: imageUrl || null,
-            bio: bio || null,
+            bio: bioText || null,
+            bio_html: bioHtml || null,
             public_visible: true,
             updated_at: new Date().toISOString()
         }, {
