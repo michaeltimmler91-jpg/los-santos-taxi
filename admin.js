@@ -1629,9 +1629,9 @@ async function loadDriverReviewsAdmin(username) {
     box.innerHTML = data.map(review => `
         <div class="admin-card">
             <strong>${escapeHtml(review.reviewer_name || "Anonym")}</strong><br>
-            ⭐ ${review.rating || 0}/5<br><br>
+            ⭐ ${review.stars || 0}/5<br><br>
 
-            ${escapeHtml(review.review_text || "-")}
+            ${escapeHtml(review.message || "-")}
 
             ${review.driver_reply ? `
                 <br><br>
