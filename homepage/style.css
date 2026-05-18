@@ -1191,3 +1191,84 @@ option {
 .driver-card::after {
   content: none !important;
 }
+/* TEAM FINAL CLEAN FIX */
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.driver-card {
+  min-height: 380px;
+  height: 380px;
+  max-height: 380px;
+
+  padding: 28px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.driver-avatar {
+  width: 92px;
+  height: 92px;
+  min-height: 92px;
+  margin-bottom: 18px;
+}
+
+.driver-card h3 {
+  margin: 0 0 8px;
+  font-size: 26px;
+}
+
+.driver-role {
+  margin-bottom: 18px;
+}
+
+.driver-text {
+  max-height: 86px;
+  min-height: 86px;
+
+  overflow: hidden;
+
+  margin: 0 0 18px;
+
+  line-height: 1.55;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.driver-meta {
+  margin-top: auto;
+  margin-bottom: 16px;
+}
+
+.driver-profile-btn {
+  width: 100%;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1000px) {
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .driver-card {
+    height: auto;
+    max-height: none;
+    min-height: 360px;
+  }
+}
