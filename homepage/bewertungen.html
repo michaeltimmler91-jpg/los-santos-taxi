@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Bewertungen - Los Santos Taxi
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css?v=3"
+  >
+
+</head>
+<body>
+
+  <header class="page-hero">
+
+    <nav class="navbar">
+
+      <a
+        href="index.html"
+        class="brand"
+      >
+
+        <div class="brand-icon">
+          LS
+        </div>
+
+        <div>
+
+          <strong>
+            Los Santos Taxi
+          </strong>
+
+          <span>
+            Premium Fahrservice
+          </span>
+
+        </div>
+
+      </a>
+
+      <div class="nav-links">
+
+        <a href="index.html">
+          Start
+        </a>
+
+        <a href="fahrt.html">
+          Fahrt anfragen
+        </a>
+
+        <a href="bewertungen.html">
+          Bewertungen
+        </a>
+
+        <a href="team.html">
+          Team
+        </a>
+
+      </div>
+
+    </nav>
+
+    <section class="page-title">
+
+      <span class="eyebrow">
+        Bewertungen
+      </span>
+
+      <h1>
+        Das sagen unsere Fahrgäste
+      </h1>
+
+      <p>
+        Erfahrungen, Bewertungen
+        und Feedback unserer Kunden.
+      </p>
+
+    </section>
+
+  </header>
+
+  <main>
+
+    <section class="section">
+
+      <div class="section-head">
+
+        <span class="eyebrow">
+          Bewertung schreiben
+        </span>
+
+        <h2>
+          Teile deine Erfahrung
+        </h2>
+
+      </div>
+
+      <div class="split-section">
+
+        <div class="section-text">
+
+          <h2>
+            Fahrer direkt bewerten
+          </h2>
+
+          <p>
+            Bewerte deine letzte Fahrt
+            und teile deine Erfahrung
+            mit anderen Fahrgästen.
+          </p>
+
+        </div>
+
+        <form
+          id="reviewForm"
+          class="order-card"
+        >
+
+          <label>
+
+            Fahrer
+
+            <select
+              id="reviewDriver"
+              required
+            >
+
+              <option value="">
+                Fahrer auswählen
+              </option>
+
+            </select>
+
+          </label>
+
+          <label>
+
+            Dein Name
+
+            <input
+              type="text"
+              id="reviewName"
+              required
+            >
+
+          </label>
+
+          <label>
+
+            Bewertung
+
+            <select
+              id="reviewRating"
+              required
+            >
+
+              <option value="5">
+                ★★★★★
+              </option>
+
+              <option value="4">
+                ★★★★☆
+              </option>
+
+              <option value="3">
+                ★★★☆☆
+              </option>
+
+              <option value="2">
+                ★★☆☆☆
+              </option>
+
+              <option value="1">
+                ★☆☆☆☆
+              </option>
+
+            </select>
+
+          </label>
+
+          <label>
+
+            Kommentar
+
+            <textarea
+              id="reviewText"
+              required
+            ></textarea>
+
+          </label>
+
+          <button
+            type="submit"
+            class="btn primary full"
+          >
+            Bewertung absenden
+          </button>
+
+          <p
+            id="reviewMessage"
+            class="form-message"
+          ></p>
+
+        </form>
+
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <div class="section-head">
+
+        <span class="eyebrow">
+          Kundenmeinungen
+        </span>
+
+        <h2>
+          Aktuelle Bewertungen
+        </h2>
+
+      </div>
+
+      <div
+        id="reviewsGrid"
+        class="review-grid"
+      ></div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+
+    <strong>
+      Los Santos Taxi
+    </strong>
+
+    <p class="footer-note">
+      Diese Website dient ausschließlich
+      als virtuelle Projekt- und Rollenspielseite
+      innerhalb eines GTA-basierten Spiels.
+      Es handelt sich nicht um ein reales Taxiunternehmen.
+    </p>
+
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="config.js"></script>
+  <script src="bewertungen.js?v=1"></script>
+
+</body>
+</html>
