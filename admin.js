@@ -26,6 +26,7 @@ async function startAdmin() {
     await loadAnnouncements();
     await loadAdminDoneJobs();
     await loadAdminTimeStats();
+    await loadDriverProfiles();
 
     loadDashboardOverview();
     loadAdminStatusUsers();
@@ -1383,6 +1384,198 @@ async function adminChangeDriverStatus() {
     if (typeof loadAdminTimeStats === "function") {
         loadAdminTimeStats();
     }
+}
+async function loadDriverProfiles() {
+
+    const box =
+        document.getElementById("admin_profiles_list");
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_driver_profiles")
+        .select("*")
+        .order("display_name", {
+            ascending: true
+        });
+
+    if (error) {
+        console.error(error);
+
+        box.innerHTML = `
+            <div class="admin-card">
+                Fehler beim Laden der Profile.
+            </div>
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine Fahrerprofile vorhanden.
+            </div>
+        `;
+
+        return;
+    }
+
+    box.innerHTML =
+        data.map(profile => {
+
+            const publicLink =
+                `profil.html?fahrer=${encodeURIComponent(profile.username)}`;
+
+            return `
+                <div class="admin-card profile-admin-card">
+
+                    <div class="profile-admin-left">
+
+                        ${
+                            profile.profile_image_url
+                                ? `
+                                    <img
+                                        src="${escapeAttr(profile.profile_image_url)}"
+                                        class="profile-admin-avatar"
+                                        alt="Profilbild"
+                                    >
+                                `
+                                : `
+                                    <div class="profile-admin-avatar-placeholder">
+                                        🚕
+                                    </div>
+                                `
+                        }
+
+                        <div>
+
+                            <strong>
+                                ${escapeHtml(profile.display_name)}
+                            </strong>
+
+                            <br>
+
+                            👤 Username:
+                            ${escapeHtml(profile.username)}
+
+                            <br>
+
+                            📅 Beim Taxi seit:
+                            ${
+                                profile.taxi_since
+                                    ? new Date(profile.taxi_since)
+                                        .toLocaleDateString("de-DE")
+                                    : "-"
+                            }
+
+                            <br>
+
+                            🌍 Öffentlich:
+                            ${
+                                profile.public_visible
+                                    ? "Ja"
+                                    : "Nein"
+                            }
+
+                        </div>
+
+                    </div>
+
+                    <div class="admin-actions">
+
+                        <a
+                            href="${publicLink}"
+                            target="_blank"
+                        >
+                            <button class="small-btn">
+                                👁️ Profil öffnen
+                            </button>
+                        </a>
+
+                        <button
+                            class="small-btn secondary-btn"
+                            onclick="toggleProfileVisibility(
+                                '${escapeAttr(profile.username)}',
+                                ${profile.public_visible}
+                            )"
+                        >
+                            ${
+                                profile.public_visible
+                                    ? "🙈 Verstecken"
+                                    : "👁️ Sichtbar"
+                            }
+                        </button>
+
+                        <button
+                            class="small-btn"
+                            onclick="changeTaxiSince(
+                                '${escapeAttr(profile.username)}',
+                                '${escapeAttr(profile.taxi_since || "")}'
+                            )"
+                        >
+                            📅 Taxi-Beitritt
+                        </button>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+async function toggleProfileVisibility(
+    username,
+    current
+) {
+
+    const { error } = await client
+        .from("taxi_driver_profiles")
+        .update({
+            public_visible: !current
+        })
+        .eq("username", username);
+
+    if (error) {
+        console.error(error);
+        alert("Profil konnte nicht geändert werden.");
+        return;
+    }
+
+    loadDriverProfiles();
+}
+
+async function changeTaxiSince(
+    username,
+    current
+) {
+
+    const newDate =
+        prompt(
+            "Seit wann beim Taxi? (YYYY-MM-DD)",
+            current || ""
+        );
+
+    if (newDate === null) {
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_driver_profiles")
+        .update({
+            taxi_since: newDate || null
+        })
+        .eq("username", username);
+
+    if (error) {
+        console.error(error);
+        alert("Datum konnte nicht gespeichert werden.");
+        return;
+    }
+
+    loadDriverProfiles();
 }
 
 startAdmin();
