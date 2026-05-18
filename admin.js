@@ -1656,24 +1656,31 @@ async function loadDriverReviewsAdmin(username) {
 }
 
 async function deleteDriverReview(id, username) {
-    const ok = confirm("Bewertung wirklich ausblenden?");
+
+    const ok =
+        confirm(
+            "Bewertung wirklich endgültig löschen?"
+        );
 
     if (!ok) return;
 
     const { error } = await client
         .from("taxi_driver_reviews")
-        .update({
-            visible: false
-        })
+        .delete()
         .eq("id", id);
 
     if (error) {
+
         console.error(error);
-        alert("Bewertung konnte nicht ausgeblendet werden.");
+
+        alert(
+            "Bewertung konnte nicht gelöscht werden."
+        );
+
         return;
     }
 
-    alert("Bewertung wurde ausgeblendet.");
+    alert("Bewertung gelöscht.");
 
     await loadDriverReviewsAdmin(username);
 }
