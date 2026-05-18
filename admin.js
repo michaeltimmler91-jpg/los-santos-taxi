@@ -1644,7 +1644,7 @@ async function loadDriverReviewsAdmin(username) {
             <div class="admin-actions">
                 <button
                     class="small-btn danger-btn"
-                    onclick="deleteDriverReview(${review.id}, '${escapeAttr(username)}')"
+                    onclick="deleteDriverReview('${escapeAttr(review.id)}', '${escapeAttr(username)}')"
                 >
                     🗑️ Bewertung löschen
                 </button>
