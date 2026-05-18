@@ -1201,9 +1201,9 @@ option {
 }
 
 .driver-card {
-  min-height: 380px;
-  height: 380px;
-  max-height: 380px;
+  min-height: 430px;
+  height: 430px;
+  max-height: 430px;
 
   padding: 28px;
 
