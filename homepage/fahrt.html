@@ -88,125 +88,132 @@
 
   </header>
 
-  <main>
+ <main>
 
-    <section class="section">
+  <section class="section fahrt-page">
 
-      <div class="split-section">
+    <div class="fahrt-header">
 
-        <div class="section-text">
+      <span class="eyebrow">
+        Fahrt anfragen
+      </span>
 
-          <span class="eyebrow">
-            Online Anfrage
-          </span>
+      <h1>
+        Du brauchst ein Taxi?
+      </h1>
 
-          <h2>
-            Fahrt in wenigen Sekunden anfragen
-          </h2>
+      <p>
+        Stelle deine Anfrage direkt online an Los Santos Taxi.
+      </p>
 
-          <p>
-            Egal ob kurze Stadtfahrt, Flughafentransfer oder lange Strecke —
-            unser Team bringt dich sicher und schnell ans Ziel.
-          </p>
+    </div>
 
-        </div>
+    <div class="fahrt-layout">
+
+      <aside class="fahrt-info-card">
+
         <div
-  id="fahrtLiveStatus"
-  class="fahrt-live-status offline"
->
-
-  <div
-    id="fahrtLiveDot"
-    class="fahrt-live-dot offline"
-  ></div>
-
-  <div>
-
-    <strong id="fahrtLiveTitle">
-      Status wird geladen...
-    </strong>
-
-    <p id="fahrtLiveText">
-      Bitte warten...
-    </p>
-
-  </div>
-
-</div>
-        <form
-          id="orderForm"
-          class="order-card"
+          id="fahrtLiveStatus"
+          class="fahrt-live-status offline"
         >
 
-          <label>
+          <div
+            id="fahrtLiveDot"
+            class="fahrt-live-dot offline"
+          ></div>
 
-            Dein Name
+          <div>
 
-            <input
-              type="text"
-              id="customerName"
-              placeholder="Name"
-              required
-            >
+            <strong id="fahrtLiveTitle">
+              Status wird geladen...
+            </strong>
 
-          </label>
+            <p id="fahrtLiveText">
+              Bitte warten...
+            </p>
 
-          <label>
+          </div>
 
-            Abholort / PLZ
+        </div>
 
-            <input
-              type="text"
-              id="pickup"
-              placeholder="z.B. Downtown / PLZ"
-              required
-            >
+        <h3>
+          Hinweis zur Anfrage
+        </h3>
 
-          </label>
+        <p>
+          Deine Anfrage wird an die Leitstelle &uuml;bermittelt.
+          Sobald ein Fahrer verf&uuml;gbar ist, kann deine Fahrt
+          bearbeitet werden.
+        </p>
 
-          <label>
+      </aside>
 
-            Zielort / PLZ
+      <form
+        id="orderForm"
+        class="order-card"
+      >
 
-            <input
-              type="text"
-              id="destination"
-              placeholder="z.B. Vinewood / PLZ"
-              required
-            >
+        <label>
+          Dein Name
 
-          </label>
-
-          <label>
-
-            Hinweise
-
-            <textarea
-              id="note"
-              placeholder="Zusätzliche Informationen..."
-            ></textarea>
-
-          </label>
-
-          <button
-            type="submit"
-            class="btn primary full"
+          <input
+            type="text"
+            id="customerName"
+            placeholder="Name"
+            required
           >
-            Fahrt anfragen
-          </button>
+        </label>
 
-          <p
-            id="orderMessage"
-            class="form-message"
-          ></p>
+        <label>
+          Abholort / PLZ
 
-        </form>
+          <input
+            type="text"
+            id="pickup"
+            placeholder="z.B. Downtown / PLZ"
+            required
+          >
+        </label>
 
-      </div>
+        <label>
+          Zielort / PLZ
 
-    </section>
+          <input
+            type="text"
+            id="destination"
+            placeholder="z.B. Vinewood / PLZ"
+            required
+          >
+        </label>
 
-  </main>
+        <label>
+          Hinweise
+
+          <textarea
+            id="note"
+            placeholder="Zus&auml;tzliche Informationen..."
+          ></textarea>
+        </label>
+
+        <button
+          type="submit"
+          class="btn primary full"
+        >
+          Fahrt anfragen
+        </button>
+
+        <p
+          id="orderMessage"
+          class="form-message"
+        ></p>
+
+      </form>
+
+    </div>
+
+  </section>
+
+</main>
 
   <footer class="footer">
 
