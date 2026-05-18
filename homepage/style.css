@@ -964,13 +964,6 @@ option {
   overflow: hidden;
 }
 
-.driver-card::after {
-  content: "Profil ansehen";
-  margin-top: auto;
-  color: #ffcc00;
-  font-weight: 800;
-  font-size: 14px;
-}
 /* DRIVER MODAL */
 
 .driver-profile-btn {
