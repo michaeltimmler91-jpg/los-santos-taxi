@@ -18,3 +18,38 @@
     color: #f87171;
     font-weight: 800;
 }
+.profile-admin-card {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.profile-admin-left {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+
+.profile-admin-avatar,
+.profile-admin-avatar-placeholder {
+    width: 82px;
+    height: 82px;
+
+    border-radius: 20px;
+}
+
+.profile-admin-avatar {
+    object-fit: cover;
+}
+
+.profile-admin-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 34px;
+
+    background: rgba(250,204,21,0.10);
+}
