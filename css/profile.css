@@ -244,3 +244,30 @@ textarea {
     font-style: normal;
     opacity: 1;
 }
+.profile-preview-bio {
+    margin-top: 18px;
+
+    padding: 16px;
+
+    border-radius: 16px;
+
+    background:
+        rgba(15,23,42,0.72);
+
+    border:
+        1px solid rgba(255,255,255,0.06);
+
+    color: #e5e7eb;
+
+    line-height: 1.7;
+}
+
+.profile-preview-bio h1,
+.profile-preview-bio h2,
+.profile-preview-bio h3 {
+    color: #facc15;
+}
+
+.profile-preview-bio a {
+    color: #60a5fa;
+}
