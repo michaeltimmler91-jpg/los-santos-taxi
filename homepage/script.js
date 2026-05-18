@@ -1,3 +1,32 @@
+const reviewForm =
+document.getElementById(
+  "reviewForm"
+);
+
+const reviewDriver =
+document.getElementById(
+  "reviewDriver"
+);
+
+const reviewName =
+document.getElementById(
+  "reviewName"
+);
+
+const reviewRating =
+document.getElementById(
+  "reviewRating"
+);
+
+const reviewText =
+document.getElementById(
+  "reviewText"
+);
+
+const reviewMessage =
+document.getElementById(
+  "reviewMessage"
+);
 const liveIndicator =
 document.getElementById(
   "liveIndicator"
@@ -327,3 +356,114 @@ setInterval(
   loadTaxiStatus,
   60000
 );
+
+async function loadDriversForReview() {
+
+  try {
+
+    const { data, error } =
+    await supabaseClient
+      .from("taxi_driver_profiles")
+      .select(`
+        username,
+        display_name
+      `)
+      .order("display_name");
+
+    if(error){
+      throw error;
+    }
+
+    reviewDriver.innerHTML =
+    `
+      <option value="">
+        Fahrer ausw&auml;hlen
+      </option>
+    `;
+
+    data.forEach(driver => {
+
+      reviewDriver.innerHTML += `
+        <option value="${driver.username}">
+          ${escapeHtml(
+            driver.display_name
+          )}
+        </option>
+      `;
+    });
+
+  } catch(err){
+
+    console.error(err);
+  }
+}
+async function submitReview(event) {
+
+  event.preventDefault();
+
+  const selectedOption =
+  reviewDriver.options[
+    reviewDriver.selectedIndex
+  ];
+
+  const driverUsername =
+  reviewDriver.value;
+
+  const driverDisplayName =
+  selectedOption.text;
+
+  try {
+
+    const { error } =
+    await supabaseClient
+      .from("taxi_driver_reviews")
+      .insert({
+
+        driver_username:
+        driverUsername,
+
+        driver_display_name:
+        driverDisplayName,
+
+        reviewer_name:
+        reviewName.value.trim(),
+
+        review_text:
+        reviewText.value.trim(),
+
+        rating:
+        Number(reviewRating.value),
+
+        created_at:
+        new Date().toISOString()
+
+      });
+
+    if(error){
+      throw error;
+    }
+
+    reviewForm.reset();
+
+    reviewMessage.innerHTML =
+    "Bewertung erfolgreich gespeichert.";
+
+    loadReviews();
+
+  } catch(err){
+
+    console.error(err);
+
+    reviewMessage.innerHTML =
+    "Bewertung konnte nicht gespeichert werden.";
+  }
+}
+loadDriversForReview();
+
+if(reviewForm){
+
+  reviewForm.addEventListener(
+    "submit",
+    submitReview
+  );
+}
