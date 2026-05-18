@@ -1,183 +1,358 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
   <title>Los Santos Taxi</title>
 
-  <link rel="stylesheet" href="style.css?v=1" />
+  <link
+    rel="stylesheet"
+    href="style.css?v=2"
+  />
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
   <header class="hero">
+
     <nav class="navbar">
+
       <div class="brand">
-        <div class="brand-icon">LS</div>
-        <div>
-          <strong>Los Santos Taxi</strong>
-          <span>Premium Fahrservice</span>
+
+        <div class="brand-icon">
+          LS
         </div>
+
+        <div>
+          <strong>
+            Los Santos Taxi
+          </strong>
+
+          <span>
+            Premium Fahrservice
+          </span>
+        </div>
+
       </div>
 
       <div class="nav-links">
-        <a href="#service">Service</a>
-        <a href="#auftrag">Fahrt anfragen</a>
-        <a href="#bewertungen">Bewertungen</a>
-        <a href="team.html">Team</a>
+
+        <a href="#service">
+          Service
+        </a>
+
+        <a href="#auftrag">
+          Fahrt anfragen
+        </a>
+
+        <a href="#bewertungen">
+          Bewertungen
+        </a>
+
+        <a href="team.html">
+          Team
+        </a>
+
       </div>
+
     </nav>
 
     <section class="hero-content">
+
       <div class="hero-text">
-        <span class="eyebrow">Schnell. Sicher. Stilvoll.</span>
-        <h1>Dein Fahrservice f&uuml;r Los Santos.</h1>
+
+        <span class="eyebrow">
+          Schnell. Sicher. Stilvoll.
+        </span>
+
+        <h1>
+          Dein Fahrservice f&uuml;r Los Santos.
+        </h1>
+
         <p>
-          Egal ob kurze Fahrt durch die Stadt, Transfer nach Sandy Shores
-          oder weiter bis Paleto: Los Santos Taxi bringt dich entspannt ans Ziel.
+          Egal ob kurze Fahrt durch die Stadt,
+          Transfer nach Sandy Shores oder
+          weiter bis Paleto:
+          Los Santos Taxi bringt dich
+          entspannt ans Ziel.
         </p>
 
         <div class="hero-actions">
-          <a href="#auftrag" class="btn primary">Fahrt anfragen</a>
-          <a href="#service" class="btn ghost">Mehr erfahren</a>
+
+          <a
+            href="#auftrag"
+            class="btn primary"
+          >
+            Fahrt anfragen
+          </a>
+
+          <a
+            href="#service"
+            class="btn ghost"
+          >
+            Mehr erfahren
+          </a>
+
         </div>
+
       </div>
 
       <div class="status-card">
-        <p class="card-label">Aktueller Status</p>
-        <h2 id="taxiStatusText">Status wird geladen...</h2>
-        <p id="taxiStatusSubtext">Bitte einen Moment Geduld.</p>
+
+        <p class="card-label">
+          Aktueller Status
+        </p>
+
+        <h2 id="taxiStatusText">
+          Status wird geladen...
+        </h2>
+
+        <p id="taxiStatusSubtext">
+          Bitte einen Moment Geduld.
+        </p>
 
         <div class="status-dot-row">
-          <span id="taxiStatusDot" class="status-dot loading"></span>
-          <span id="taxiDriverCount">Fahrer werden gepr&uuml;ft...</span>
+
+          <span
+            id="taxiStatusDot"
+            class="status-dot loading"
+          ></span>
+
+          <span id="taxiDriverCount">
+            Fahrer werden gepr&uuml;ft...
+          </span>
+
         </div>
+
       </div>
+
     </section>
+
   </header>
 
   <main>
 
-    <section id="service" class="section">
+    <section
+      id="service"
+      class="section"
+    >
+
       <div class="section-head">
-        <span class="eyebrow">Unser Service</span>
-        <h2>Mobil durch ganz Los Santos</h2>
+
+        <span class="eyebrow">
+          Unser Service
+        </span>
+
+        <h2>
+          Mobil durch ganz Los Santos
+        </h2>
+
         <p>
-          Klarer Preis, freundliche Fahrer und ein Fahrservice, der dich
-          nicht ewig warten l&auml;sst.
+          Klarer Preis,
+          freundliche Fahrer
+          und ein Fahrservice,
+          der dich nicht ewig
+          warten l&auml;sst.
         </p>
+
       </div>
 
       <div class="grid cards-3">
-        <article class="info-card">
-          <div class="icon">🚕</div>
-          <h3>Faire Preise</h3>
-          <p>5$ pro angefangenem Kilometer. Einfach, transparent und ohne versteckte Kosten.</p>
-        </article>
 
         <article class="info-card">
-          <div class="icon">🌆</div>
-          <h3>Gro&szlig;es Gebiet</h3>
-          <p>Fahrten in Los Santos, Sandy Shores, Paleto und Umgebung.</p>
-        </article>
 
-        <article class="info-card">
-          <div class="icon">🧾</div>
-          <h3>Saubere Rechnung</h3>
-          <p>Trinkgelder bitte &uuml;ber die Rechnung geben. Fahrer nehmen kein Bargeld.</p>
-        </article>
-      </div>
-    </section>
+          <div class="icon">
+            🚕
+          </div>
 
-    <section id="auftrag" class="section split-section">
-      <div class="section-text">
-        <span class="eyebrow">Fahrt anfragen</span>
-        <h2>Du brauchst ein Taxi?</h2>
-        <p>
-          Sende deine Anfrage direkt an unsere Leitstelle. Sobald ein Fahrer
-          verf&uuml;gbar ist, wird dein Auftrag bearbeitet.
-        </p>
+          <h3>
+            Faire Preise
+          </h3>
 
-        <div class="mini-list">
-          <span>✓ Abholort eintragen</span>
-          <span>✓ Ziel eintragen</span>
-          <span>✓ Zusatzinfo optional</span>
-        </div>
-      </div>
-
-      <form id="orderForm" class="order-card">
-        <label>
-          Dein Name
-          <input type="text" id="customerName" placeholder="z.B. Max" required />
-        </label>
-
-        <label>
-          Abholort
-          <input type="text" id="pickup" placeholder="z.B. Legion Square" required />
-        </label>
-
-        <label>
-          Ziel
-          <input type="text" id="destination" placeholder="z.B. Paleto Bay" required />
-        </label>
-
-        <label>
-          Hinweis
-          <textarea id="note" placeholder="Optional: besondere Hinweise"></textarea>
-        </label>
-
-        <button type="submit" class="btn primary full">Fahrt absenden</button>
-
-        <p id="orderMessage" class="form-message"></p>
-      </form>
-    </section>
-
-    <section id="bewertungen" class="section">
-      <div class="section-head">
-        <span class="eyebrow">Bewertungen</span>
-        <h2>Das sagen unsere Fahrg&auml;ste</h2>
-        <p>Ausgew&auml;hlte Bewertungen unserer Fahrer und des Services.</p>
-      </div>
-
-      <div id="reviewsGrid" class="grid cards-3">
-        <article class="info-card muted">
-          <h3>Bewertungen werden geladen...</h3>
-          <p>Bitte einen Moment Geduld.</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="team" class="section team-preview">
-      <div class="section-head">
-        <span class="eyebrow">Team</span>
-        <h2>Unsere Fahrer</h2>
-        <p>
-          Bald findest du hier &ouml;ffentliche Fahrerprofile mit Bewertung,
-          Beschreibung und aktuellem Status.
-        </p>
-      </div>
-
-      <div class="team-placeholder">
-        <div>
-          <h3>Teamseite in Vorbereitung</h3>
           <p>
-            Dieser Bereich ist bereits vorbereitet und kann sp&auml;ter direkt
-            mit den Fahrerprofilen aus Supabase verbunden werden.
+            5$ pro angefangenem Kilometer.
           </p>
-        </div>
-       <a href="team.html" class="btn ghost">Team ansehen</a>
+
+        </article>
+
+        <article class="info-card">
+
+          <div class="icon">
+            🌆
+          </div>
+
+          <h3>
+            Gro&szlig;es Gebiet
+          </h3>
+
+          <p>
+            Fahrten in Los Santos,
+            Sandy Shores,
+            Paleto und Umgebung.
+          </p>
+
+        </article>
+
+        <article class="info-card">
+
+          <div class="icon">
+            🧾
+          </div>
+
+          <h3>
+            Rechnungssystem
+          </h3>
+
+          <p>
+            Trinkgelder bitte
+            &uuml;ber die Rechnung geben.
+          </p>
+
+        </article>
+
       </div>
+
+    </section>
+
+    <section
+      id="auftrag"
+      class="section split-section"
+    >
+
+      <div class="section-text">
+
+        <span class="eyebrow">
+          Fahrt anfragen
+        </span>
+
+        <h2>
+          Du brauchst ein Taxi?
+        </h2>
+
+        <p>
+          Sende deine Anfrage direkt
+          an unsere Leitstelle.
+        </p>
+
+      </div>
+
+      <form
+        id="orderForm"
+        class="order-card"
+      >
+
+        <label>
+
+          Dein Name
+
+          <input
+            type="text"
+            id="customerName"
+            required
+          />
+
+        </label>
+
+        <label>
+
+          Abholort
+
+          <input
+            type="text"
+            id="pickup"
+            required
+          />
+
+        </label>
+
+        <label>
+
+          Ziel
+
+          <input
+            type="text"
+            id="destination"
+            required
+          />
+
+        </label>
+
+        <label>
+
+          Hinweis
+
+          <textarea
+            id="note"
+          ></textarea>
+
+        </label>
+
+        <button
+          type="submit"
+          class="btn primary full"
+        >
+          Fahrt absenden
+        </button>
+
+        <p
+          id="orderMessage"
+          class="form-message"
+        ></p>
+
+      </form>
+
+    </section>
+
+    <section
+      id="bewertungen"
+      class="section"
+    >
+
+      <div class="section-head">
+
+        <span class="eyebrow">
+          Bewertungen
+        </span>
+
+        <h2>
+          Das sagen unsere Fahrg&auml;ste
+        </h2>
+
+      </div>
+
+      <div
+        id="reviewsGrid"
+        class="grid cards-3"
+      ></div>
+
     </section>
 
   </main>
 
   <footer class="footer">
-    <strong>Los Santos Taxi</strong>
-    <span>Dein Fahrservice f&uuml;r Los Santos, Sandy Shores und Paleto.</span>
+
+    <strong>
+      Los Santos Taxi
+    </strong>
+
+    <span>
+      Dein Fahrservice
+      f&uuml;r Los Santos.
+    </span>
+
   </footer>
 
-  <script src="script.js?v=1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="config.js"></script>
+
+  <script src="script.js?v=2"></script>
+
 </body>
 </html>
