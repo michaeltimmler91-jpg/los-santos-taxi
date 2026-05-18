@@ -13,26 +13,6 @@ document.getElementById(
   "liveBannerDrivers"
 );
 
-const taxiStatusText =
-document.getElementById(
-  "taxiStatusText"
-);
-
-const taxiStatusSubtext =
-document.getElementById(
-  "taxiStatusSubtext"
-);
-
-const taxiStatusDot =
-document.getElementById(
-  "taxiStatusDot"
-);
-
-const taxiDriverCount =
-document.getElementById(
-  "taxiDriverCount"
-);
-
 const orderForm =
 document.getElementById(
   "orderForm"
