@@ -50,7 +50,7 @@ async function loadMyProfile() {
     if (!profileBioEditor) {
         profileBioEditor = new Quill("#profile_bio_editor", {
             theme: "snow",
-            placeholder: "Was sollten Fahrgäste über dich wissen?"
+            placeholder: "Was sollten Fahrgäste über dich wissen?",
             modules: {
                 toolbar: [
                     ["bold", "italic", "underline"],
