@@ -552,3 +552,62 @@ textarea:focus {
   color: #c9c9c9;
   line-height: 1.65;
 }
+.live-banner {
+  max-width: 1180px;
+  margin: -110px auto 26px;
+  padding: 24px 28px;
+  border-radius: 30px;
+  background: rgba(12,12,12,0.92);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.38);
+  backdrop-filter: blur(16px);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+
+  position: relative;
+  z-index: 10;
+}
+
+.live-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.live-label {
+  display: block;
+  color: #bdbdbd;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.live-banner h3 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.live-banner-right {
+  color: #ffcc00;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.live-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 0 0 24px currentColor;
+}
+
+.live-indicator.online {
+  background: #3cff7b;
+  color: #3cff7b;
+}
+
+.live-indicator.offline {
+  background: #ff4d4d;
+  color: #ff4d4d;
+}
