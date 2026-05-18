@@ -62,25 +62,9 @@
             <button onclick="showAdminTab('tab_announcements')" class="admin-nav-btn">
                 📢 Infos
             </button>
-            <div class="admin-card">
-
-    <h3>🎉 Easter Eggs</h3>
-
-    <div class="admin-actions">
-
-        <button onclick="runTaxiEgg()">
-            🚕 Taxi fahren lassen
-        </button>
-
-        <button onclick="runCrashEgg()">
-            💥 Leitstelle abstürzen
-        </button>
-
-        <button onclick="runDiscoEgg()">
-            🌈 Disco-Modus
-        </button>
-
-    </div>
+            <button onclick="showAdminTab('tab_eastereggs')" class="admin-nav-btn">
+                🎉 Easter Eggs
+            </button>
 
 </div>
         </nav>
@@ -458,6 +442,32 @@
     </div>
 
 </div>      
+
+<div class="admin-tab-content" id="tab_eastereggs" style="display:none;">
+
+    <div class="admin-section">
+
+        <h2>🎉 Easter Eggs</h2>
+
+        <div class="admin-actions">
+
+            <button onclick="runTaxiEgg()">
+                🚕 Taxi fahren lassen
+            </button>
+
+            <button onclick="runCrashEgg()">
+                💥 Leitstelle abstürzen
+            </button>
+
+            <button onclick="runDiscoEgg()">
+                🌈 Disco-Modus
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
             <!-- TRINKGELD -->
 
             <div class="admin-tab-content" id="tab_tips" style="display:none;">
