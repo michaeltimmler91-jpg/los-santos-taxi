@@ -80,45 +80,6 @@ async function loadTaxiStatus() {
   "Bitte sp&auml;ter erneut versuchen";
 }
 
-    taxiStatusDot.classList.remove(
-      "loading",
-      "online",
-      "offline"
-    );
-
-    if (count > 0) {
-
-      taxiStatusText.innerHTML =
-      "Taxi verf&uuml;gbar";
-
-      taxiStatusSubtext.innerHTML =
-      "Aktuell sind Fahrer im Dienst.";
-
-      taxiStatusDot.classList.add(
-        "online"
-      );
-
-      taxiDriverCount.innerHTML =
-      count === 1
-      ? "1 Fahrer verf&uuml;gbar"
-      : count +
-        " Fahrer verf&uuml;gbar";
-
-    } else {
-
-      taxiStatusText.innerHTML =
-      "Aktuell kein Taxi verf&uuml;gbar";
-
-      taxiStatusSubtext.innerHTML =
-      "Bitte versuche es sp&auml;ter erneut.";
-
-      taxiStatusDot.classList.add(
-        "offline"
-      );
-
-      taxiDriverCount.innerHTML =
-      "Kein Fahrer verf&uuml;gbar";
-    }
 
   } catch (err) {
 
