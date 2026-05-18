@@ -1277,3 +1277,55 @@ option {
   margin-top: auto;
   flex-shrink: 0;
 }
+/* TEAM CARD POLISH */
+
+.driver-card {
+  backdrop-filter: blur(10px);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10,10,10,0.92) 0%,
+      rgba(5,5,5,0.96) 100%
+    );
+
+  border: 1px solid rgba(255,255,255,0.06);
+
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.driver-card:hover {
+  transform: translateY(-6px);
+
+  border-color: rgba(255,190,0,0.25);
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.45),
+    0 0 30px rgba(255,190,0,0.08);
+}
+
+.driver-avatar img,
+.driver-avatar span {
+  border-radius: 24px;
+}
+
+.driver-role {
+  color: #ffcc00;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.driver-text {
+  color: rgba(255,255,255,0.82);
+}
+
+.driver-pill {
+  align-self: flex-start;
+}
+
+.driver-profile-btn {
+  border-radius: 18px;
+}
