@@ -216,3 +216,31 @@ textarea {
 .ql-editor strong {
     color: #e5e7eb !important;
 }
+.profile-review-reply-box {
+    margin-top: 16px;
+}
+
+.profile-review-reply-box textarea {
+    margin-bottom: 12px;
+}
+
+.profile-review-reply-box button {
+    width: auto;
+}
+.ql-editor {
+    color: #e5e7eb !important;
+}
+
+.ql-editor p,
+.ql-editor li,
+.ql-editor span,
+.ql-editor strong,
+.ql-editor em {
+    color: #e5e7eb !important;
+}
+
+.ql-editor.ql-blank::before {
+    color: #94a3b8 !important;
+    font-style: normal;
+    opacity: 1;
+}
