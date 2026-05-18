@@ -205,7 +205,27 @@ function renderReviews(reviews) {
             <div class="profile-review-text">
                 ${escapeHtml(review.review_text || "").replaceAll("\n", "<br>")}
             </div>
+${canDriverReply(review)
+    ? `
+        <div class="profile-review-reply-box">
 
+            <textarea
+                id="reply_${review.id}"
+                rows="3"
+                placeholder="Antwort auf diese Bewertung..."
+            ></textarea>
+
+            <button
+                class="small-btn"
+                onclick="saveDriverReply(${review.id})"
+            >
+                Antwort speichern
+            </button>
+
+        </div>
+    `
+    : ""
+}
             ${review.driver_reply
                 ? `
                     <div class="profile-driver-reply">
@@ -252,5 +272,56 @@ async function sendDriverReview(driverUsername, driverDisplayName) {
     }
 
     alert("Bewertung gespeichert. Danke!");
+    loadDriverProfile();
+}
+function canDriverReply(review) {
+    const saved =
+        localStorage.getItem("taxiMobileUser");
+
+    if (!saved) {
+        return false;
+    }
+
+    const user =
+        JSON.parse(saved);
+
+    return (
+        user.username === review.driver_username
+    );
+}
+
+async function saveDriverReply(reviewId) {
+
+    const textarea =
+        document.getElementById(`reply_${reviewId}`);
+
+    if (!textarea) {
+        return;
+    }
+
+    const text =
+        textarea.value.trim();
+
+    if (!text) {
+        alert("Bitte eine Antwort eingeben.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_driver_reviews")
+        .update({
+            driver_reply: text,
+            driver_reply_at:
+                new Date().toISOString()
+        })
+        .eq("id", reviewId);
+
+    if (error) {
+        console.error(error);
+        alert("Antwort konnte nicht gespeichert werden.");
+        return;
+    }
+
+    alert("Antwort gespeichert.");
     loadDriverProfile();
 }
