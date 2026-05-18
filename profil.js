@@ -95,9 +95,11 @@ async function loadDriverProfile() {
                     <h2>Über mich</h2>
 
                     <p>
-                        ${profile.bio
-                            ? escapeHtml(profile.bio).replaceAll("\n", "<br>")
-                            : "Dieser Fahrer hat noch keine Bio eingetragen."
+                        ${profile.bio_html
+                            ? DOMPurify.sanitize(profile.bio_html)
+                                : profile.bio
+                                ? escapeHtml(profile.bio).replaceAll("\n", "<br>")
+                                : "Dieser Fahrer hat noch keine Bio eingetragen."
                         }
                     </p>
                 </div>
