@@ -1521,6 +1521,11 @@ async function loadDriverProfiles() {
                         </button>
 
                     </div>
+                    <div
+    id="reviews_${escapeAttr(profile.username)}"
+    class="profile-admin-reviews"
+    style="display:none;margin-top:16px;"
+></div>
 
                 </div>
             `;
