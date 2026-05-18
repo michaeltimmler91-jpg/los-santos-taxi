@@ -1,46 +1,6 @@
 @import url("css/legacy.css");
 
-.taxi-egg {
-    position: fixed;
-    left: -100px;
-    bottom: 80px;
-    font-size: 48px;
-    z-index: 999999;
-    pointer-events: none;
-    display: none;
-}
 
-.taxi-egg.drive {
-    display: block;
-    animation: taxiDrive 5s linear forwards;
-}
-
-@keyframes taxiDrive {
-    from { left: -100px; }
-    to { left: 110vw; }
-}
-
-.crash-egg {
-    position: fixed;
-    inset: 0;
-    background: #020617;
-    color: #facc15;
-    z-index: 9999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.disco-mode {
-    animation: discoBg 0.25s infinite;
-}
-
-@keyframes discoBg {
-    0% { filter: hue-rotate(0deg); }
-    50% { filter: hue-rotate(180deg) saturate(2); }
-    100% { filter: hue-rotate(360deg); }
-}
 
 /* Ab hier ziehen wir nach und nach saubere Bereiche raus */
 @import url("css/jobs.css");
