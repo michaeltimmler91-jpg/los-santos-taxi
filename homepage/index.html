@@ -393,7 +393,139 @@
       </form>
 
     </section>
+ <section
+  id="bewertung-abgeben"
+  class="section"
+>
 
+  <div class="section-head">
+
+    <span class="eyebrow">
+      Fahrer bewerten
+    </span>
+
+    <h2>
+      Deine Erfahrung z&auml;hlt
+    </h2>
+
+    <p>
+      Teile deine Erfahrung mit einem Fahrer
+      von Los Santos Taxi.
+    </p>
+
+  </div>
+
+  <div class="split-section">
+
+    <div class="section-text">
+
+      <h2>
+        Bewertung abgeben
+      </h2>
+
+      <p>
+        Fahrg&auml;ste k&ouml;nnen Fahrer
+        direkt bewerten und Kommentare
+        hinterlassen.
+      </p>
+
+    </div>
+
+    <form
+      id="reviewForm"
+      class="order-card"
+    >
+
+      <label>
+
+        Fahrer
+
+        <select
+          id="reviewDriver"
+          required
+        >
+
+          <option value="">
+            Fahrer ausw&auml;hlen
+          </option>
+
+        </select>
+
+      </label>
+
+      <label>
+
+        Dein Name
+
+        <input
+          type="text"
+          id="reviewName"
+          required
+        >
+
+      </label>
+
+      <label>
+
+        Bewertung
+
+        <select
+          id="reviewRating"
+          required
+        >
+
+          <option value="5">
+            ★★★★★
+          </option>
+
+          <option value="4">
+            ★★★★☆
+          </option>
+
+          <option value="3">
+            ★★★☆☆
+          </option>
+
+          <option value="2">
+            ★★☆☆☆
+          </option>
+
+          <option value="1">
+            ★☆☆☆☆
+          </option>
+
+        </select>
+
+      </label>
+
+      <label>
+
+        Kommentar
+
+        <textarea
+          id="reviewText"
+          required
+        ></textarea>
+
+      </label>
+
+      <button
+        type="submit"
+        class="btn primary full"
+      >
+        Bewertung absenden
+      </button>
+
+      <p
+        id="reviewMessage"
+        class="form-message"
+      ></p>
+
+    </form>
+
+  </div>
+
+</section>
     <section
       id="bewertungen"
       class="section"
