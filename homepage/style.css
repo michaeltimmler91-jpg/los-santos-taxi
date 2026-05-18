@@ -8,11 +8,26 @@ html {
 
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background:
-    radial-gradient(circle at top left, rgba(255, 204, 0, 0.14), transparent 32%),
-    linear-gradient(135deg, #050505, #101010 45%, #050505);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
   color: #f5f5f5;
+
+  background:
+    linear-gradient(
+      rgba(0,0,0,0.72),
+      rgba(0,0,0,0.88)
+    ),
+    url("bg.jpg");
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+
+  min-height: 100vh;
 }
 
 a {
@@ -25,17 +40,6 @@ a {
 .hero {
   min-height: 100vh;
   padding: 24px;
-
-  background:
-    linear-gradient(
-      rgba(0,0,0,0.35),
-      rgba(0,0,0,0.72)
-    ),
-    url("bg.jpg");
-
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
 
   position: relative;
   overflow: hidden;
