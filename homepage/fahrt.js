@@ -97,3 +97,103 @@ if(orderForm){
     submitOrder
   );
 }
+const fahrtLiveStatus =
+document.getElementById(
+  "fahrtLiveStatus"
+);
+
+const fahrtLiveDot =
+document.getElementById(
+  "fahrtLiveDot"
+);
+
+const fahrtLiveTitle =
+document.getElementById(
+  "fahrtLiveTitle"
+);
+
+const fahrtLiveText =
+document.getElementById(
+  "fahrtLiveText"
+);
+
+async function loadDriverStatus() {
+
+  try {
+
+    const { data, error } =
+    await supabaseClient
+      .from("taxi_driver_status")
+      .select("*");
+
+    if (error) {
+      throw error;
+    }
+
+    const onlineDrivers =
+    (data || []).filter(
+      driver =>
+        driver.status === "Im Dienst"
+    );
+
+    if (onlineDrivers.length > 0) {
+
+      fahrtLiveStatus.classList.remove(
+        "offline"
+      );
+
+      fahrtLiveStatus.classList.add(
+        "online"
+      );
+
+      fahrtLiveDot.classList.remove(
+        "offline"
+      );
+
+      fahrtLiveDot.classList.add(
+        "online"
+      );
+
+      fahrtLiveTitle.innerHTML =
+      "Fahrer aktuell verf&uuml;gbar";
+
+      fahrtLiveText.innerHTML =
+      `${onlineDrivers.length} Fahrer befinden sich aktuell im Dienst.`;
+
+    } else {
+
+      fahrtLiveStatus.classList.remove(
+        "online"
+      );
+
+      fahrtLiveStatus.classList.add(
+        "offline"
+      );
+
+      fahrtLiveDot.classList.remove(
+        "online"
+      );
+
+      fahrtLiveDot.classList.add(
+        "offline"
+      );
+
+      fahrtLiveTitle.innerHTML =
+      "Aktuell keine Fahrer im Dienst";
+
+      fahrtLiveText.innerHTML =
+      "Fahrtanfragen k&ouml;nnen verz&ouml;gert bearbeitet werden.";
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+}
+
+loadDriverStatus();
+setInterval(
+  loadDriverStatus,
+  60000
+);
