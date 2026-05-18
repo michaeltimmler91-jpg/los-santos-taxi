@@ -1507,7 +1507,9 @@ async function loadDriverProfiles() {
                                     : "👁️ Sichtbar"
                             }
                         </button>
-
+                        <button class="small-btn secondary-btn" onclick="toggleDriverReviews('${escapeAttr(profile.username)}')" >
+                            ⭐ Bewertungen
+                        </button>
                         <button
                             class="small-btn"
                             onclick="changeTaxiSince(
@@ -1576,6 +1578,93 @@ async function changeTaxiSince(
     }
 
     loadDriverProfiles();
+}
+async function toggleDriverReviews(username) {
+    const box = document.getElementById(`reviews_${username}`);
+
+    if (!box) return;
+
+    if (box.style.display === "block") {
+        box.style.display = "none";
+        return;
+    }
+
+    box.style.display = "block";
+    box.innerHTML = "Lädt...";
+
+    await loadDriverReviewsAdmin(username);
+}
+
+async function loadDriverReviewsAdmin(username) {
+    const box = document.getElementById(`reviews_${username}`);
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_driver_reviews")
+        .select("*")
+        .eq("driver_username", username)
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Fehler beim Laden.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card">
+                Keine Bewertungen vorhanden.
+            </div>
+        `;
+        return;
+    }
+
+    box.innerHTML = data.map(review => `
+        <div class="admin-card">
+            <strong>${escapeHtml(review.reviewer_name || "Anonym")}</strong><br>
+            ⭐ ${review.rating || 0}/5<br><br>
+
+            ${escapeHtml(review.review_text || "-")}
+
+            ${review.driver_reply ? `
+                <br><br>
+                <div class="admin-card">
+                    <strong>Antwort vom Fahrer:</strong><br>
+                    ${escapeHtml(review.driver_reply)}
+                </div>
+            ` : ""}
+
+            <div class="admin-actions">
+                <button
+                    class="small-btn danger-btn"
+                    onclick="deleteDriverReview(${review.id}, '${escapeAttr(username)}')"
+                >
+                    🗑️ Bewertung löschen
+                </button>
+            </div>
+        </div>
+    `).join("");
+}
+
+async function deleteDriverReview(id, username) {
+    const ok = confirm("Bewertung wirklich löschen?");
+
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_driver_reviews")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Bewertung konnte nicht gelöscht werden.");
+        return;
+    }
+
+    await loadDriverReviewsAdmin(username);
 }
 
 startAdmin();
