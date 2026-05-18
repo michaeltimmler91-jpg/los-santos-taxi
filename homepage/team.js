@@ -39,7 +39,7 @@ async function loadTeam() {
       "Im Dienst";
 
       return `
-        <article class="driver-card">
+        <a class="driver-card driver-card-link" href="profil?fahrer=${encodeURIComponent(driver.username)}">
 
           <div class="driver-avatar">
 
@@ -95,7 +95,7 @@ async function loadTeam() {
 
           </div>
 
-        </article>
+        </a>
       `;
 
     }).join("");
