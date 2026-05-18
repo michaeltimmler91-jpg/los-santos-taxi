@@ -1,3 +1,5 @@
+let currentUser = null;
+let currentProfile = null;
 let profileUser = null;
 let profileBioEditor = null;
 
@@ -62,6 +64,12 @@ async function loadMyProfile() {
                 ]
             }
         });
+        profileBioEditor.on(
+    "text-change",
+    () => {
+        updateProfileBioPreview();
+    }
+);
     }
 
     document.getElementById("profile_preview_name").innerText =
@@ -99,6 +107,7 @@ async function loadMyProfile() {
         }
 
         profile = inserted;
+        currentProfile = profile;
     }
 
     document.getElementById("profile_image_url").value =
@@ -109,6 +118,7 @@ async function loadMyProfile() {
 
     updateProfilePreview();
     updateProfileBioPreview();
+    currentProfile = profile;
 }
 
 function updateProfilePreview() {
@@ -156,7 +166,7 @@ if (uploadedImage) {
         .upsert({
             username: profileUser.username,
             display_name: profileUser.display_name,
-            profile_image_url: imageUrl || null,
+            profile_image_url: profileImageUrl || null,
             bio: bioText || null,
             bio_html: bioHtml || null,
             public_visible: true,
@@ -215,15 +225,6 @@ function updateProfileBioPreview() {
 
     preview.innerHTML = DOMPurify.sanitize(bioHtml);
 }
-if (profileBioEditor) {
-
-    profileBioEditor.on(
-        "text-change",
-        () => {
-            updateProfileBioPreview();
-        }
-    );
-}
 async function uploadProfileImage() {
 
     const input =
@@ -241,7 +242,7 @@ async function uploadProfileImage() {
         file.name.split(".").pop();
 
     const fileName =
-        `${currentUser.username}_${Date.now()}.${extension}`;
+        `${profileUser.username}_${Date.now()}.${extension}`;
 
     const { error } = await client.storage
         .from("driver-profile-images")
