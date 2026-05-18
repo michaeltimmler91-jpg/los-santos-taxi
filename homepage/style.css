@@ -1348,3 +1348,55 @@ option {
 
   line-height: 1.5;
 }
+.fahrt-page {
+  padding-top: 70px;
+}
+
+.fahrt-header {
+  max-width: 760px;
+  margin-bottom: 36px;
+}
+
+.fahrt-header h1 {
+  font-size: clamp(42px, 6vw, 74px);
+  line-height: 0.95;
+  margin: 14px 0;
+}
+
+.fahrt-header p {
+  color: #c9c9c9;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.fahrt-layout {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.fahrt-info-card {
+  padding: 30px;
+  border-radius: 32px;
+  background: rgba(18,18,18,0.84);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.38);
+  backdrop-filter: blur(16px);
+}
+
+.fahrt-info-card h3 {
+  margin-top: 24px;
+  font-size: 24px;
+}
+
+.fahrt-info-card p {
+  color: #c9c9c9;
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .fahrt-layout {
+    grid-template-columns: 1fr;
+  }
+}
