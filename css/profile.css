@@ -206,3 +206,13 @@ textarea {
 .ql-editor.ql-blank::before {
     color: #64748b;
 }
+.ql-editor {
+    color: #e5e7eb !important;
+}
+
+.ql-editor p,
+.ql-editor li,
+.ql-editor span,
+.ql-editor strong {
+    color: #e5e7eb !important;
+}
