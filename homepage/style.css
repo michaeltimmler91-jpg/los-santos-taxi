@@ -617,3 +617,87 @@ textarea:focus {
   background: #ff4d4d;
   color: #ff4d4d;
 }
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-visual-card {
+  width: 100%;
+  max-width: 460px;
+  min-height: 420px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,204,0,0.08),
+      rgba(255,255,255,0.03)
+    );
+
+  border: 1px solid rgba(255,255,255,0.1);
+
+  border-radius: 36px;
+
+  padding: 38px;
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.45),
+    0 0 60px rgba(255,204,0,0.08);
+
+  backdrop-filter: blur(16px);
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.visual-badge {
+  display: inline-block;
+
+  padding: 8px 14px;
+
+  border-radius: 999px;
+
+  background: rgba(255,204,0,0.12);
+
+  border: 1px solid rgba(255,204,0,0.18);
+
+  color: #ffcc00;
+
+  font-size: 13px;
+
+  font-weight: 800;
+
+  margin-bottom: 24px;
+}
+
+.hero-visual-card h3 {
+  font-size: 42px;
+  line-height: 1.05;
+  margin: 0 0 18px;
+}
+
+.hero-visual-card p {
+  color: #c9c9c9;
+  line-height: 1.7;
+  max-width: 320px;
+}
+
+.visual-lines {
+  margin-top: 40px;
+  display: grid;
+  gap: 14px;
+}
+
+.visual-line {
+  height: 16px;
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,204,0,0.9),
+      rgba(255,204,0,0.05)
+    );
+}
