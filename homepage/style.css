@@ -470,6 +470,11 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
+  .public-features {
+  grid-template-columns: 1fr;
+  margin-top: -40px;
+  }
+
   .hero {
     padding: 16px;
   }
@@ -511,4 +516,39 @@ textarea:focus {
   .driver-card {
     border-radius: 24px;
   }
+}
+
+.public-features {
+  max-width: 1180px;
+  margin: -70px auto 0;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  position: relative;
+  z-index: 5;
+}
+
+.public-feature-card {
+  background: rgba(18,18,18,0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.38);
+  backdrop-filter: blur(16px);
+}
+
+.feature-icon {
+  font-size: 38px;
+  margin-bottom: 18px;
+}
+
+.public-feature-card h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+}
+
+.public-feature-card p {
+  color: #c9c9c9;
+  line-height: 1.65;
 }
