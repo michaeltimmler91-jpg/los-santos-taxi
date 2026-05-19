@@ -15,24 +15,16 @@ function runDiscoEgg() {
 }
 
 function runEasterEggByType(type) {
-    if (type === "taxi") {
-        runTaxiEgg();
-    }
-
-    if (type === "crash") {
-        runCrashEgg();
-    }
-
-    if (type === "disco") {
-        runDiscoEgg();
-    }
+    if (type === "taxi") runTaxiEgg();
+    if (type === "crash") runCrashEgg();
+    if (type === "disco") runDiscoEgg();
 }
 
 async function triggerGlobalEasterEgg(type) {
     const userRaw = localStorage.getItem("taxiUser");
     const user = userRaw ? JSON.parse(userRaw) : null;
 
-    const { error } = await client
+    const { error } = await window.client
         .from("taxi_easter_events")
         .insert([{
             event_type: type,
@@ -46,7 +38,9 @@ async function triggerGlobalEasterEgg(type) {
 }
 
 function setupGlobalEasterEggs() {
-    client
+    if (!window.client) return;
+
+    window.client
         .channel("taxi-easter-eggs")
         .on(
             "postgres_changes",
