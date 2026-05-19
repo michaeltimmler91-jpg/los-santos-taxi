@@ -1,28 +1,34 @@
 function runTaxiEgg() {
-
     alert("🚕 Taxi Easter Egg!");
-
 }
 
 function runCrashEgg() {
-
     alert("💥 Leitstelle abgestürzt!");
-
 }
 
 function runDiscoEgg() {
-
-    document.body.style.animation =
-        "discoFlash 0.3s infinite";
+    document.body.classList.add("disco-mode");
 
     setTimeout(() => {
-
-        document.body.style.animation = "";
-
+        document.body.classList.remove("disco-mode");
     }, 5000);
 }
-async function triggerGlobalEasterEgg(type) {
 
+function runEasterEggByType(type) {
+    if (type === "taxi") {
+        runTaxiEgg();
+    }
+
+    if (type === "crash") {
+        runCrashEgg();
+    }
+
+    if (type === "disco") {
+        runDiscoEgg();
+    }
+}
+
+async function triggerGlobalEasterEgg(type) {
     const userRaw = localStorage.getItem("taxiUser");
     const user = userRaw ? JSON.parse(userRaw) : null;
 
@@ -35,11 +41,11 @@ async function triggerGlobalEasterEgg(type) {
 
     if (error) {
         console.error(error);
+        alert("Easter Egg konnte nicht ausgelöst werden.");
     }
 }
 
 function setupGlobalEasterEggs() {
-
     client
         .channel("taxi-easter-eggs")
         .on(
@@ -50,10 +56,7 @@ function setupGlobalEasterEggs() {
                 table: "taxi_easter_events"
             },
             payload => {
-
-                runEasterEggByType(
-                    payload.new.event_type
-                );
+                runEasterEggByType(payload.new.event_type);
             }
         )
         .subscribe();
