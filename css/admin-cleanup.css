@@ -193,3 +193,61 @@
         position: static;
     }
 }
+.admin-shell {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.admin-sidebar-nav {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.admin-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 15px;
+}
+
+.admin-sidebar-footer {
+    position: sticky;
+    bottom: 0;
+    background: rgba(2, 6, 23, 0.98);
+    padding: 12px 24px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.admin-sidebar-footer .small-btn,
+.admin-sidebar-footer button {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.admin-sidebar-footer .danger-btn {
+    margin-bottom: 0;
+}
+
+.admin-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-nav::-webkit-scrollbar-thumb {
+    background: rgba(250, 204, 21, 0.35);
+    border-radius: 99px;
+}
+
+.admin-nav-section-title {
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+.admin-nav-btn {
+    min-height: 42px;
+    padding: 11px 18px;
+}
