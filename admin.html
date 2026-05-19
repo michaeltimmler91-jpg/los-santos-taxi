@@ -24,44 +24,74 @@
 
         <nav class="admin-nav">
 
-            <button onclick="showAdminTab('tab_dashboard')" class="admin-nav-btn active">
-                📊 Übersicht
-            </button>
+            <div class="admin-nav-group">
+                <div class="admin-nav-section-title">Zentrale</div>
 
-            <button onclick="showAdminTab('tab_users')" class="admin-nav-btn">
-                👥 Benutzer
-            </button>
-            
-            <button class="admin-nav-btn" onclick="showAdminTab('tab_profiles')">
-                👤 Fahrerprofile
-            </button>
+                <button onclick="showAdminTab('tab_dashboard', this)" class="admin-nav-btn active">
+                    📊 Übersicht
+                </button>
 
-            <button onclick="showAdminTab('tab_times')" class="admin-nav-btn">
-                ⏱️ Dienstzeiten
-            </button>
-            
-            <button onclick="showAdminTab('tab_tips')" class="admin-nav-btn">
-                🎁 Trinkgeld
-            </button>
+                <button onclick="showAdminTab('tab_announcements', this)" class="admin-nav-btn">
+                    📢 Infos
+                </button>
+            </div>
 
-            <button onclick="showAdminTab('tab_rides')" class="admin-nav-btn">
-                🚕 Fahrten
-            </button>
-            
-            <button onclick="showAdminTab('tab_companies')" class="admin-nav-btn">
-                🏢 Firmen
-            </button>
-            
-            <button onclick="showAdminTab('tab_workshops')" class="admin-nav-btn">
-    🔧         Werkstätten
-            </button>
-            
-            <button onclick="showAdminTab('tab_dealer')" class="admin-nav-btn">
-                🚗 Händler
-            </button>
-            <button onclick="showAdminTab('tab_announcements')" class="admin-nav-btn">
-                📢 Infos
-            </button>
+            <div class="admin-nav-group">
+                <div class="admin-nav-section-title">Team</div>
+
+                <button onclick="showAdminTab('tab_users', this)" class="admin-nav-btn">
+                    👥 Benutzer
+                </button>
+
+                <button onclick="showAdminTab('tab_profiles', this)" class="admin-nav-btn">
+                    👤 Fahrerprofile
+                </button>
+
+                <button onclick="showAdminTab('tab_times', this)" class="admin-nav-btn">
+                    ⏱️ Dienstzeiten
+                </button>
+            </div>
+
+            <div class="admin-nav-group">
+                <div class="admin-nav-section-title">Abrechnung</div>
+
+                <button onclick="showAdminTab('tab_rides', this)" class="admin-nav-btn">
+                    🚕 Fahrten
+                </button>
+
+                <button onclick="showAdminTab('tab_tips', this)" class="admin-nav-btn">
+                    🎁 Trinkgeld
+                </button>
+
+                <button onclick="showAdminTab('tab_dealer', this)" class="admin-nav-btn">
+                    🚗 Händler
+                </button>
+            </div>
+
+            <div class="admin-nav-group">
+                <div class="admin-nav-section-title">Verwaltung</div>
+
+                <button onclick="showAdminTab('tab_companies', this)" class="admin-nav-btn">
+                    🏢 Firmen
+                </button>
+
+                <button onclick="showAdminTab('tab_workshops', this)" class="admin-nav-btn">
+                    🔧 Werkstätten
+                </button>
+
+                <button onclick="showAdminTab('tab_plz_admin', this)" class="admin-nav-btn">
+                    🗺️ PLZ-Meldungen
+                </button>
+            </div>
+
+            <div class="admin-nav-group">
+                <div class="admin-nav-section-title">Extras</div>
+
+                <button onclick="showAdminTab('tab_eastereggs', this)" class="admin-nav-btn">
+                    🎉 EasterEggs
+                </button>
+            </div>
+
         </nav>
 
         <div class="admin-sidebar-footer">
@@ -483,6 +513,85 @@
                 </div>
 
             </div>
+            <div class="admin-tab-content" id="tab_plz_admin" style="display:none;">
+
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2>🗺️ PLZ-Meldungen</h2>
+
+                        <button class="small-btn" onclick="loadPlzReports()">
+                            🔄 Aktualisieren
+                        </button>
+                    </div>
+
+                    <div class="form-grid" style="margin-bottom:20px;">
+                        <div class="field">
+                            <label>Nach PLZ suchen</label>
+                            <input
+                                type="text"
+                                id="plz_admin_search"
+                                placeholder="z.B. 1037"
+                                oninput="renderPlzReports()"
+                            >
+                        </div>
+
+                        <div class="field">
+                            <label>Status filtern</label>
+                            <select id="plz_admin_status_filter" onchange="renderPlzReports()">
+                                <option value="alle">Alle</option>
+                                <option value="offen">Offen</option>
+                                <option value="bearbeitung">In Bearbeitung</option>
+                                <option value="erledigt">Erledigt</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="plz_reports_list">
+                        Lädt...
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="admin-tab-content" id="tab_eastereggs" style="display:none;">
+
+                <div class="admin-section">
+                    <h2>🎉 Leitstellen-Chaos</h2>
+                    <p>Globale Effekte für alle geöffneten Leitstellen auslösen.</p>
+
+                    <div class="easter-admin-grid">
+                        <button onclick="triggerGlobalEasterEgg('clean')">
+                            🧹 Leitstelle wird geputzt
+                        </button>
+
+                        <button onclick="triggerGlobalEasterEgg('fire')">
+                            🔥 Server brennt
+                        </button>
+
+                        <button onclick="triggerGlobalEasterEgg('superdisco')">
+                            🪩 SUPER Disco
+                        </button>
+
+                        <button onclick="triggerGlobalEasterEgg('ufo')">
+                            🛸 UFO entführt Leitstelle
+                        </button>
+
+                        <button onclick="triggerGlobalEasterEgg('taxi')">
+                            🚕 Taxi fahren lassen
+                        </button>
+
+                        <button onclick="triggerGlobalEasterEgg('crash')">
+                            💥 Leitstelle abstürzen
+                        </button>
+
+                        <button onclick="triggerGlobalEasterEgg('disco')">
+                            🌈 Disco
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
 
         </div>
 
@@ -495,8 +604,9 @@
 <script src="config.js?v=2"></script>
 <script src="utils.js?v=2"></script>
 <script src="api.js?v=1"></script>
+<script src="plz_admin.js?v=2"></script>
 
-<script src="admin.js?v=18"></script>
+<script src="admin.js?v=19"></script>
 <script src="eastereggs.js?v=5"></script>
 
     <script>

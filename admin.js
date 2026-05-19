@@ -28,6 +28,10 @@ async function startAdmin() {
     await loadAdminTimeStats();
     await loadDriverProfiles();
 
+    if (typeof loadPlzReports === "function") {
+        await loadPlzReports();
+    }
+
     loadDashboardOverview();
     loadAdminStatusUsers();
 }
@@ -37,7 +41,7 @@ function logoutAdmin() {
     location.href = "index.html";
 }
 
-function showAdminTab(tabId) {
+function showAdminTab(tabId, clickedButton = null) {
     document.querySelectorAll(".admin-tab-content").forEach(tab => {
         tab.style.display = "none";
     });
@@ -46,8 +50,23 @@ function showAdminTab(tabId) {
         btn.classList.remove("active");
     });
 
-    document.getElementById(tabId).style.display = "block";
-    event.target.classList.add("active");
+    const tab = document.getElementById(tabId);
+
+    if (tab) {
+        tab.style.display = "block";
+    }
+
+    const button =
+        clickedButton ||
+        document.querySelector(`.admin-nav-btn[onclick*="${tabId}"]`);
+
+    if (button) {
+        button.classList.add("active");
+    }
+
+    if (tabId === "tab_plz_admin" && typeof loadPlzReports === "function") {
+        loadPlzReports();
+    }
 }
 
 async function loadAdminStats() {
