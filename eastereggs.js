@@ -9,11 +9,27 @@ function getDbClient() {
 }
 
 function runTaxiEgg() {
-    alert("🚕 Taxi Easter Egg!");
+    const taxi = document.getElementById("taxiEgg");
+    if (!taxi) return;
+
+    taxi.classList.remove("drive");
+    void taxi.offsetWidth;
+    taxi.classList.add("drive");
+
+    setTimeout(() => {
+        taxi.classList.remove("drive");
+    }, 5500);
 }
 
 function runCrashEgg() {
-    alert("💥 Leitstelle abgestürzt!");
+    const crash = document.getElementById("crashEgg");
+    if (!crash) return;
+
+    crash.style.display = "flex";
+
+    setTimeout(() => {
+        crash.style.display = "none";
+    }, 3500);
 }
 
 function runDiscoEgg() {
