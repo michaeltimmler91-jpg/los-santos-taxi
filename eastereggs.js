@@ -1,3 +1,13 @@
+function getDbClient() {
+    if (typeof client !== "undefined") return client;
+    if (typeof supabaseClient !== "undefined") return supabaseClient;
+    if (window.client) return window.client;
+    if (window.supabaseClient) return window.supabaseClient;
+
+    console.error("Kein Supabase Client gefunden.");
+    return null;
+}
+
 function runTaxiEgg() {
     alert("🚕 Taxi Easter Egg!");
 }
@@ -21,10 +31,17 @@ function runEasterEggByType(type) {
 }
 
 async function triggerGlobalEasterEgg(type) {
+    const db = getDbClient();
+
+    if (!db) {
+        alert("Supabase Client nicht gefunden.");
+        return;
+    }
+
     const userRaw = localStorage.getItem("taxiUser");
     const user = userRaw ? JSON.parse(userRaw) : null;
 
-    const { error } = await window.client
+    const { error } = await db
         .from("taxi_easter_events")
         .insert([{
             event_type: type,
@@ -38,9 +55,14 @@ async function triggerGlobalEasterEgg(type) {
 }
 
 function setupGlobalEasterEggs() {
-    if (!window.client) return;
+    const db = getDbClient();
 
-    window.client
+    if (!db) {
+        console.error("Realtime konnte nicht gestartet werden.");
+        return;
+    }
+
+    db
         .channel("taxi-easter-eggs")
         .on(
             "postgres_changes",
