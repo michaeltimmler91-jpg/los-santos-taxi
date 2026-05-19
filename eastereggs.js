@@ -152,7 +152,30 @@ function runDiscoExtremEgg() {
     document.body.classList.add(
         "super-disco-mode"
     );
+    const discoSongs = [
 
+    "eastereggsound/crazy-chicken-klingelton.mp3",
+    "eastereggsound/die-tasse-kaffee.mp3",
+    "eastereggsound/hardcore-peniz-effect.mp3",
+    "eastereggsound/mobelstuck.mp3"
+
+];
+
+const randomSong =
+
+    discoSongs[
+        Math.floor(
+            Math.random() *
+            discoSongs.length
+        )
+    ];
+
+const discoAudio =
+new Audio(randomSong);
+
+discoAudio.volume = 0.35;
+
+discoAudio.play().catch(() => {});
     const sayings = [
 
         "🪩 DISCO EXTREM AKTIVIERT",
@@ -263,6 +286,8 @@ function runDiscoExtremEgg() {
         );
 
         overlay.remove();
+        discoAudio.pause();
 
+        discoAudio.currentTime = 0;
     }, 10000);
 }
