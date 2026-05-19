@@ -1,0 +1,25 @@
+@keyframes discoFlash {
+    0% {
+        filter: hue-rotate(0deg) saturate(1);
+    }
+
+    25% {
+        filter: hue-rotate(90deg) saturate(2);
+    }
+
+    50% {
+        filter: hue-rotate(180deg) saturate(3);
+    }
+
+    75% {
+        filter: hue-rotate(270deg) saturate(2);
+    }
+
+    100% {
+        filter: hue-rotate(360deg) saturate(1);
+    }
+}
+
+.disco-mode {
+    animation: discoFlash 0.4s linear infinite;
+}
