@@ -274,25 +274,4 @@ window.addEventListener(
     "DOMContentLoaded",
     startAdmin
 );
-```
-
-# Wichtige Einbindung
-
-Zusätzlich unten in deiner `admin.html`:
-
-```html
-<script src="plz_admin.js?v=2"></script>
-<script src="eastereggs.js?v=2"></script>
-<script src="admin.js?v=99"></script>
-```
-
-Und bei jedem Menübutton:
-
-```html
-<button
-    class="admin-nav-btn"
-    data-tab="tab_plz_admin"
->
-    🗺️ PLZ Admin
-</button>
 
