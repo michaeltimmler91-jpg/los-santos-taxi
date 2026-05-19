@@ -68,3 +68,133 @@
 .crash-egg p {
     font-size: 22px;
 }
+.easter-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.clean-egg {
+    position: fixed;
+    left: -120px;
+    bottom: 120px;
+    font-size: 70px;
+    z-index: 999999;
+    display: none;
+    pointer-events: none;
+}
+
+.clean-egg.active {
+    display: block;
+    animation: cleanDrive 5s linear forwards;
+}
+
+@keyframes cleanDrive {
+    from {
+        left: -120px;
+        transform: rotate(-10deg);
+    }
+
+    to {
+        left: 110vw;
+        transform: rotate(20deg);
+    }
+}
+
+.fire-egg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999998;
+    display: none;
+    box-shadow: inset 0 0 120px 50px rgba(255, 40, 0, 0.75);
+    animation: firePulse 0.25s infinite alternate;
+}
+
+.fire-egg.active {
+    display: block;
+}
+
+@keyframes firePulse {
+    from {
+        box-shadow: inset 0 0 80px 30px rgba(255, 80, 0, 0.55);
+    }
+
+    to {
+        box-shadow: inset 0 0 160px 70px rgba(255, 0, 0, 0.9);
+    }
+}
+
+.super-disco-mode {
+    animation: superDisco 0.18s infinite;
+}
+
+@keyframes superDisco {
+    0% {
+        filter: hue-rotate(0deg) saturate(2);
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        filter: hue-rotate(180deg) saturate(4);
+        transform: rotate(1deg) scale(1.01);
+    }
+
+    100% {
+        filter: hue-rotate(360deg) saturate(2);
+        transform: rotate(-1deg) scale(1);
+    }
+}
+
+.ufo-egg {
+    position: fixed;
+    top: -120px;
+    left: 50%;
+    font-size: 90px;
+    z-index: 9999999;
+    display: none;
+    pointer-events: none;
+}
+
+.ufo-egg.active {
+    display: block;
+    animation: ufoAbduct 6s ease-in-out forwards;
+}
+
+.ufo-abduct-body {
+    animation: abductPage 6s ease-in-out forwards;
+}
+
+@keyframes ufoAbduct {
+    0% {
+        top: -120px;
+        transform: translateX(-50%);
+    }
+
+    35% {
+        top: 80px;
+        transform: translateX(-50%) rotate(8deg);
+    }
+
+    100% {
+        top: -180px;
+        transform: translateX(-50%) rotate(-12deg);
+    }
+}
+
+@keyframes abductPage {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateY(-40px);
+        opacity: 0.85;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
