@@ -48,6 +48,7 @@ function runEasterEggByType(type) {
     if (type === "fire") runFireEgg();
     if (type === "superdisco") runSuperDiscoEgg();
     if (type === "ufo") runUfoEgg();
+    if (type === "discoextrem") runDiscoExtremEgg();
 }
 
 async function triggerGlobalEasterEgg(type) {
@@ -145,4 +146,123 @@ function runUfoEgg() {
         ufo.classList.remove("active");
         document.body.classList.remove("ufo-abduct-body");
     }, 6500);
+}
+function runDiscoExtremEgg() {
+
+    document.body.classList.add(
+        "super-disco-mode"
+    );
+
+    const sayings = [
+
+        "🪩 DISCO EXTREM AKTIVIERT",
+
+        "🚕 LENNOX DREHT KOMPLETT DURCH",
+
+        "💃 ALLE FAHRER TANZEN JETZT",
+
+        "🌈 CHAOSLEVEL KRITISCH",
+
+        "🎶 TAXI FM ESKALIERT",
+
+        "🕺 LEITSTELLE IM PARTYMODUS",
+
+        "🔥 DISPATCH SYSTEM ÜBERHITZT"
+
+    ];
+
+    const randomText =
+    sayings[
+        Math.floor(
+            Math.random() * sayings.length
+        )
+    ];
+
+    const overlay =
+    document.createElement("div");
+
+    overlay.className =
+    "disco-extrem-overlay";
+
+    overlay.innerHTML = `
+
+        <div class="disco-extrem-box">
+
+            <div class="disco-extrem-title">
+
+                ${randomText}
+
+            </div>
+
+            <div class="disco-extrem-emojis">
+
+                🚕 🪩 🌈 💃 🕺 🎶 🔥
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(
+        overlay
+    );
+
+    const emojiRain =
+    setInterval(() => {
+
+        const emoji =
+        document.createElement("div");
+
+        emoji.className =
+        "disco-extrem-rain";
+
+        const emojis = [
+            "🪩",
+            "🚕",
+            "🌈",
+            "💃",
+            "🕺",
+            "🔥",
+            "🎶"
+        ];
+
+        emoji.innerText =
+        emojis[
+            Math.floor(
+                Math.random() * emojis.length
+            )
+        ];
+
+        emoji.style.left =
+        Math.random() * 100 + "vw";
+
+        emoji.style.fontSize =
+        (20 + Math.random() * 40) + "px";
+
+        emoji.style.animationDuration =
+        (2 + Math.random() * 3) + "s";
+
+        document.body.appendChild(
+            emoji
+        );
+
+        setTimeout(() => {
+            emoji.remove();
+        }, 6000);
+
+    }, 120);
+
+    setTimeout(() => {
+
+        clearInterval(
+            emojiRain
+        );
+
+        document.body.classList.remove(
+            "super-disco-mode"
+        );
+
+        overlay.remove();
+
+    }, 10000);
 }
