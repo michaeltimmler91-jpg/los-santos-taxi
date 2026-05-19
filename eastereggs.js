@@ -44,6 +44,10 @@ function runEasterEggByType(type) {
     if (type === "taxi") runTaxiEgg();
     if (type === "crash") runCrashEgg();
     if (type === "disco") runDiscoEgg();
+    if (type === "clean") runCleanEgg();
+    if (type === "fire") runFireEgg();
+    if (type === "superdisco") runSuperDiscoEgg();
+    if (type === "ufo") runUfoEgg();
 }
 
 async function triggerGlobalEasterEgg(type) {
@@ -92,4 +96,53 @@ function setupGlobalEasterEggs() {
             }
         )
         .subscribe();
+}
+function runCleanEgg() {
+    const clean = document.getElementById("cleanEgg");
+    if (!clean) return;
+
+    clean.classList.remove("active");
+    void clean.offsetWidth;
+    clean.classList.add("active");
+
+    setTimeout(() => {
+        clean.classList.remove("active");
+    }, 5500);
+}
+
+function runFireEgg() {
+    const fire = document.getElementById("fireEgg");
+    if (!fire) return;
+
+    fire.classList.add("active");
+
+    setTimeout(() => {
+        fire.classList.remove("active");
+    }, 5000);
+}
+
+function runSuperDiscoEgg() {
+    document.body.classList.add("super-disco-mode");
+
+    setTimeout(() => {
+        document.body.classList.remove("super-disco-mode");
+    }, 6000);
+}
+
+function runUfoEgg() {
+    const ufo = document.getElementById("ufoEgg");
+    if (!ufo) return;
+
+    ufo.classList.remove("active");
+    document.body.classList.remove("ufo-abduct-body");
+
+    void ufo.offsetWidth;
+
+    ufo.classList.add("active");
+    document.body.classList.add("ufo-abduct-body");
+
+    setTimeout(() => {
+        ufo.classList.remove("active");
+        document.body.classList.remove("ufo-abduct-body");
+    }, 6500);
 }
