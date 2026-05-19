@@ -370,6 +370,75 @@ setupGlobalEasterEggs();
 <div id="cleanEgg" class="clean-egg">🧹</div>
 <div id="fireEgg" class="fire-egg"></div>
 <div id="ufoEgg" class="ufo-egg">🛸</div>
-    
+
+<!--- Uhreasteregg anfang --->
+    <script>
+
+const clock =
+document.getElementById("clock");
+
+clock.addEventListener("click", () => {
+
+    const now = new Date();
+
+    const hours =
+    String(now.getHours())
+    .padStart(2, "0");
+
+    const minutes =
+    String(now.getMinutes())
+    .padStart(2, "0");
+
+    const sayings = [
+
+        `Leitstelle meldet. Es ist ${hours} Uhr ${minutes}. Bitte keine Panik.`,
+
+        `Achtung Fahrpersonal. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Kaffee nicht vergessen.`,
+
+        `Lennox behauptet es wäre ${hours} Uhr ${minutes}. Ob das stimmt weiß keiner.`,
+
+        `Die Uhr sagt ${hours} Uhr ${minutes}. Die Taxameter sagen leider etwas anderes.`,
+
+        `Es ist ${hours} Uhr ${minutes}. Zeit für eine entspannte Stadtrundfahrt.`,
+
+        `Leitstelle Los Santos. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte anschnallen.`,
+
+        `Es ist ${hours} Uhr ${minutes}. Mindestens drei Fahrer sind wahrscheinlich wieder AFK.`,
+
+        `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte nicht wieder ins Meer fahren.`,
+
+        `Lennox News. Es ist ${hours} Uhr ${minutes} und irgendwo brennt bestimmt wieder etwas.`,
+
+        `Die aktuelle Uhrzeit beträgt ${hours} Uhr ${minutes}. Das Chaos läuft planmäßig.`
+
+    ];
+
+    const randomText =
+    sayings[
+        Math.floor(
+            Math.random() * sayings.length
+        )
+    ];
+
+    const speech =
+    new SpeechSynthesisUtterance(
+        randomText
+    );
+
+    speech.lang = "de-DE";
+
+    speech.rate = 0.96;
+    speech.pitch = 1;
+
+    speech.volume = 1;
+
+    speechSynthesis.cancel();
+    speechSynthesis.speak(speech);
+
+});
+
+</script>
+
+    <!--- Uhreasteregg ende --->
 </body>
 </html>
