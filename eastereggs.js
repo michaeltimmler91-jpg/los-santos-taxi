@@ -275,7 +275,9 @@ discoAudio.play().catch(() => {});
 
     }, 120);
 
-    setTimeout(() => {
+    discoAudio.addEventListener(
+    "ended",
+    () => {
 
         clearInterval(
             emojiRain
@@ -286,8 +288,10 @@ discoAudio.play().catch(() => {});
         );
 
         overlay.remove();
+
         discoAudio.pause();
 
         discoAudio.currentTime = 0;
-    }, 10000);
+    }
+);
 }
