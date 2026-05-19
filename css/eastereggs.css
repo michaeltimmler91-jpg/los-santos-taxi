@@ -198,3 +198,114 @@
         opacity: 1;
     }
 }
+
+.disco-extrem-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 99999999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+.disco-extrem-box {
+
+    padding: 40px 60px;
+
+    border-radius: 30px;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    backdrop-filter:
+        blur(10px);
+
+    text-align: center;
+
+    animation:
+        discoExtremPulse 0.35s infinite alternate;
+}
+
+.disco-extrem-title {
+
+    font-size: 42px;
+    font-weight: 900;
+
+    color: white;
+
+    text-shadow:
+        0 0 20px #ff00ff,
+        0 0 40px #00ffff;
+
+    margin-bottom: 20px;
+}
+
+.disco-extrem-emojis {
+
+    font-size: 42px;
+
+    animation:
+        discoExtremSpin 2s linear infinite;
+}
+
+.disco-extrem-rain {
+
+    position: fixed;
+
+    top: -80px;
+
+    z-index: 99999999;
+
+    pointer-events: none;
+
+    animation:
+        discoExtremRain linear forwards;
+}
+
+@keyframes discoExtremPulse {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes discoExtremSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes discoExtremRain {
+
+    from {
+
+        transform:
+            translateY(-100px)
+            rotate(0deg);
+
+        opacity: 1;
+    }
+
+    to {
+
+        transform:
+            translateY(120vh)
+            rotate(720deg);
+
+        opacity: 0;
+    }
+}
