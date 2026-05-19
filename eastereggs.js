@@ -26,7 +26,7 @@ async function triggerGlobalEasterEgg(type) {
     const userRaw = localStorage.getItem("taxiUser");
     const user = userRaw ? JSON.parse(userRaw) : null;
 
-    const { error } = await supabaseClient
+    const { error } = await client
         .from("taxi_easter_events")
         .insert([{
             event_type: type,
@@ -38,24 +38,9 @@ async function triggerGlobalEasterEgg(type) {
     }
 }
 
-function runEasterEggByType(type) {
-
-    if (type === "taxi") {
-        runTaxiEgg();
-    }
-
-    if (type === "crash") {
-        runCrashEgg();
-    }
-
-    if (type === "disco") {
-        runDiscoEgg();
-    }
-}
-
 function setupGlobalEasterEggs() {
 
-    supabaseClient
+    client
         .channel("taxi-easter-eggs")
         .on(
             "postgres_changes",
