@@ -152,17 +152,17 @@ function runDiscoExtremEgg() {
     document.body.classList.add(
         "super-disco-mode"
     );
+
     const discoSongs = [
 
-    "eastereggsound/crazy-chicken-klingelton.mp3",
-    "eastereggsound/die-tasse-kaffee.mp3",
-    "eastereggsound/hardcore-peniz-effect.mp3",
-    "eastereggsound/mobelstuck.mp3"
+        "eastereggsound/crazy-chicken-klingelton.mp3",
+        "eastereggsound/die-tasse-kaffee.mp3",
+        "eastereggsound/hardcore-peniz-effect.mp3",
+        "eastereggsound/mobelstuck.mp3"
 
-];
+    ];
 
-const randomSong =
-
+    const randomSong =
     discoSongs[
         Math.floor(
             Math.random() *
@@ -170,26 +170,19 @@ const randomSong =
         )
     ];
 
-const discoAudio =
-new Audio(randomSong);
+    const discoAudio =
+    new Audio(randomSong);
 
-discoAudio.volume = 0.35;
+    discoAudio.volume = 0.35;
 
-discoAudio.play().catch(() => {});
     const sayings = [
 
         "🪩 DISCO EXTREM AKTIVIERT",
-
         "🚕 LENNOX DREHT KOMPLETT DURCH",
-
         "💃 ALLE FAHRER TANZEN JETZT",
-
         "🌈 CHAOSLEVEL KRITISCH",
-
         "🎶 TAXI FM ESKALIERT",
-
         "🕺 LEITSTELLE IM PARTYMODUS",
-
         "🔥 DISPATCH SYSTEM ÜBERHITZT"
 
     ];
@@ -212,15 +205,11 @@ discoAudio.play().catch(() => {});
         <div class="disco-extrem-box">
 
             <div class="disco-extrem-title">
-
                 ${randomText}
-
             </div>
 
             <div class="disco-extrem-emojis">
-
                 🚕 🪩 🌈 💃 🕺 🎶 🔥
-
             </div>
 
         </div>
@@ -275,9 +264,13 @@ discoAudio.play().catch(() => {});
 
     }, 120);
 
-    discoAudio.addEventListener(
-    "ended",
-    () => {
+    let stopped = false;
+
+    function stopDiscoExtrem() {
+
+        if (stopped) return;
+
+        stopped = true;
 
         clearInterval(
             emojiRain
@@ -287,11 +280,38 @@ discoAudio.play().catch(() => {});
             "super-disco-mode"
         );
 
-        overlay.remove();
+        if (overlay) {
+            overlay.remove();
+        }
 
         discoAudio.pause();
 
         discoAudio.currentTime = 0;
     }
-);
+
+    discoAudio.addEventListener(
+        "ended",
+        stopDiscoExtrem
+    );
+
+    discoAudio.addEventListener(
+        "error",
+        stopDiscoExtrem
+    );
+
+    discoAudio
+    .play()
+    .catch(() => {
+
+        setTimeout(() => {
+            stopDiscoExtrem();
+        }, 15000);
+
+    });
+
+    setTimeout(() => {
+
+        stopDiscoExtrem();
+
+    }, 180000);
 }
