@@ -60,32 +60,19 @@
    Stand: 19_05
 ========================= */
 
-.admin-shell {
-    min-height: 100vh;
-}
-
 .admin-sidebar-nav {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    width: 260px;
+    min-width: 260px;
 
-    width: 294px;
-    max-height: 100vh;
+    height: 100vh;
 
     display: flex;
     flex-direction: column;
 
+    position: sticky;
+    top: 0;
+
     overflow: hidden;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(2,6,23,0.98),
-            rgba(3,7,18,0.98)
-        );
-
-    border-right: 1px solid rgba(255,255,255,0.08);
 }
 
 .admin-brand {
@@ -94,11 +81,12 @@
 }
 
 .admin-nav {
-    flex: 1 1 auto;
+    flex: 1;
+
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding: 0 18px 14px;
+    padding-right: 8px;
 }
 
 .admin-nav-group {
@@ -147,18 +135,13 @@
 }
 
 .admin-sidebar-footer {
-    flex: 0 0 auto;
+    margin-top: auto;
 
-    padding: 12px 24px 16px;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(2,6,23,0.90),
-            rgba(2,6,23,1)
-        );
+    padding-top: 16px;
 
     border-top: 1px solid rgba(255,255,255,0.08);
+
+    background: rgba(2,6,23,0.96);
 }
 
 .admin-sidebar-footer a {
@@ -177,10 +160,9 @@
 }
 
 .admin-main {
-    margin-left: 294px;
-    min-height: 100vh;
-
-    padding: 28px 42px;
+    flex: 1;
+    min-width: 0;
+    padding: 30px;
 }
 
 .admin-nav::-webkit-scrollbar {
