@@ -391,25 +391,107 @@ clock.addEventListener("click", () => {
 
     const sayings = [
 
-        `Leitstelle meldet. Es ist ${hours} Uhr ${minutes}. Bitte keine Panik.`,
+  `Leitstelle meldet. Es ist ${hours} Uhr ${minutes}. Bitte keine Panik.`,
 
-        `Achtung Fahrpersonal. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Kaffee nicht vergessen.`,
+    `Achtung Fahrpersonal. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Kaffee nicht vergessen.`,
 
-        `Lennox behauptet es wäre ${hours} Uhr ${minutes}. Ob das stimmt weiß keiner.`,
+    `Lennox behauptet es wäre ${hours} Uhr ${minutes}. Ob das stimmt weiß keiner.`,
 
-        `Die Uhr sagt ${hours} Uhr ${minutes}. Die Taxameter sagen leider etwas anderes.`,
+    `Die Uhr sagt ${hours} Uhr ${minutes}. Die Taxameter sagen leider etwas anderes.`,
 
-        `Es ist ${hours} Uhr ${minutes}. Zeit für eine entspannte Stadtrundfahrt.`,
+    `Es ist ${hours} Uhr ${minutes}. Zeit für eine entspannte Stadtrundfahrt.`,
 
-        `Leitstelle Los Santos. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte anschnallen.`,
+    `Leitstelle Los Santos. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte anschnallen.`,
 
-        `Es ist ${hours} Uhr ${minutes}. Mindestens drei Fahrer sind wahrscheinlich wieder AFK.`,
+    `Es ist ${hours} Uhr ${minutes}. Mindestens drei Fahrer sind wahrscheinlich wieder AFK.`,
 
-        `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte nicht wieder ins Meer fahren.`,
+    `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte nicht wieder ins Meer fahren.`,
 
-        `Lennox News. Es ist ${hours} Uhr ${minutes} und irgendwo brennt bestimmt wieder etwas.`,
+    `Lennox News. Es ist ${hours} Uhr ${minutes} und irgendwo brennt bestimmt wieder etwas.`,
 
-        `Die aktuelle Uhrzeit beträgt ${hours} Uhr ${minutes}. Das Chaos läuft planmäßig.`
+    `Die aktuelle Uhrzeit beträgt ${hours} Uhr ${minutes}. Das Chaos läuft planmäßig.`,
+
+    `Taxi Funk meldet ${hours} Uhr ${minutes}. Fahrer 3 schläft vermutlich wieder.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Bitte keine Kunden am falschen Eingang stehen lassen.`,
+
+    `Leitstelle sagt ${hours} Uhr ${minutes}. Der Wahnsinn beginnt pünktlich.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Irgendwer hat bestimmt wieder das Taxi versenkt.`,
+
+    `Durchsage. ${hours} Uhr ${minutes}. Trinkgeld erhöht die Motivation um 300 Prozent.`,
+
+    `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte keine Ufos mehr melden.`,
+
+    `Lennox FM meldet ${hours} Uhr ${minutes}. Die Stadt ist weiterhin komplett lost.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Vermutlich wartet schon wieder jemand am Hafen.`,
+
+    `Leitstelle informiert. ${hours} Uhr ${minutes}. Chaosstufe Gelb.`,
+
+    `Die aktuelle Uhrzeit beträgt ${hours} Uhr ${minutes}. Bitte keine Bordsteine mitnehmen.`,
+
+    `Achtung. ${hours} Uhr ${minutes}. Fahrer bitte nicht gegenseitig überfahren.`,
+
+    `Taxi News. Es ist ${hours} Uhr ${minutes}. Niemand weiß wo Fahrer 7 ist.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Bitte nicht in den Mount Chiliad navigieren.`,
+
+    `Leitstelle meldet ${hours} Uhr ${minutes}. Kaffeevorräte kritisch niedrig.`,
+
+    `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte keine Kunden auf dem Dach transportieren.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Irgendwo hupt garantiert schon wieder jemand.`,
+
+    `Lennox sagt. ${hours} Uhr ${minutes}. Alles läuft absolut gar nicht nach Plan.`,
+
+    `Die Uhr zeigt ${hours} Uhr ${minutes}. Die Reifen quietschen bereits.`,
+
+    `Leitstelle Los Santos meldet ${hours} Uhr ${minutes}. Heute bitte nur halb illegal fahren.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Vermutlich steht irgendwo wieder ein Taxi im Meer.`,
+
+    `Durchsage an alle Fahrer. ${hours} Uhr ${minutes}. Bitte wenigstens so tun als würdet ihr arbeiten.`,
+
+    `Taxi Funk meldet ${hours} Uhr ${minutes}. Der Verkehr ist wie immer eine Katastrophe.`,
+
+    `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte keine Kunden verlieren.`,
+
+    `Leitstelle sagt ${hours} Uhr ${minutes}. Fahrer 2 diskutiert vermutlich wieder mit einem Poller.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Das Chaos ist weiterhin vollständig unter Kontrolle. Vielleicht.`,
+
+    `Lennox News meldet ${hours} Uhr ${minutes}. Irgendwo brennt wahrscheinlich wieder ein Roller.`,
+
+    `Die Uhr zeigt ${hours} Uhr ${minutes}. Zeit für eine fragwürdige Abkürzung.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Die Leitstelle empfiehlt mehr Kaffee.`,
+
+    `Leitstelle meldet ${hours} Uhr ${minutes}. Bitte keine Kunden im Kreis fahren.`,
+
+    `Taxi FM sagt ${hours} Uhr ${minutes}. Mindestens ein Fahrer ist falsch abgebogen.`,
+
+    `Durchsage. ${hours} Uhr ${minutes}. Bitte keine Rennen mit dem Bus veranstalten.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Fahrer bitte aufhören gegen Laternen zu fahren.`,
+
+    `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Lennox sucht vermutlich wieder sein Fahrzeug.`,
+
+    `Leitstelle informiert. ${hours} Uhr ${minutes}. Die Stadt dreht komplett frei.`,
+
+    `Taxi News meldet ${hours} Uhr ${minutes}. Drei Fahrer haben sich gleichzeitig verfahren.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Bitte nicht wieder rückwärts über die Autobahn fahren.`,
+
+    `Lennox sagt ${hours} Uhr ${minutes}. Alles ganz normal. Leider.`,
+
+    `Die aktuelle Uhrzeit beträgt ${hours} Uhr ${minutes}. Bitte die Kunden nicht anschreien.`,
+
+    `Es ist ${hours} Uhr ${minutes}. Der Taxameter hat innerlich bereits gekündigt.`,
+
+    `Leitstelle meldet ${hours} Uhr ${minutes}. Irgendwer hat schon wieder den Funk offen gelassen.`,
+
+    `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte keine Taxifahrzeuge als Geländewagen benutzen.`
 
     ];
 
