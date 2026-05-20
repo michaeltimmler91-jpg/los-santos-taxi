@@ -325,15 +325,28 @@ setTimeout(() => {
     stopDiscoExtrem();
 }, 180000);
 }
-function runEasterEggByType(type) {
+function runEasterEggByType(type, data = null) {
+
     if (type === "taxi") runTaxiEgg();
+
     if (type === "crash") runCrashEgg();
+
     if (type === "disco") runDiscoEgg();
+
     if (type === "clean") runCleanEgg();
+
     if (type === "fire") runFireEgg();
+
     if (type === "superdisco") runSuperDiscoEgg();
+
     if (type === "ufo") runUfoEgg();
-    if (type === "discoextrem") { runDiscoExtremEgg(data?.song); }
+
+    if (type === "discoextrem") {
+
+        runDiscoExtremEgg(
+            data?.song
+        );
+    }
 }
 
 async function triggerGlobalEasterEgg(type) {
