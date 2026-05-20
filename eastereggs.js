@@ -90,7 +90,7 @@ function runUfoEgg() {
     }, 6500);
 }
 
-function runDiscoExtremEgg() {
+function runDiscoExtremEgg(song = null) {
 
     document.body.classList.add(
         "super-disco-mode",
@@ -114,9 +114,10 @@ function runDiscoExtremEgg() {
     ];
 
     const randomSong =
-    discoSongs[
-        Math.floor(Math.random() * discoSongs.length)
-    ];
+song ||
+discoSongs[
+    Math.floor(Math.random() * discoSongs.length)
+];
 
     const discoAudio =
     new Audio(randomSong);
@@ -332,7 +333,7 @@ function runEasterEggByType(type) {
     if (type === "fire") runFireEgg();
     if (type === "superdisco") runSuperDiscoEgg();
     if (type === "ufo") runUfoEgg();
-    if (type === "discoextrem") runDiscoExtremEgg();
+    if (type === "discoextrem") { runDiscoExtremEgg(data?.song); }
 }
 
 async function triggerGlobalEasterEgg(type) {
@@ -346,12 +347,39 @@ async function triggerGlobalEasterEgg(type) {
     const userRaw = localStorage.getItem("taxiUser");
     const user = userRaw ? JSON.parse(userRaw) : null;
 
-    const { error } = await db
-        .from("taxi_easter_events")
-        .insert([{
-            event_type: type,
-            created_by: user ? user.display_name : "Unbekannt"
-        }]);
+    let song = null;
+
+if (type === "discoextrem") {
+
+    const songs = [
+        "eastereggsound/2-unlimited-get-ready-for-this.mp3",
+        "eastereggsound/crazy-chicken-klingelton.mp3",
+        "eastereggsound/crazy-frog-remix.mp3",
+        "eastereggsound/daft-punk.mp3",
+        "eastereggsound/danza-kuduro.mp3",
+        "eastereggsound/die-tasse-kaffee.mp3",
+        "eastereggsound/dota-basshunter.mp3",
+        "eastereggsound/hardcore-peniz-effect.mp3",
+        "eastereggsound/mobelstuck.mp3",
+        "eastereggsound/musica-barbie.mp3",
+        "eastereggsound/smells-like-teen-spirit.mp3",
+        "eastereggsound/tell-me-why-long.mp3",
+        "eastereggsound/vengaboys-boom-boom-boom-boom.mp3"
+    ];
+
+    song =
+    songs[
+        Math.floor(Math.random() * songs.length)
+    ];
+}
+
+const { error } = await db
+    .from("taxi_easter_events")
+    .insert([{
+        event_type: type,
+        created_by: user ? user.display_name : "Unbekannt",
+        song: song
+    }]);
 
     if (error) {
         console.error(error);
@@ -398,7 +426,8 @@ async function setupGlobalEasterEggs() {
                 payload.new.id;
 
                 runEasterEggByType(
-                    payload.new.event_type
+                    payload.new.event_type,
+                    payload.new
                 );
             }
         )
