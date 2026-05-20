@@ -310,13 +310,13 @@ function runDiscoExtremEgg() {
         stopDiscoExtrem
     );
 
-    discoAudio
-    .play()
-    .catch(() => {
+discoAudio
+.play()
+.catch(() => {
 
-        setTimeout(() => {
-            stopDiscoExtrem();
-        }, 15000);
+    console.log("Disco-Musik wurde vom Browser blockiert.");
+
+});
 
     });
 
