@@ -355,9 +355,19 @@
 <script src="plz.js?v=2"></script>
 <script src="map-service.js?v=2"></script>
 
-<script src="eastereggs.js?v=10"></script>
+<script src="eastereggs.js?v=11"></script>
 <script>
 setupGlobalEasterEggs();
+
+setInterval(() => {
+
+    if (
+        typeof checkEasterEggs === "function"
+    ) {
+        checkEasterEggs();
+    }
+
+}, 3000);
 </script>
 <div id="taxiEgg" class="taxi-egg">🚕</div>
 
