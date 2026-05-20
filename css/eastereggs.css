@@ -530,3 +530,14 @@
     color: #00ffff;
     font-weight: 900;
 }
+.disco-extrem-box {
+    z-index: 1000005 !important;
+}
+
+.disco-laser {
+    z-index: 1000001 !important;
+}
+
+.disco-extrem-rain {
+    z-index: 1000002 !important;
+}
