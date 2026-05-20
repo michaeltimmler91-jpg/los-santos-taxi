@@ -218,7 +218,7 @@ function runDiscoExtremEgg() {
         </div>
     `;
 
-    document.body.appendChild(overlay);
+    document.documentElement.appendChild(overlay);
 
     const emojis = [
         "🪩",
@@ -260,7 +260,7 @@ function runDiscoExtremEgg() {
 
         emoji.style.transition = "all linear 5s";
 
-        document.body.appendChild(emoji);
+        document.documentElement.appendChild(emoji);
 
         setTimeout(() => {
 
