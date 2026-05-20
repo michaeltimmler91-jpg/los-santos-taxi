@@ -77,8 +77,6 @@ async function triggerGlobalEasterEgg(type) {
 
 let lastSeenEasterEventId = null;
 
-let lastSeenEasterEventId = null;
-
 async function setupGlobalEasterEggs() {
     const db = getDbClient();
 
