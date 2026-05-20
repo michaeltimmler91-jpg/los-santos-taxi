@@ -1,0 +1,477 @@
+@keyframes discoFlash {
+    0% {
+        filter: hue-rotate(0deg) saturate(1);
+    }
+
+    25% {
+        filter: hue-rotate(90deg) saturate(2);
+    }
+
+    50% {
+        filter: hue-rotate(180deg) saturate(3);
+    }
+
+    75% {
+        filter: hue-rotate(270deg) saturate(2);
+    }
+
+    100% {
+        filter: hue-rotate(360deg) saturate(1);
+    }
+}
+
+.disco-mode {
+    animation: discoFlash 0.4s linear infinite;
+}
+.taxi-egg {
+    position: fixed;
+    left: -120px;
+    bottom: 80px;
+    font-size: 56px;
+    z-index: 999999;
+    pointer-events: none;
+    display: none;
+}
+
+.taxi-egg.drive {
+    display: block;
+    animation: taxiDrive 5s linear forwards;
+}
+
+@keyframes taxiDrive {
+    from {
+        left: -120px;
+    }
+
+    to {
+        left: 110vw;
+    }
+}
+
+.crash-egg {
+    position: fixed;
+    inset: 0;
+    background: #020617;
+    color: #facc15;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.crash-egg h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.crash-egg p {
+    font-size: 22px;
+}
+.easter-admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.clean-egg {
+    position: fixed;
+    left: -120px;
+    bottom: 120px;
+    font-size: 70px;
+    z-index: 999999;
+    display: none;
+    pointer-events: none;
+}
+
+.clean-egg.active {
+    display: block;
+    animation: cleanDrive 5s linear forwards;
+}
+
+@keyframes cleanDrive {
+    from {
+        left: -120px;
+        transform: rotate(-10deg);
+    }
+
+    to {
+        left: 110vw;
+        transform: rotate(20deg);
+    }
+}
+
+.fire-egg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 999998;
+    display: none;
+    box-shadow: inset 0 0 120px 50px rgba(255, 40, 0, 0.75);
+    animation: firePulse 0.25s infinite alternate;
+}
+
+.fire-egg.active {
+    display: block;
+}
+
+@keyframes firePulse {
+    from {
+        box-shadow: inset 0 0 80px 30px rgba(255, 80, 0, 0.55);
+    }
+
+    to {
+        box-shadow: inset 0 0 160px 70px rgba(255, 0, 0, 0.9);
+    }
+}
+
+.super-disco-mode {
+    animation: superDisco 0.18s infinite;
+}
+
+@keyframes superDisco {
+    0% {
+        filter: hue-rotate(0deg) saturate(2);
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        filter: hue-rotate(180deg) saturate(4);
+        transform: rotate(1deg) scale(1.01);
+    }
+
+    100% {
+        filter: hue-rotate(360deg) saturate(2);
+        transform: rotate(-1deg) scale(1);
+    }
+}
+
+.ufo-egg {
+    position: fixed;
+    top: -120px;
+    left: 50%;
+    font-size: 90px;
+    z-index: 9999999;
+    display: none;
+    pointer-events: none;
+}
+
+.ufo-egg.active {
+    display: block;
+    animation: ufoAbduct 6s ease-in-out forwards;
+}
+
+.ufo-abduct-body {
+    animation: abductPage 6s ease-in-out forwards;
+}
+
+@keyframes ufoAbduct {
+    0% {
+        top: -120px;
+        transform: translateX(-50%);
+    }
+
+    35% {
+        top: 80px;
+        transform: translateX(-50%) rotate(8deg);
+    }
+
+    100% {
+        top: -180px;
+        transform: translateX(-50%) rotate(-12deg);
+    }
+}
+
+@keyframes abductPage {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translateY(-40px);
+        opacity: 0.85;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.disco-extrem-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    z-index: 99999999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+.disco-extrem-box {
+
+    padding: 40px 60px;
+
+    border-radius: 30px;
+
+    background:
+        rgba(0,0,0,0.55);
+
+    backdrop-filter:
+        blur(10px);
+
+    text-align: center;
+
+    animation:
+        discoExtremPulse 0.35s infinite alternate;
+}
+
+.disco-extrem-title {
+
+    font-size: 42px;
+    font-weight: 900;
+
+    color: white;
+
+    text-shadow:
+        0 0 20px #ff00ff,
+        0 0 40px #00ffff;
+
+    margin-bottom: 20px;
+}
+
+.disco-extrem-emojis {
+
+    font-size: 42px;
+
+    animation:
+        discoExtremSpin 2s linear infinite;
+}
+
+.disco-extrem-rain {
+
+    position: fixed;
+
+    top: -80px;
+
+    z-index: 99999999;
+
+    pointer-events: none;
+
+    animation:
+        discoExtremRain linear forwards;
+}
+
+@keyframes discoExtremPulse {
+
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes discoExtremSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes discoExtremRain {
+
+    from {
+
+        transform:
+            translateY(-100px)
+            rotate(0deg);
+
+        opacity: 1;
+    }
+
+    to {
+
+        transform:
+            translateY(120vh)
+            rotate(720deg);
+
+        opacity: 0;
+    }
+}
+
+.super-disco-mode {
+    animation: superDiscoBackground 0.35s infinite;
+}
+
+.disco-screen-shake {
+    animation: discoShake 0.12s infinite;
+}
+
+.disco-flash::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.28);
+    z-index: 999998;
+    pointer-events: none;
+}
+
+.disco-extrem-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.disco-extrem-box {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-2deg);
+    padding: 35px 55px;
+    border-radius: 28px;
+    background: rgba(0, 0, 0, 0.82);
+    border: 4px solid #fff;
+    box-shadow:
+        0 0 25px #ff00ff,
+        0 0 55px #00ffff,
+        0 0 90px #ffff00;
+    text-align: center;
+    animation: discoBoxPulse 0.45s infinite alternate;
+}
+
+.disco-extrem-title {
+    font-size: 48px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow:
+        0 0 10px #ff00ff,
+        0 0 20px #00ffff,
+        0 0 35px #ffff00;
+}
+
+.disco-extrem-subtitle {
+    margin-top: 12px;
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffea00;
+}
+
+.disco-extrem-emojis {
+    margin-top: 20px;
+    font-size: 42px;
+    animation: emojiPulse 0.3s infinite alternate;
+}
+
+.disco-bass-text {
+    margin-top: 18px;
+    font-size: 18px;
+    letter-spacing: 5px;
+    color: #00ffff;
+    font-weight: 900;
+}
+
+.disco-extrem-rain {
+    position: fixed;
+    top: -80px;
+    z-index: 999999;
+    animation-name: discoRainFall;
+    animation-timing-function: linear;
+    pointer-events: none;
+}
+
+.disco-laser {
+    position: fixed;
+    width: 160vw;
+    height: 8px;
+    left: -30vw;
+    opacity: 0.85;
+    z-index: 999999;
+    animation: laserMove 0.7s infinite alternate;
+}
+
+.laser-one {
+    top: 20%;
+    background: #ff00ff;
+    transform: rotate(18deg);
+}
+
+.laser-two {
+    top: 50%;
+    background: #00ffff;
+    transform: rotate(-15deg);
+}
+
+.laser-three {
+    top: 75%;
+    background: #ffff00;
+    transform: rotate(8deg);
+}
+
+@keyframes superDiscoBackground {
+    0% { filter: hue-rotate(0deg) saturate(1.5); }
+    25% { filter: hue-rotate(90deg) saturate(2.5); }
+    50% { filter: hue-rotate(180deg) saturate(3); }
+    75% { filter: hue-rotate(270deg) saturate(2.5); }
+    100% { filter: hue-rotate(360deg) saturate(1.5); }
+}
+
+@keyframes discoShake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(2px, -2px); }
+    50% { transform: translate(-2px, 2px); }
+    75% { transform: translate(3px, 1px); }
+    100% { transform: translate(-1px, -3px); }
+}
+
+@keyframes discoBoxPulse {
+    from {
+        transform: translate(-50%, -50%) scale(1) rotate(-2deg);
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1.08) rotate(2deg);
+    }
+}
+
+@keyframes emojiPulse {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.25) rotate(4deg);
+    }
+}
+
+@keyframes discoRainFall {
+    from {
+        top: -80px;
+        opacity: 1;
+    }
+    to {
+        top: 110vh;
+        opacity: 0;
+    }
+}
+
+@keyframes laserMove {
+    from {
+        margin-left: -20vw;
+        box-shadow: 0 0 20px currentColor;
+    }
+    to {
+        margin-left: 20vw;
+        box-shadow: 0 0 60px currentColor;
+    }
+}
