@@ -77,6 +77,8 @@ async function triggerGlobalEasterEgg(type) {
 
 let lastSeenEasterEventId = null;
 
+let lastSeenEasterEventId = null;
+
 async function setupGlobalEasterEggs() {
     const db = getDbClient();
 
@@ -133,7 +135,7 @@ async function setupGlobalEasterEggs() {
         }
 
     }, 3000);
-}
+} 
 function runCleanEgg() {
     const clean = document.getElementById("cleanEgg");
     if (!clean) return;
