@@ -314,14 +314,15 @@ discoAudio
 .play()
 .catch(() => {
 
-    console.log("Disco-Musik wurde vom Browser blockiert.");
+    console.log(
+        "Disco-Musik wurde vom Browser blockiert."
+    );
 
 });
 
-    setTimeout(() => {
-        stopDiscoExtrem();
-    }, 180000);
-}
+setTimeout(() => {
+    stopDiscoExtrem();
+}, 180000);
 
 function runEasterEggByType(type) {
     if (type === "taxi") runTaxiEgg();
