@@ -318,8 +318,6 @@ discoAudio
 
 });
 
-    });
-
     setTimeout(() => {
         stopDiscoExtrem();
     }, 180000);
