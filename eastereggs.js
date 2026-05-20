@@ -468,7 +468,8 @@ async function setupGlobalEasterEggs() {
             data.id;
 
             runEasterEggByType(
-                data.event_type
+                data.event_type,
+                data
             );
         }
 
