@@ -155,10 +155,19 @@ function runDiscoExtremEgg() {
 
     const discoSongs = [
 
+        "eastereggsound/2-unlimited-get-ready-for-this.mp3",
         "eastereggsound/crazy-chicken-klingelton.mp3",
+        "eastereggsound/crazy-frog-remix.mp3",
+        "eastereggsound/daft-punk.mp3",
+        "eastereggsound/danza-kuduro.mp3",
         "eastereggsound/die-tasse-kaffee.mp3",
+        "eastereggsound/dota-basshunter.mp3",
         "eastereggsound/hardcore-peniz-effect.mp3",
-        "eastereggsound/mobelstuck.mp3"
+        "eastereggsound/mobelstuck.mp3",
+        "eastereggsound/musica-barbie.mp3",
+        "eastereggsound/smells-like-teen-spirit.mp3",
+        "eastereggsound/tell-me-why-long.mp3",
+        "eastereggsound/vengaboys-boom-boom-boom-boom.mp3",
 
     ];
 
