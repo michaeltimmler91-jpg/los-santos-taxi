@@ -523,5 +523,19 @@ clock.addEventListener("click", () => {
 </script>
 
     <!--- Uhreasteregg ende --->
+    <!--- Superdisco anfang --->
+    <script>
+document.addEventListener("click", () => {
+    window.taxiAudioUnlocked = true;
+
+    const unlockAudio = new Audio();
+    unlockAudio.volume = 0;
+    unlockAudio.play().catch(() => {});
+}, {
+    once: true
+});
+</script>
+<!--- Superdisco ende --->
+    
 </body>
 </html>
