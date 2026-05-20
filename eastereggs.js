@@ -75,12 +75,27 @@ async function triggerGlobalEasterEgg(type) {
     }
 }
 
-function setupGlobalEasterEggs() {
+let lastSeenEasterEventId = null;
+
+async function setupGlobalEasterEggs() {
     const db = getDbClient();
 
     if (!db) {
         console.error("Realtime konnte nicht gestartet werden.");
         return;
+    }
+
+    const { data } = await db
+        .from("taxi_easter_events")
+        .select("id")
+        .order("created_at", {
+            ascending: false
+        })
+        .limit(1)
+        .maybeSingle();
+
+    if (data) {
+        lastSeenEasterEventId = data.id;
     }
 
     db
@@ -93,10 +108,31 @@ function setupGlobalEasterEggs() {
                 table: "taxi_easter_events"
             },
             payload => {
+                lastSeenEasterEventId = payload.new.id;
                 runEasterEggByType(payload.new.event_type);
             }
         )
         .subscribe();
+
+    setInterval(async () => {
+
+        const { data, error } = await db
+            .from("taxi_easter_events")
+            .select("*")
+            .order("created_at", {
+                ascending: false
+            })
+            .limit(1)
+            .maybeSingle();
+
+        if (error || !data) return;
+
+        if (data.id !== lastSeenEasterEventId) {
+            lastSeenEasterEventId = data.id;
+            runEasterEggByType(data.event_type);
+        }
+
+    }, 3000);
 }
 function runCleanEgg() {
     const clean = document.getElementById("cleanEgg");
