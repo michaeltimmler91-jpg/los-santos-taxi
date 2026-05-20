@@ -40,100 +40,6 @@ function runDiscoEgg() {
     }, 5000);
 }
 
-function runEasterEggByType(type) {
-    if (type === "taxi") runTaxiEgg();
-    if (type === "crash") runCrashEgg();
-    if (type === "disco") runDiscoEgg();
-    if (type === "clean") runCleanEgg();
-    if (type === "fire") runFireEgg();
-    if (type === "superdisco") runSuperDiscoEgg();
-    if (type === "ufo") runUfoEgg();
-    if (type === "discoextrem") runDiscoExtremEgg();
-}
-
-async function triggerGlobalEasterEgg(type) {
-    const db = getDbClient();
-
-    if (!db) {
-        alert("Supabase Client nicht gefunden.");
-        return;
-    }
-
-    const userRaw = localStorage.getItem("taxiUser");
-    const user = userRaw ? JSON.parse(userRaw) : null;
-
-    const { error } = await db
-        .from("taxi_easter_events")
-        .insert([{
-            event_type: type,
-            created_by: user ? user.display_name : "Unbekannt"
-        }]);
-
-    if (error) {
-        console.error(error);
-        alert("Easter Egg konnte nicht ausgelöst werden.");
-    }
-}
-
-let lastSeenEasterEventId = null;
-
-async function setupGlobalEasterEggs() {
-    const db = getDbClient();
-
-    if (!db) {
-        console.error("Realtime konnte nicht gestartet werden.");
-        return;
-    }
-
-    const { data } = await db
-        .from("taxi_easter_events")
-        .select("id")
-        .order("created_at", {
-            ascending: false
-        })
-        .limit(1)
-        .maybeSingle();
-
-    if (data) {
-        lastSeenEasterEventId = data.id;
-    }
-
-    db
-        .channel("taxi-easter-eggs")
-        .on(
-            "postgres_changes",
-            {
-                event: "INSERT",
-                schema: "public",
-                table: "taxi_easter_events"
-            },
-            payload => {
-                lastSeenEasterEventId = payload.new.id;
-                runEasterEggByType(payload.new.event_type);
-            }
-        )
-        .subscribe();
-
-    setInterval(async () => {
-
-        const { data, error } = await db
-            .from("taxi_easter_events")
-            .select("*")
-            .order("created_at", {
-                ascending: false
-            })
-            .limit(1)
-            .maybeSingle();
-
-        if (error || !data) return;
-
-        if (data.id !== lastSeenEasterEventId) {
-            lastSeenEasterEventId = data.id;
-            runEasterEggByType(data.event_type);
-        }
-
-    }, 3000);
-} 
 function runCleanEgg() {
     const clean = document.getElementById("cleanEgg");
     if (!clean) return;
@@ -183,6 +89,7 @@ function runUfoEgg() {
         document.body.classList.remove("ufo-abduct-body");
     }, 6500);
 }
+
 function runDiscoExtremEgg() {
 
     document.body.classList.add(
@@ -237,30 +144,74 @@ function runDiscoExtremEgg() {
     const overlay =
     document.createElement("div");
 
-    overlay.className =
-    "disco-extrem-overlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.zIndex = "999999999";
+    overlay.style.pointerEvents = "none";
+    overlay.style.overflow = "hidden";
 
     overlay.innerHTML = `
 
-        <div class="disco-laser laser-one"></div>
-        <div class="disco-laser laser-two"></div>
-        <div class="disco-laser laser-three"></div>
+        <div style="
+            position:fixed;
+            top:50%;
+            left:50%;
+            transform:translate(-50%, -50%);
+            min-width:700px;
+            min-height:260px;
+            padding:40px 60px;
+            background:rgba(0,0,0,0.92);
+            border:5px solid white;
+            border-radius:30px;
+            box-shadow:
+                0 0 30px #ff00ff,
+                0 0 70px #00ffff,
+                0 0 120px #ffff00;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            color:white;
+        ">
 
-        <div class="disco-extrem-box">
-
-            <div class="disco-extrem-title">
+            <div style="
+                font-size:52px;
+                font-weight:900;
+                text-shadow:
+                    0 0 10px #ff00ff,
+                    0 0 25px #00ffff,
+                    0 0 45px #ffff00;
+                margin-bottom:20px;
+            ">
                 ${randomText}
             </div>
 
-            <div class="disco-extrem-subtitle">
+            <div style="
+                font-size:24px;
+                font-weight:800;
+                color:#ffe600;
+                margin-bottom:20px;
+            ">
                 🚕 LEITSTELLE NICHT MEHR ZUSTÄNDIG 🚕
             </div>
 
-            <div class="disco-extrem-emojis">
+            <div style="
+                font-size:42px;
+                margin-bottom:20px;
+            ">
                 🚕 🪩 🌈 💃 🕺 🎶 🔥 🚨 💥
             </div>
 
-            <div class="disco-bass-text">
+            <div style="
+                font-size:22px;
+                font-weight:900;
+                color:#00ffff;
+                letter-spacing:4px;
+            ">
                 BASS BOOST AKTIV
             </div>
 
@@ -269,28 +220,6 @@ function runDiscoExtremEgg() {
 
     document.body.appendChild(overlay);
 
-    const discoBox = overlay.querySelector(".disco-extrem-box");
-
-if (discoBox) {
-    discoBox.style.position = "fixed";
-    discoBox.style.top = "50%";
-    discoBox.style.left = "50%";
-    discoBox.style.transform = "translate(-50%, -50%)";
-    discoBox.style.zIndex = "999999999";
-    discoBox.style.display = "flex";
-    discoBox.style.flexDirection = "column";
-    discoBox.style.alignItems = "center";
-    discoBox.style.justifyContent = "center";
-    discoBox.style.minWidth = "700px";
-    discoBox.style.minHeight = "260px";
-    discoBox.style.padding = "40px 60px";
-    discoBox.style.background = "rgba(0,0,0,0.92)";
-    discoBox.style.border = "5px solid white";
-    discoBox.style.borderRadius = "30px";
-    discoBox.style.boxShadow = "0 0 30px #ff00ff, 0 0 70px #00ffff, 0 0 120px #ffff00";
-    discoBox.style.color = "white";
-}
-    
     const emojis = [
         "🪩",
         "🚕",
@@ -312,42 +241,42 @@ if (discoBox) {
         const emoji =
         document.createElement("div");
 
-        emoji.className =
-        "disco-extrem-rain";
-
         emoji.innerText =
         emojis[
             Math.floor(Math.random() * emojis.length)
         ];
 
+        emoji.style.position = "fixed";
+        emoji.style.top = "-80px";
         emoji.style.left =
         Math.random() * 100 + "vw";
 
         emoji.style.fontSize =
         (22 + Math.random() * 55) + "px";
 
-        emoji.style.animationDuration =
-        (1.4 + Math.random() * 2.5) + "s";
+        emoji.style.zIndex = "999999999";
 
-        emoji.style.transform =
-        "rotate(" + (Math.random() * 360) + "deg)";
+        emoji.style.pointerEvents = "none";
+
+        emoji.style.transition = "all linear 5s";
 
         document.body.appendChild(emoji);
+
+        setTimeout(() => {
+
+            emoji.style.top = "110vh";
+            emoji.style.transform =
+            "rotate(720deg)";
+
+            emoji.style.opacity = "0";
+
+        }, 50);
 
         setTimeout(() => {
             emoji.remove();
         }, 6000);
 
     }, 70);
-
-    const flash =
-    setInterval(() => {
-
-        document.body.classList.toggle(
-            "disco-flash"
-        );
-
-    }, 180);
 
     let stopped = false;
 
@@ -358,7 +287,6 @@ if (discoBox) {
         stopped = true;
 
         clearInterval(emojiRain);
-        clearInterval(flash);
 
         document.body.classList.remove(
             "super-disco-mode",
@@ -366,9 +294,7 @@ if (discoBox) {
             "disco-flash"
         );
 
-        if (overlay) {
-            overlay.remove();
-        }
+        overlay.remove();
 
         discoAudio.pause();
         discoAudio.currentTime = 0;
@@ -397,4 +323,113 @@ if (discoBox) {
     setTimeout(() => {
         stopDiscoExtrem();
     }, 180000);
+}
+
+function runEasterEggByType(type) {
+    if (type === "taxi") runTaxiEgg();
+    if (type === "crash") runCrashEgg();
+    if (type === "disco") runDiscoEgg();
+    if (type === "clean") runCleanEgg();
+    if (type === "fire") runFireEgg();
+    if (type === "superdisco") runSuperDiscoEgg();
+    if (type === "ufo") runUfoEgg();
+    if (type === "discoextrem") runDiscoExtremEgg();
+}
+
+async function triggerGlobalEasterEgg(type) {
+    const db = getDbClient();
+
+    if (!db) {
+        alert("Supabase Client nicht gefunden.");
+        return;
+    }
+
+    const userRaw = localStorage.getItem("taxiUser");
+    const user = userRaw ? JSON.parse(userRaw) : null;
+
+    const { error } = await db
+        .from("taxi_easter_events")
+        .insert([{
+            event_type: type,
+            created_by: user ? user.display_name : "Unbekannt"
+        }]);
+
+    if (error) {
+        console.error(error);
+        alert("Easter Egg konnte nicht ausgelöst werden.");
+    }
+}
+
+let lastSeenEasterEventId = null;
+
+async function setupGlobalEasterEggs() {
+
+    const db = getDbClient();
+
+    if (!db) {
+        console.error("Realtime konnte nicht gestartet werden.");
+        return;
+    }
+
+    const { data } = await db
+        .from("taxi_easter_events")
+        .select("id")
+        .order("created_at", {
+            ascending: false
+        })
+        .limit(1)
+        .maybeSingle();
+
+    if (data) {
+        lastSeenEasterEventId = data.id;
+    }
+
+    db
+        .channel("taxi-easter-eggs")
+        .on(
+            "postgres_changes",
+            {
+                event: "INSERT",
+                schema: "public",
+                table: "taxi_easter_events"
+            },
+            payload => {
+
+                lastSeenEasterEventId =
+                payload.new.id;
+
+                runEasterEggByType(
+                    payload.new.event_type
+                );
+            }
+        )
+        .subscribe();
+
+    setInterval(async () => {
+
+        const { data, error } = await db
+            .from("taxi_easter_events")
+            .select("*")
+            .order("created_at", {
+                ascending: false
+            })
+            .limit(1)
+            .maybeSingle();
+
+        if (error || !data) return;
+
+        if (
+            data.id !==
+            lastSeenEasterEventId
+        ) {
+
+            lastSeenEasterEventId =
+            data.id;
+
+            runEasterEggByType(
+                data.event_type
+            );
+        }
+
+    }, 3000);
 }
