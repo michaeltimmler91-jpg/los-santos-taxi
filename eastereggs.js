@@ -323,7 +323,7 @@ discoAudio
 setTimeout(() => {
     stopDiscoExtrem();
 }, 180000);
-
+}
 function runEasterEggByType(type) {
     if (type === "taxi") runTaxiEgg();
     if (type === "crash") runCrashEgg();
