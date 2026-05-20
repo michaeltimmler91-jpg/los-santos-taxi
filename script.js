@@ -1507,39 +1507,5 @@ function startEasterEggs() {
        
     }, 5 * 60 * 1000);
 }
-let lastDiscoEvent = null;
-
-async function checkEasterEggs() {
-
-    const { data, error } =
-    await client
-        .from("taxi_easter_events")
-        .select("*")
-        .order("created_at", {
-            ascending: false
-        })
-        .limit(1)
-        .single();
-
-    if (error || !data) {
-        return;
-    }
-
-    if (
-        data.event_type === "discoextrem" &&
-        data.id !== lastDiscoEvent
-    ) {
-
-        lastDiscoEvent = data.id;
-
-        runDiscoExtremEgg();
-    }
-}
-
-setInterval(() => {
-
-    checkEasterEggs();
-
-}, 3000);
 
 startApp();
