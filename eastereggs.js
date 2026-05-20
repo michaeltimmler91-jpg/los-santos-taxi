@@ -233,6 +233,28 @@ function runDiscoExtremEgg() {
 
     document.body.appendChild(overlay);
 
+    const discoBox = overlay.querySelector(".disco-extrem-box");
+
+if (discoBox) {
+    discoBox.style.position = "fixed";
+    discoBox.style.top = "50%";
+    discoBox.style.left = "50%";
+    discoBox.style.transform = "translate(-50%, -50%)";
+    discoBox.style.zIndex = "999999999";
+    discoBox.style.display = "flex";
+    discoBox.style.flexDirection = "column";
+    discoBox.style.alignItems = "center";
+    discoBox.style.justifyContent = "center";
+    discoBox.style.minWidth = "700px";
+    discoBox.style.minHeight = "260px";
+    discoBox.style.padding = "40px 60px";
+    discoBox.style.background = "rgba(0,0,0,0.92)";
+    discoBox.style.border = "5px solid white";
+    discoBox.style.borderRadius = "30px";
+    discoBox.style.boxShadow = "0 0 30px #ff00ff, 0 0 70px #00ffff, 0 0 120px #ffff00";
+    discoBox.style.color = "white";
+}
+    
     const emojis = [
         "🪩",
         "🚕",
