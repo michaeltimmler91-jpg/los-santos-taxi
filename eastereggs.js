@@ -1,0 +1,342 @@
+function getDbClient() {
+    if (typeof client !== "undefined") return client;
+    if (typeof supabaseClient !== "undefined") return supabaseClient;
+    if (window.client) return window.client;
+    if (window.supabaseClient) return window.supabaseClient;
+
+    console.error("Kein Supabase Client gefunden.");
+    return null;
+}
+
+function runTaxiEgg() {
+    const taxi = document.getElementById("taxiEgg");
+    if (!taxi) return;
+
+    taxi.classList.remove("drive");
+    void taxi.offsetWidth;
+    taxi.classList.add("drive");
+
+    setTimeout(() => {
+        taxi.classList.remove("drive");
+    }, 5500);
+}
+
+function runCrashEgg() {
+    const crash = document.getElementById("crashEgg");
+    if (!crash) return;
+
+    crash.style.display = "flex";
+
+    setTimeout(() => {
+        crash.style.display = "none";
+    }, 3500);
+}
+
+function runDiscoEgg() {
+    document.body.classList.add("disco-mode");
+
+    setTimeout(() => {
+        document.body.classList.remove("disco-mode");
+    }, 5000);
+}
+
+function runEasterEggByType(type) {
+    if (type === "taxi") runTaxiEgg();
+    if (type === "crash") runCrashEgg();
+    if (type === "disco") runDiscoEgg();
+    if (type === "clean") runCleanEgg();
+    if (type === "fire") runFireEgg();
+    if (type === "superdisco") runSuperDiscoEgg();
+    if (type === "ufo") runUfoEgg();
+    if (type === "discoextrem") runDiscoExtremEgg();
+}
+
+async function triggerGlobalEasterEgg(type) {
+    const db = getDbClient();
+
+    if (!db) {
+        alert("Supabase Client nicht gefunden.");
+        return;
+    }
+
+    const userRaw = localStorage.getItem("taxiUser");
+    const user = userRaw ? JSON.parse(userRaw) : null;
+
+    const { error } = await db
+        .from("taxi_easter_events")
+        .insert([{
+            event_type: type,
+            created_by: user ? user.display_name : "Unbekannt"
+        }]);
+
+    if (error) {
+        console.error(error);
+        alert("Easter Egg konnte nicht ausgelöst werden.");
+    }
+}
+
+function setupGlobalEasterEggs() {
+    const db = getDbClient();
+
+    if (!db) {
+        console.error("Realtime konnte nicht gestartet werden.");
+        return;
+    }
+
+    db
+        .channel("taxi-easter-eggs")
+        .on(
+            "postgres_changes",
+            {
+                event: "INSERT",
+                schema: "public",
+                table: "taxi_easter_events"
+            },
+            payload => {
+                runEasterEggByType(payload.new.event_type);
+            }
+        )
+        .subscribe();
+}
+function runCleanEgg() {
+    const clean = document.getElementById("cleanEgg");
+    if (!clean) return;
+
+    clean.classList.remove("active");
+    void clean.offsetWidth;
+    clean.classList.add("active");
+
+    setTimeout(() => {
+        clean.classList.remove("active");
+    }, 5500);
+}
+
+function runFireEgg() {
+    const fire = document.getElementById("fireEgg");
+    if (!fire) return;
+
+    fire.classList.add("active");
+
+    setTimeout(() => {
+        fire.classList.remove("active");
+    }, 5000);
+}
+
+function runSuperDiscoEgg() {
+    document.body.classList.add("super-disco-mode");
+
+    setTimeout(() => {
+        document.body.classList.remove("super-disco-mode");
+    }, 6000);
+}
+
+function runUfoEgg() {
+    const ufo = document.getElementById("ufoEgg");
+    if (!ufo) return;
+
+    ufo.classList.remove("active");
+    document.body.classList.remove("ufo-abduct-body");
+
+    void ufo.offsetWidth;
+
+    ufo.classList.add("active");
+    document.body.classList.add("ufo-abduct-body");
+
+    setTimeout(() => {
+        ufo.classList.remove("active");
+        document.body.classList.remove("ufo-abduct-body");
+    }, 6500);
+}
+function runDiscoExtremEgg() {
+
+    document.body.classList.add(
+        "super-disco-mode",
+        "disco-screen-shake"
+    );
+
+    const discoSongs = [
+        "eastereggsound/2-unlimited-get-ready-for-this.mp3",
+        "eastereggsound/crazy-chicken-klingelton.mp3",
+        "eastereggsound/crazy-frog-remix.mp3",
+        "eastereggsound/daft-punk.mp3",
+        "eastereggsound/danza-kuduro.mp3",
+        "eastereggsound/die-tasse-kaffee.mp3",
+        "eastereggsound/dota-basshunter.mp3",
+        "eastereggsound/hardcore-peniz-effect.mp3",
+        "eastereggsound/mobelstuck.mp3",
+        "eastereggsound/musica-barbie.mp3",
+        "eastereggsound/smells-like-teen-spirit.mp3",
+        "eastereggsound/tell-me-why-long.mp3",
+        "eastereggsound/vengaboys-boom-boom-boom-boom.mp3"
+    ];
+
+    const randomSong =
+    discoSongs[
+        Math.floor(Math.random() * discoSongs.length)
+    ];
+
+    const discoAudio =
+    new Audio(randomSong);
+
+    discoAudio.volume = 0.45;
+
+    const sayings = [
+        "🪩 DISCO EXTREM AKTIVIERT",
+        "🚕 LENNOX HAT DIE LEITSTELLE VERLOREN",
+        "💃 ALLE FAHRER TANZEN JETZT",
+        "🌈 CHAOSLEVEL: AMTLICH BEDENKLICH",
+        "🎶 TAXI FM SENDET ILLEGAL",
+        "🕺 LEITSTELLE IM TOTALABSTURZ",
+        "🔥 DISPATCH SYSTEM BRENNT",
+        "🚨 TANZPFLICHT FÜR ALLE EINHEITEN",
+        "⚠️ DIE LEITSTELLE IST JETZT EIN CLUB",
+        "💥 SYSTEM SAGT: NEIN. LENNOX SAGT: DOCH."
+    ];
+
+    const randomText =
+    sayings[
+        Math.floor(Math.random() * sayings.length)
+    ];
+
+    const overlay =
+    document.createElement("div");
+
+    overlay.className =
+    "disco-extrem-overlay";
+
+    overlay.innerHTML = `
+
+        <div class="disco-laser laser-one"></div>
+        <div class="disco-laser laser-two"></div>
+        <div class="disco-laser laser-three"></div>
+
+        <div class="disco-extrem-box">
+
+            <div class="disco-extrem-title">
+                ${randomText}
+            </div>
+
+            <div class="disco-extrem-subtitle">
+                🚕 LEITSTELLE NICHT MEHR ZUSTÄNDIG 🚕
+            </div>
+
+            <div class="disco-extrem-emojis">
+                🚕 🪩 🌈 💃 🕺 🎶 🔥 🚨 💥
+            </div>
+
+            <div class="disco-bass-text">
+                BASS BOOST AKTIV
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const emojis = [
+        "🪩",
+        "🚕",
+        "🌈",
+        "💃",
+        "🕺",
+        "🔥",
+        "🎶",
+        "🚨",
+        "💥",
+        "✨",
+        "🧨",
+        "📢"
+    ];
+
+    const emojiRain =
+    setInterval(() => {
+
+        const emoji =
+        document.createElement("div");
+
+        emoji.className =
+        "disco-extrem-rain";
+
+        emoji.innerText =
+        emojis[
+            Math.floor(Math.random() * emojis.length)
+        ];
+
+        emoji.style.left =
+        Math.random() * 100 + "vw";
+
+        emoji.style.fontSize =
+        (22 + Math.random() * 55) + "px";
+
+        emoji.style.animationDuration =
+        (1.4 + Math.random() * 2.5) + "s";
+
+        emoji.style.transform =
+        "rotate(" + (Math.random() * 360) + "deg)";
+
+        document.body.appendChild(emoji);
+
+        setTimeout(() => {
+            emoji.remove();
+        }, 6000);
+
+    }, 70);
+
+    const flash =
+    setInterval(() => {
+
+        document.body.classList.toggle(
+            "disco-flash"
+        );
+
+    }, 180);
+
+    let stopped = false;
+
+    function stopDiscoExtrem() {
+
+        if (stopped) return;
+
+        stopped = true;
+
+        clearInterval(emojiRain);
+        clearInterval(flash);
+
+        document.body.classList.remove(
+            "super-disco-mode",
+            "disco-screen-shake",
+            "disco-flash"
+        );
+
+        if (overlay) {
+            overlay.remove();
+        }
+
+        discoAudio.pause();
+        discoAudio.currentTime = 0;
+    }
+
+    discoAudio.addEventListener(
+        "ended",
+        stopDiscoExtrem
+    );
+
+    discoAudio.addEventListener(
+        "error",
+        stopDiscoExtrem
+    );
+
+    discoAudio
+    .play()
+    .catch(() => {
+
+        setTimeout(() => {
+            stopDiscoExtrem();
+        }, 15000);
+
+    });
+
+    setTimeout(() => {
+        stopDiscoExtrem();
+    }, 180000);
+}
