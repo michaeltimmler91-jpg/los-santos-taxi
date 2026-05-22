@@ -638,20 +638,50 @@ function getVoiceLine() {
 const randomText =
 getVoiceLine();
 
-    const speech =
-    new SpeechSynthesisUtterance(
-        randomText
-    );
+const speech =
+new SpeechSynthesisUtterance(
+    randomText
+);
 
-    speech.lang = "de-DE";
+const voices =
+speechSynthesis.getVoices();
 
-    speech.rate = 0.96;
-    speech.pitch = 1;
+const germanVoices =
+voices.filter(voice =>
+    voice.lang
+    .toLowerCase()
+    .startsWith("de")
+);
 
-    speech.volume = 1;
+const randomVoice =
+germanVoices[
+    Math.floor(
+        Math.random() *
+        germanVoices.length
+    )
+];
 
-    speechSynthesis.cancel();
-    speechSynthesis.speak(speech);
+if(randomVoice){
+
+    speech.voice =
+    randomVoice;
+
+}
+
+speech.lang = "de-DE";
+
+speech.rate = 0.96;
+
+speech.pitch =
+0.8 + Math.random() * 0.5;
+
+speech.volume = 1;
+
+speechSynthesis.cancel();
+
+speechSynthesis.speak(
+    speech
+);
 
 });
 
