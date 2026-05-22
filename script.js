@@ -280,9 +280,6 @@ async function leaveDispatcher() {
 }
 
 async function setDriverStatus(status) {
-    if (status === "Offline" && isActiveDispatcher()) {
-        await leaveDispatcher();
-    }
 if (status === "Offline" && isActiveDispatcher()) {
 
     await setDeliveriesEnabled(false);
@@ -295,6 +292,8 @@ if (status === "Offline" && isActiveDispatcher()) {
         "🚚 Lieferungen deaktiviert",
         "Leitstelle wurde verlassen."
     );
+
+    await leaveDispatcher();
 }
     const { error } = await client
         .from("taxi_driver_status")
