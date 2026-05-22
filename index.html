@@ -406,41 +406,181 @@ clock.addEventListener("click", () => {
     .padStart(2, "0");
 
 const voiceLines = {
-    leitstelle: [
-        `Leitstelle Los Santos meldet ${hours} Uhr ${minutes}. Alle Fahrer bitte Funkdisziplin halten.`,
-        `Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Offene Fahrten bitte prüfen.`,
-        `Leitstelle informiert. ${hours} Uhr ${minutes}. Bitte einsatzbereit bleiben.`
-    ],
+leitstelle: [
 
-    lennox: [
-        `Lennox behauptet es wäre ${hours} Uhr ${minutes}. Ob das stimmt weiß keiner.`,
-        `Es ist ${hours} Uhr ${minutes}. Lennox sucht vermutlich wieder sein Fahrzeug.`,
-        `Lennox News meldet ${hours} Uhr ${minutes}. Irgendwo brennt bestimmt wieder etwas.`
-    ],
+`Leitstelle Los Santos meldet ${hours} Uhr ${minutes}. Alle Fahrer bitte Funkdisziplin halten.`,
 
-    radio: [
-        `Guten Abend Los Santos. Hier ist Taxi FM mit der aktuellen Uhrzeit ${hours} Uhr ${minutes}.`,
-        `Taxi Radio meldet ${hours} Uhr ${minutes}. Die Straßen sind voll, die Fahrer überfordert.`,
-        `Willkommen bei Lennox FM. Es ist ${hours} Uhr ${minutes} und die Stadt dreht frei.`
-    ],
+`Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Offene Fahrten bitte prüfen.`,
 
-    ki: [
-        `Systemmeldung. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Chaoswahrscheinlichkeit erhöht.`,
-        `Automatische Leitstelle aktiv. ${hours} Uhr ${minutes}. Bitte keine Kollisionen verursachen.`,
-        `Warnung. ${hours} Uhr ${minutes}. Fahreraktivität wirkt fragwürdig.`
-    ],
+`Leitstelle informiert. ${hours} Uhr ${minutes}. Bitte einsatzbereit bleiben.`,
 
-    nacht: [
-        `Nachtschicht aktiv. ${hours} Uhr ${minutes}. Bitte wach bleiben.`,
-        `Es ist ${hours} Uhr ${minutes}. Die Stadt wird langsam noch seltsamer.`,
-        `Taxi Funk meldet ${hours} Uhr ${minutes}. Nachtdienst läuft. Kaffee empfohlen.`
-    ],
+`Leitstelle meldet ${hours} Uhr ${minutes}. Fahrer 3 antwortet vermutlich wieder nicht auf Funk.`,
 
-    selten: [
-        `Sondermeldung. ${hours} Uhr ${minutes}. Bitte keine UFO Sichtungen mehr melden.`,
-        `Warnung. ${hours} Uhr ${minutes}. Lennox nähert sich einem Fahrzeug.`,
-        `Leitstelle meldet ${hours} Uhr ${minutes}. Mount Chiliad bleibt keine Abkürzung.`
-    ]
+`Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte keine Kunden vergessen.`,
+
+`Leitstelle informiert ${hours} Uhr ${minutes}. Die Stadt bleibt weiterhin maximal chaotisch.`,
+
+`Leitstelle sagt ${hours} Uhr ${minutes}. Bitte keine Rennen mit Kunden veranstalten.`,
+
+`Leitstelle meldet ${hours} Uhr ${minutes}. Fahrerstatus prüfen bitte.`,
+
+`Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte keine Taxifahrzeuge zweckentfremden.`,
+
+`Leitstelle informiert ${hours} Uhr ${minutes}. Lieferungen laufen aktuell stabil. Überraschenderweise.`,
+
+`Leitstelle meldet ${hours} Uhr ${minutes}. Fahrer 5 steht vermutlich wieder am Automaten.`,
+
+`Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte nicht erneut den Funk offen lassen.`,
+
+`Leitstelle informiert ${hours} Uhr ${minutes}. Die offenen Fahrten werden nicht von alleine verschwinden.`,
+
+`Leitstelle meldet ${hours} Uhr ${minutes}. Heute bitte nur kleinere Katastrophen.`,
+
+`Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Die Stadt ist weiterhin komplett überfordert.`,
+
+`Leitstelle sagt ${hours} Uhr ${minutes}. Bitte keine Lieferungen verlieren.`,
+
+`Leitstelle informiert ${hours} Uhr ${minutes}. Fahrer 7 wurde zuletzt verwirrt am Hafen gesehen.`,
+
+`Leitstelle meldet ${hours} Uhr ${minutes}. Das Chaos läuft weiterhin planmäßig.`,
+
+`Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Bitte wenigstens so tun als würdet ihr arbeiten.`,
+
+`Leitstelle informiert ${hours} Uhr ${minutes}. Irgendwo hupt garantiert schon wieder jemand.`
+
+],
+
+lennox: [
+
+`Lennox behauptet es wäre ${hours} Uhr ${minutes}. Ob das stimmt weiß keiner.`,
+
+`Es ist ${hours} Uhr ${minutes}. Lennox sucht vermutlich wieder sein Fahrzeug.`,
+
+`Lennox News meldet ${hours} Uhr ${minutes}. Irgendwo brennt bestimmt wieder etwas.`,
+
+`Es ist ${hours} Uhr ${minutes}. Lennox diskutiert vermutlich wieder mit einem Poller.`,
+
+`Lennox sagt ${hours} Uhr ${minutes}. Alles absolut unter Kontrolle. Leider gelogen.`,
+
+`Es ist ${hours} Uhr ${minutes}. Vermutlich steht irgendwo wieder ein Taxi im Meer.`,
+
+`Lennox FM meldet ${hours} Uhr ${minutes}. Die Stadt ist weiterhin komplett lost.`,
+
+`Es ist ${hours} Uhr ${minutes}. Lennox hat vermutlich erneut falsch geparkt.`,
+
+`Lennox News meldet ${hours} Uhr ${minutes}. Fahrer 2 wurde zuletzt rückwärts fahrend gesehen.`,
+
+`Es ist ${hours} Uhr ${minutes}. Wahrscheinlich wurde gerade wieder ein Bordstein beleidigt.`,
+
+`Lennox sagt ${hours} Uhr ${minutes}. Das Navi ist erneut komplett verwirrt.`,
+
+`Es ist ${hours} Uhr ${minutes}. Lennox sucht vermutlich wieder den richtigen Eingang.`,
+
+`Lennox FM meldet ${hours} Uhr ${minutes}. Irgendwo wurde garantiert wieder ein Reifen geopfert.`,
+
+`Es ist ${hours} Uhr ${minutes}. Fahrer 4 fährt vermutlich erneut in die falsche Richtung.`,
+
+`Lennox News meldet ${hours} Uhr ${minutes}. Die Chancen auf Chaos liegen weiterhin bei hundert Prozent.`,
+
+`Es ist ${hours} Uhr ${minutes}. Bitte keine Fahrzeuge mehr im Kanal versenken.`,
+
+`Lennox sagt ${hours} Uhr ${minutes}. Heute bitte maximal nur halb illegal fahren.`,
+
+`Es ist ${hours} Uhr ${minutes}. Vermutlich fragt gleich wieder jemand ob Taxifahren kostenlos ist.`,
+
+`Lennox FM meldet ${hours} Uhr ${minutes}. Die Leitstelle braucht vermutlich Urlaub.`,
+
+`Es ist ${hours} Uhr ${minutes}. Irgendwer hat garantiert schon wieder das Funkgerät falsch eingestellt.`
+
+],
+
+radio: [
+
+`Guten Abend Los Santos. Hier ist Taxi FM mit der aktuellen Uhrzeit ${hours} Uhr ${minutes}.`,
+
+`Taxi Radio meldet ${hours} Uhr ${minutes}. Die Straßen sind voll, die Fahrer überfordert.`,
+
+`Willkommen bei Lennox FM. Es ist ${hours} Uhr ${minutes} und die Stadt dreht frei.`,
+
+`Taxi FM meldet ${hours} Uhr ${minutes}. Der Verkehr bewegt sich heute ungefähr gar nicht.`,
+
+`Radio Los Santos meldet ${hours} Uhr ${minutes}. Bitte anschnallen und Ruhe bewahren.`,
+
+`Taxi FM sagt ${hours} Uhr ${minutes}. Fahrer 3 hat vermutlich erneut die Ausfahrt verpasst.`,
+
+`Willkommen zurück bei Taxi Radio. Es ist ${hours} Uhr ${minutes}. Chaoslevel weiterhin kritisch.`,
+
+`Taxi FM meldet ${hours} Uhr ${minutes}. Kaffeeverbrauch erreicht Rekordwerte.`,
+
+`Radio Lennox informiert ${hours} Uhr ${minutes}. Die Reifen quietschen bereits.`,
+
+`Taxi FM sagt ${hours} Uhr ${minutes}. Bitte keine Kunden auf dem Dach transportieren.`,
+
+`Willkommen bei Taxi FM. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Die Stadt ist maximal genervt.`,
+
+`Radio Los Santos meldet ${hours} Uhr ${minutes}. Fahrer bitte keine Abkürzungen durch den Strand.`,
+
+`Taxi FM informiert ${hours} Uhr ${minutes}. Irgendwo steht wieder jemand mitten auf der Kreuzung.`,
+
+`Willkommen bei Lennox Radio. Es ist ${hours} Uhr ${minutes}. Die Funkgeräte glühen bereits.`,
+
+`Taxi FM meldet ${hours} Uhr ${minutes}. Fahrer bitte nicht erneut gegen Laternen fahren.`,
+
+`Radio Los Santos sagt ${hours} Uhr ${minutes}. Vermutlich wurde wieder falsch navigiert.`,
+
+`Taxi FM informiert ${hours} Uhr ${minutes}. Die Leitstelle tut weiterhin professionell.`,
+
+`Willkommen zurück bei Taxi Radio. Es ist ${hours} Uhr ${minutes}. Niemand weiß wo Fahrer 8 ist.`,
+
+`Taxi FM meldet ${hours} Uhr ${minutes}. Die offenen Fahrten stapeln sich bereits.`,
+
+`Radio Lennox informiert ${hours} Uhr ${minutes}. Das Chaos entwickelt sich hervorragend.`
+
+],
+
+ki: [
+
+`Systemmeldung. Aktuelle Uhrzeit ${hours} Uhr ${minutes}. Chaoswahrscheinlichkeit erhöht.`,
+
+`Automatische Leitstelle aktiv. ${hours} Uhr ${minutes}. Bitte keine Kollisionen verursachen.`,
+
+`Warnung. ${hours} Uhr ${minutes}. Fahreraktivität wirkt fragwürdig.`,
+
+`Systemanalyse abgeschlossen. ${hours} Uhr ${minutes}. Wahrscheinlichkeit für Chaos neunundneunzig Prozent.`,
+
+`Automatische Durchsage. ${hours} Uhr ${minutes}. Bitte keine Taxifahrzeuge versenken.`,
+
+`Systemwarnung. ${hours} Uhr ${minutes}. Fahrer 5 bewegt sich verdächtig schnell.`,
+
+`Digitale Leitstelle aktiv. ${hours} Uhr ${minutes}. Kaffeepegel kritisch.`,
+
+`Systemmeldung ${hours} Uhr ${minutes}. Offene Fahrten steigen rapide an.`,
+
+`Automatischer Hinweis. ${hours} Uhr ${minutes}. Bordsteine gelten nicht als Fahrbahn.`,
+
+`Warnung. ${hours} Uhr ${minutes}. Fahrer 2 ignoriert vermutlich erneut das Navi.`,
+
+`Systemanalyse ${hours} Uhr ${minutes}. Die Stadt befindet sich weiterhin im Ausnahmezustand.`,
+
+`Automatische Leitstelle meldet ${hours} Uhr ${minutes}. Lieferungen aktuell aktiv.`,
+
+`Warnung. ${hours} Uhr ${minutes}. Wahrscheinlichkeit eines Unfalls steigt minütlich.`,
+
+`Digitale Durchsage ${hours} Uhr ${minutes}. Bitte keine Rennen mit Bussen.`,
+
+`Systemmeldung ${hours} Uhr ${minutes}. Funkqualität weiterhin katastrophal.`,
+
+`Automatische Analyse ${hours} Uhr ${minutes}. Fahrerstatus teilweise fragwürdig.`,
+
+`Warnung. ${hours} Uhr ${minutes}. Poller wurden erneut beschädigt.`,
+
+`Systemmeldung ${hours} Uhr ${minutes}. Die Leitstelle verliert langsam die Geduld.`,
+
+`Automatische Durchsage ${hours} Uhr ${minutes}. Bitte nicht erneut im Kanal landen.`,
+
+`Digitale Leitstelle meldet ${hours} Uhr ${minutes}. Chaos weiterhin stabil.`
+
+]
 };
 
 function pickRandomLine(lines) {
