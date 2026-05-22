@@ -283,7 +283,19 @@ async function setDriverStatus(status) {
     if (status === "Offline" && isActiveDispatcher()) {
         await leaveDispatcher();
     }
+if (status === "Offline" && isActiveDispatcher()) {
 
+    await setDeliveriesEnabled(false);
+
+    deliveriesEnabled = false;
+
+    renderDeliveryControl();
+
+    showToast(
+        "🚚 Lieferungen deaktiviert",
+        "Leitstelle wurde verlassen."
+    );
+}
     const { error } = await client
         .from("taxi_driver_status")
         .upsert({
@@ -1551,10 +1563,6 @@ function canManageDeliveries() {
 
     if (!currentUser) {
         return false;
-    }
-
-    if (currentUser.role === "admin") {
-        return true;
     }
 
     return isActiveDispatcher();
