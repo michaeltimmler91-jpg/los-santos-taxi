@@ -1570,15 +1570,27 @@ function canManageDeliveries() {
 
 function renderDeliveryControl() {
 
-    const statusBox =
-    document.getElementById("delivery_status_text");
+    const deliveryBox =
+document.getElementById("deliveryControlBox");
 
-    const button =
-    document.getElementById("deliveryToggleBtn");
+const statusBox =
+document.getElementById("delivery_status_text");
 
-    if (!statusBox || !button) {
-        return;
-    }
+const button =
+document.getElementById("deliveryToggleBtn");
+
+if (!deliveryBox || !statusBox || !button) {
+    return;
+}
+
+deliveryBox.style.display =
+canManageDeliveries()
+    ? "block"
+    : "none";
+
+if (!canManageDeliveries()) {
+    return;
+}
 
     if (deliveriesEnabled) {
 
@@ -1616,11 +1628,6 @@ function renderDeliveryControl() {
             "danger-btn"
         );
     }
-
-    button.style.display =
-    canManageDeliveries()
-        ? "inline-block"
-        : "none";
 }
 
 async function toggleDeliveriesEnabled() {
