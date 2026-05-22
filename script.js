@@ -6,6 +6,7 @@ let realtimeStarted = false;
 let idleTimer = null;
 let idleConfirmTimer = null;
 let lastHeartbeatUpdate = null;
+let deliveriesEnabled = true;
 
 const IDLE_LIMIT_MS = 20 * 60 * 1000;
 const IDLE_CONFIRM_MS = 60 * 1000;
@@ -55,6 +56,7 @@ async function startApp() {
     await loadDispatchers();
     await loadDriverStatus();
     await loadCompanies();
+    await loadDeliveryControl();
 
     updateJobForm();
 
@@ -120,6 +122,23 @@ function setupRealtime() {
                 loadDriverStatus();
             }
         )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "taxi_settings"
+            },
+            (payload) => {
+                if (
+                    payload.new &&
+                    payload.new.key === "deliveries_enabled"
+                ) {
+                    deliveriesEnabled = payload.new.value === "true";
+                    renderDeliveryControl();
+                }
+            }
+        )
         .subscribe();
 }
 
@@ -180,6 +199,7 @@ function renderDispatchers() {
     }
 
     updateDispatcherButton();
+    renderDeliveryControl();
 }
 
 async function toggleDispatcherStatus() {
@@ -1509,3 +1529,121 @@ function startEasterEggs() {
 }
 
 startApp();
+
+
+/* =========================
+   LIEFERSTOPP / LIEFERSTATUS
+========================= */
+
+async function loadDeliveryControl() {
+
+    if (typeof getDeliveriesEnabled !== "function") {
+        return;
+    }
+
+    deliveriesEnabled =
+    await getDeliveriesEnabled();
+
+    renderDeliveryControl();
+}
+
+function canManageDeliveries() {
+
+    if (!currentUser) {
+        return false;
+    }
+
+    if (currentUser.role === "admin") {
+        return true;
+    }
+
+    return isActiveDispatcher();
+}
+
+function renderDeliveryControl() {
+
+    const statusBox =
+    document.getElementById("delivery_status_text");
+
+    const button =
+    document.getElementById("deliveryToggleBtn");
+
+    if (!statusBox || !button) {
+        return;
+    }
+
+    if (deliveriesEnabled) {
+
+        statusBox.innerHTML = `
+            <div class="delivery-status delivery-status-open">
+                🟢 Lieferungen aktiv
+            </div>
+            <small>
+                Firmen k&ouml;nnen Lieferauftr&auml;ge senden.
+            </small>
+        `;
+
+        button.innerText =
+        "🚚 Lieferungen deaktivieren";
+
+        button.classList.add(
+            "danger-btn"
+        );
+
+    } else {
+
+        statusBox.innerHTML = `
+            <div class="delivery-status delivery-status-closed">
+                🔴 Lieferungen deaktiviert
+            </div>
+            <small>
+                Firmen sehen einen Stopp-Hinweis und k&ouml;nnen nichts senden.
+            </small>
+        `;
+
+        button.innerText =
+        "✅ Lieferungen freigeben";
+
+        button.classList.remove(
+            "danger-btn"
+        );
+    }
+
+    button.style.display =
+    canManageDeliveries()
+        ? "inline-block"
+        : "none";
+}
+
+async function toggleDeliveriesEnabled() {
+
+    if (!canManageDeliveries()) {
+        alert("Nur aktive Leitstelle oder Admin darf Lieferungen umschalten.");
+        return;
+    }
+
+    const newValue =
+    !deliveriesEnabled;
+
+    const ok =
+    await setDeliveriesEnabled(
+        newValue
+    );
+
+    if (!ok) {
+        alert("Lieferstatus konnte nicht gespeichert werden.");
+        return;
+    }
+
+    deliveriesEnabled =
+    newValue;
+
+    renderDeliveryControl();
+
+    showToast(
+        "🚚 Lieferstatus",
+        deliveriesEnabled
+            ? "Lieferungen wurden freigegeben."
+            : "Lieferungen wurden deaktiviert."
+    );
+}

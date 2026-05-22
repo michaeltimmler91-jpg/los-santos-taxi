@@ -25,6 +25,27 @@
     </div>
 
     <div
+        id="delivery_disabled_box"
+        class="admin-card no-driver-card delivery-disabled-card"
+        style="display:none; max-width:800px; margin:auto auto 20px auto;"
+    >
+        <div class="no-driver-icon">🚚</div>
+
+        <div class="no-driver-title">
+            Lieferungen aktuell deaktiviert
+        </div>
+
+        <div class="no-driver-text">
+            Die Taxi-Leitstelle nimmt momentan keine Lieferauftr&auml;ge an.<br>
+            Bitte sp&auml;ter erneut versuchen.
+        </div>
+
+        <div class="no-driver-status">
+            Die Seite aktualisiert sich automatisch.
+        </div>
+    </div>
+
+    <div
         id="no_driver_box"
         class="admin-card no-driver-card"
         style="display:none; max-width:800px; margin:auto auto 20px auto;"
@@ -95,7 +116,7 @@
 
             </div>
 
-            <button onclick="sendCompanyJob()">
+            <button id="company_send_btn" onclick="sendCompanyJob()">
                 Auftrag senden
             </button>
 
@@ -186,8 +207,8 @@
 
 <script src="config.js?v=2"></script>
 <script src="utils.js?v=2"></script>
-<script src="api.js?v=1"></script>
-<script src="firma.js?v=17"></script>
+<script src="api.js?v=2"></script>
+<script src="firma.js?v=18"></script>
 <script src="plz.js?v=1"></script>
 <script src="map-service.js?v=2"></script>
 

@@ -3,6 +3,9 @@ let fixedCompanyName = null;
 let currentJobId = null;
 let liveChannel = null;
 let currentThemeColor = "yellow";
+let deliveriesEnabled = true;
+let activeDriverCount = 0;
+let deliverySettingsChannel = null;
 
 function getCompanyFromUrl() {
 
@@ -96,6 +99,16 @@ async function sendCompanyJob() {
     const resultBox = document.getElementById("company_result");
 
     resultBox.innerHTML = "";
+
+    if (!deliveriesEnabled) {
+        resultBox.innerHTML = `
+            <div class="admin-card">
+                🚫 Lieferungen sind aktuell deaktiviert.
+            </div>
+        `;
+        updateCompanyAvailability();
+        return;
+    }
 
     if (
         !companyName ||
@@ -275,10 +288,6 @@ function escapeAttr(value) {
     return escapeHtml(value);
 }
 async function loadDriverCount() {
-    const formCard = document.getElementById("company_form_card");
-    const noDriverBox = document.getElementById("no_driver_box");
-
-    if (!formCard || !noDriverBox) return;
 
     const { data, error } = await client
         .from("taxi_driver_status")
@@ -290,17 +299,116 @@ async function loadDriverCount() {
         return;
     }
 
-    const count = data?.length || 0;
+    activeDriverCount =
+    data?.length || 0;
 
-    if (count <= 0) {
+    updateCompanyAvailability();
+}
+
+async function loadDeliveryStatus() {
+
+    if (typeof getDeliveriesEnabled !== "function") {
+        deliveriesEnabled = true;
+        updateCompanyAvailability();
+        return;
+    }
+
+    deliveriesEnabled =
+    await getDeliveriesEnabled();
+
+    updateCompanyAvailability();
+}
+
+function updateCompanyAvailability() {
+
+    const formCard =
+    document.getElementById("company_form_card");
+
+    const noDriverBox =
+    document.getElementById("no_driver_box");
+
+    const deliveryDisabledBox =
+    document.getElementById("delivery_disabled_box");
+
+    const sendButton =
+    document.getElementById("company_send_btn");
+
+    if (!formCard || !noDriverBox) {
+        return;
+    }
+
+    if (!deliveriesEnabled) {
+
+        formCard.style.display = "none";
+        noDriverBox.style.display = "none";
+
+        if (deliveryDisabledBox) {
+            deliveryDisabledBox.style.display = "block";
+        }
+
+        if (sendButton) {
+            sendButton.disabled = true;
+        }
+
+        return;
+    }
+
+    if (deliveryDisabledBox) {
+        deliveryDisabledBox.style.display = "none";
+    }
+
+    if (activeDriverCount <= 0) {
+
         formCard.style.display = "none";
         noDriverBox.style.display = "block";
+
+        if (sendButton) {
+            sendButton.disabled = true;
+        }
+
         return;
     }
 
     formCard.style.display = "block";
     noDriverBox.style.display = "none";
+
+    if (sendButton) {
+        sendButton.disabled = false;
+    }
 }
+
+function setupDeliverySettingsRealtime() {
+
+    if (deliverySettingsChannel) {
+        client.removeChannel(deliverySettingsChannel);
+    }
+
+    deliverySettingsChannel =
+    client
+    .channel("firma-delivery-settings")
+    .on(
+        "postgres_changes",
+        {
+            event: "*",
+            schema: "public",
+            table: "taxi_settings"
+        },
+        payload => {
+
+            if (
+                payload.new &&
+                payload.new.key === "deliveries_enabled"
+            ) {
+                deliveriesEnabled =
+                payload.new.value === "true";
+
+                updateCompanyAvailability();
+            }
+        }
+    )
+    .subscribe();
+}
+
 async function loadLastCompanyJobs() {
 
     const box = document.getElementById("company_last_jobs");
@@ -409,7 +517,10 @@ async function loadLastCompanyJobs() {
 async function startCompanyPortal() {
     await loadCompanies();
     await loadLastCompanyJobs();
+    await loadDeliveryStatus();
     await loadDriverCount();
+
+    setupDeliverySettingsRealtime();
 
     setInterval(loadDriverCount, 15000);
 }

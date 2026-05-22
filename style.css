@@ -12,3 +12,52 @@
 @import url("css/admin.css");
 
 
+
+
+/* =========================
+   LIEFERSTOPP
+========================= */
+
+.delivery-control-card .small-btn {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.delivery-status-box {
+    margin-top: 10px;
+}
+
+.delivery-status {
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+
+.delivery-status-open {
+    background: rgba(34,197,94,0.14);
+    color: #4ade80;
+    border: 1px solid rgba(34,197,94,0.28);
+}
+
+.delivery-status-closed {
+    background: rgba(239,68,68,0.14);
+    color: #f87171;
+    border: 1px solid rgba(239,68,68,0.28);
+}
+
+.sidebar-small-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #94a3b8;
+}
+
+.delivery-disabled-card {
+    border-left: 5px solid rgba(239,68,68,0.85);
+}
+
+#company_send_btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

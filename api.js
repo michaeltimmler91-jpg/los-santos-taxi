@@ -167,3 +167,65 @@ async function saveAnnouncementRead(announcementId, user) {
 
     return true;
 }
+
+
+/* =========================
+   GLOBALE TAXI EINSTELLUNGEN
+========================= */
+
+async function getTaxiSetting(key, fallbackValue = null) {
+
+    const { data, error } = await client
+        .from("taxi_settings")
+        .select("*")
+        .eq("key", key)
+        .maybeSingle();
+
+    if (error) {
+        console.error(error);
+        return fallbackValue;
+    }
+
+    if (!data) {
+        return fallbackValue;
+    }
+
+    return data.value;
+}
+
+async function setTaxiSetting(key, value) {
+
+    const { error } = await client
+        .from("taxi_settings")
+        .upsert({
+            key: key,
+            value: String(value),
+            updated_at: new Date().toISOString()
+        });
+
+    if (error) {
+        console.error(error);
+        return false;
+    }
+
+    return true;
+}
+
+async function getDeliveriesEnabled() {
+
+    const value =
+    await getTaxiSetting(
+        "deliveries_enabled",
+        "true"
+    );
+
+    return value === "true";
+}
+
+async function setDeliveriesEnabled(enabled) {
+
+    return await setTaxiSetting(
+        "deliveries_enabled",
+        enabled ? "true" : "false"
+    );
+}
