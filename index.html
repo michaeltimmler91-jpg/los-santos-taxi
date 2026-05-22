@@ -182,26 +182,20 @@
                     </button>
                 </div>
 
-                <div class="sidebar-card delivery-control-card">
-                    <div class="sidebar-title">🚚 Lieferungen</div>
+                <div class="sidebar-card" id="deliveryControlBox">
+    <div class="sidebar-title">🚚 Lieferungen</div>
 
-                    <div id="delivery_status_text" class="delivery-status-box">
-                        Status wird geladen...
-                    </div>
+    <div id="delivery_status_text">
+        Status wird geladen...
+    </div>
 
-                    <button
-                        id="deliveryToggleBtn"
-                        class="small-btn"
-                        onclick="toggleDeliveriesEnabled()"
-                        style="display:none;"
-                    >
-                        Lieferstatus ändern
-                    </button>
-
-                    <div class="sidebar-small-hint">
-                        Nur aktive Leitstelle/Admin kann Lieferungen stoppen oder freigeben.
-                    </div>
-                </div>
+    <button
+        id="deliveryToggleBtn"
+        onclick="toggleDeliveriesEnabled()"
+    >
+        Lieferstatus ändern
+    </button>
+</div>
 
                 <div class="sidebar-card">
     <div class="sidebar-title">🚦 Fahrerstatus</div>
