@@ -1632,7 +1632,7 @@ if (!canManageDeliveries()) {
 async function toggleDeliveriesEnabled() {
 
     if (!canManageDeliveries()) {
-        alert("Nur aktive Leitstelle oder Admin darf Lieferungen umschalten.");
+        alert("Nur aktive Leitstelle darf Lieferungen umschalten.");
         return;
     }
 
