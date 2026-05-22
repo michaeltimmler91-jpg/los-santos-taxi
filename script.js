@@ -1581,13 +1581,10 @@ document.getElementById("deliveryToggleBtn");
 if (!deliveryBox || !statusBox || !button) {
     return;
 }
-
-deliveryBox.style.display =
-canManageDeliveries()
-    ? "block"
-    : "none";
-
 if (!canManageDeliveries()) {
+
+    deliveryBox.style.display = "none";
+
     return;
 }
 
