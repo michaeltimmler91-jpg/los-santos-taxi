@@ -1587,7 +1587,7 @@ if (!canManageDeliveries()) {
 
     return;
 }
-
+deliveryBox.style.display = "block";
     if (deliveriesEnabled) {
 
         statusBox.innerHTML = `
