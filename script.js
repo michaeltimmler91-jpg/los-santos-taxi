@@ -774,7 +774,7 @@ if (rideType === "Essenslieferung") {
                 notes: done_notes || jobData.notes
             }]);
     }
-
+    await setDriverStatus("Im Dienst");
     loadJobs();
 }
 
@@ -796,7 +796,7 @@ async function releaseJob(jobId) {
         console.error(error);
         return;
     }
-
+    await setDriverStatus("Im Dienst");
     loadJobs();
 }
 
@@ -817,7 +817,7 @@ async function markNoShow(jobId) {
         console.error(error);
         return;
     }
-
+    await setDriverStatus("Im Dienst");
     loadJobs();
 }
 
