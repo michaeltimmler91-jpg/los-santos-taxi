@@ -64,6 +64,17 @@ async function startApp() {
     await checkAnnouncements();
 
     setupRealtime();
+
+    
+
+    setInterval(() => {
+        loadJobs();
+        loadDriverStatus();
+        loadDispatchers();
+    }, 15000);
+
+
+    
     loadSoundSettings();
     startIdleWatcher();
     startEasterEggs();
