@@ -871,6 +871,7 @@ if (rideType === "Essenslieferung") {
             }]);
     }
     await setDriverStatus("Im Dienst");
+    await loadMyJobs();
     await refreshTaxiData();
 }
 
@@ -893,6 +894,7 @@ async function releaseJob(jobId) {
         return;
     }
     await setDriverStatus("Im Dienst");
+    await loadMyJobs();
     await refreshTaxiData();
 }
 
@@ -914,6 +916,7 @@ async function markNoShow(jobId) {
         return;
     }
     await setDriverStatus("Im Dienst");
+    await loadMyJobs();
     await refreshTaxiData();
 }
 
