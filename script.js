@@ -175,7 +175,6 @@ async function refreshTaxiData() {
 
         await Promise.all([
             loadOpenJobs(),
-            loadMyJobs(),
             loadDoneJobs(),
             loadDashboardStats(),
             loadDriverStatus(),
