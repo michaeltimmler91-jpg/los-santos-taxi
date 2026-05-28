@@ -3,6 +3,10 @@ let companies = [];
 let activeDispatchers = [];
 let currentDriverStatus = "Offline";
 let realtimeStarted = false;
+let taxiLiveChannel = null;
+let fallbackRefreshTimer = null;
+let knownOpenJobIds = new Set();
+let openJobsInitialized = false;
 let idleTimer = null;
 let idleConfirmTimer = null;
 let lastHeartbeatUpdate = null;
@@ -61,20 +65,11 @@ async function startApp() {
     updateJobForm();
 
     await loadJobs();
-    await checkAnnouncements();
+    await checkAnnouncements();    
 
     setupRealtime();
-
-    
-
-    setInterval(() => {
-        loadJobs();
-        loadDriverStatus();
-        loadDispatchers();
-    }, 15000);
-
-
-    
+    startFallbackRefresh();
+    setupRealtimeReconnectWatcher();
     loadSoundSettings();
     startIdleWatcher();
     startEasterEggs();
@@ -82,9 +77,10 @@ async function startApp() {
 
 function setupRealtime() {
     if (realtimeStarted) return;
+
     realtimeStarted = true;
 
-    client
+    taxiLiveChannel = client
         .channel("taxi-live")
         .on(
             "postgres_changes",
@@ -93,21 +89,8 @@ function setupRealtime() {
                 schema: "public",
                 table: "taxi_jobs"
             },
-            (payload) => {
-                if (
-                    payload.eventType === "INSERT" &&
-                    payload.new &&
-                    payload.new.job_status === "Offen"
-                ) {
-                    playNewJobSound();
-
-                    showToast(
-                        "📞 Neuer Auftrag",
-                        `${payload.new.ride_type} • ${payload.new.pickup_location || "Unbekannt"}`
-                    );
-                }
-
-                loadJobs();
+            async (payload) => {
+                await refreshTaxiData();
             }
         )
         .on(
@@ -117,9 +100,8 @@ function setupRealtime() {
                 schema: "public",
                 table: "taxi_dispatchers"
             },
-            () => {
-                loadDispatchers();
-                loadDashboardStats();
+            async () => {
+                await refreshTaxiData();
             }
         )
         .on(
@@ -129,8 +111,8 @@ function setupRealtime() {
                 schema: "public",
                 table: "taxi_driver_status"
             },
-            () => {
-                loadDriverStatus();
+            async () => {
+                await refreshTaxiData();
             }
         )
         .on(
@@ -140,7 +122,7 @@ function setupRealtime() {
                 schema: "public",
                 table: "taxi_settings"
             },
-            (payload) => {
+            async (payload) => {
                 if (
                     payload.new &&
                     payload.new.key === "deliveries_enabled"
@@ -148,9 +130,63 @@ function setupRealtime() {
                     deliveriesEnabled = payload.new.value === "true";
                     renderDeliveryControl();
                 }
+
+                await refreshTaxiData();
             }
         )
-        .subscribe();
+        .subscribe((status) => {
+            console.log("Taxi Realtime:", status);
+        });
+}
+
+async function refreshTaxiData() {
+    if (!currentUser) return;
+
+    await Promise.all([
+        loadJobs(),
+        loadDriverStatus(),
+        loadDispatchers()
+    ]);
+}
+
+function restartRealtime() {
+    if (taxiLiveChannel) {
+        client.removeChannel(taxiLiveChannel);
+    }
+
+    taxiLiveChannel = null;
+    realtimeStarted = false;
+
+    setupRealtime();
+}
+
+function startFallbackRefresh() {
+    if (fallbackRefreshTimer) {
+        clearInterval(fallbackRefreshTimer);
+    }
+
+    fallbackRefreshTimer = setInterval(async () => {
+        await refreshTaxiData();
+    }, 10000);
+}
+
+function setupRealtimeReconnectWatcher() {
+    window.addEventListener("focus", () => {
+        restartRealtime();
+        refreshTaxiData();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+            restartRealtime();
+            refreshTaxiData();
+        }
+    });
+
+    window.addEventListener("online", () => {
+        restartRealtime();
+        refreshTaxiData();
+    });
 }
 
 function isActiveDispatcher() {
@@ -598,7 +634,7 @@ async function createJob() {
     document.getElementById("job_notes").value = "";
 
     updateJobForm();
-    loadJobs();
+    await refreshTaxiData();
 }
 
 async function takeJob(jobId) {
@@ -619,7 +655,7 @@ async function takeJob(jobId) {
     }
 
     await setDriverStatus("Im Dienst");
-    loadJobs();
+    await refreshTaxiData();
 }
 
 function getFareLabel(rideType) {
@@ -786,7 +822,7 @@ if (rideType === "Essenslieferung") {
             }]);
     }
     await setDriverStatus("Im Dienst");
-    loadJobs();
+    await refreshTaxiData();
 }
 
 async function releaseJob(jobId) {
@@ -808,7 +844,7 @@ async function releaseJob(jobId) {
         return;
     }
     await setDriverStatus("Im Dienst");
-    loadJobs();
+    await refreshTaxiData();
 }
 
 async function markNoShow(jobId) {
@@ -829,7 +865,7 @@ async function markNoShow(jobId) {
         return;
     }
     await setDriverStatus("Im Dienst");
-    loadJobs();
+    await refreshTaxiData();
 }
 
 async function loadJobs() {
@@ -865,6 +901,24 @@ async function loadDashboardStats() {
 async function loadOpenJobs() {
     const box = document.getElementById("open_jobs_list");
     const data = await getOpenJobs();
+
+    const currentIds = new Set((data || []).map(job => job.id));
+
+const newJobs = (data || []).filter(job =>
+    !knownOpenJobIds.has(job.id)
+);
+
+if (openJobsInitialized && newJobs.length > 0) {
+    playNewJobSound();
+
+    showToast(
+        "📞 Neuer Auftrag",
+        `${newJobs[0].ride_type} • ${newJobs[0].pickup_location || "Unbekannt"}`
+    );
+}
+
+knownOpenJobIds = currentIds;
+openJobsInitialized = true;
 
     box.innerHTML = "";
 
