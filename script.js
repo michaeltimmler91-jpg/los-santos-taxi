@@ -704,6 +704,7 @@ async function takeJob(jobId) {
     }
 
     await setDriverStatus("Im Dienst");
+    await loadMyJobs();
     await refreshTaxiData();
 }
 
