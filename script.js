@@ -152,30 +152,36 @@ async function refreshTaxiData() {
     try {
         const active = document.activeElement;
 
-const isTyping =
-    active &&
-    (
-        active.tagName === "INPUT" ||
-        active.tagName === "TEXTAREA" ||
-        active.tagName === "SELECT"
-    );
+        const isEditing =
+            active &&
+            (
+                active.tagName === "INPUT" ||
+                active.tagName === "TEXTAREA" ||
+                active.tagName === "SELECT"
+            );
 
-if (isTyping) {
-    await Promise.all([
-        loadOpenJobs(),
-        loadDashboardStats(),
-        loadDriverStatus(),
-        loadDispatchers()
-    ]);
+        if (isEditing) {
+            await Promise.all([
+                loadOpenJobs(),
+                loadDoneJobs(),
+                loadDashboardStats(),
+                loadDriverStatus(),
+                loadDispatchers(),
+                loadMyTimeStats()
+            ]);
 
-    return;
-}
+            return;
+        }
 
-await Promise.all([
-    loadJobs(),
-    loadDriverStatus(),
-    loadDispatchers()
-]);
+        await Promise.all([
+            loadOpenJobs(),
+            loadMyJobs(),
+            loadDoneJobs(),
+            loadDashboardStats(),
+            loadDriverStatus(),
+            loadDispatchers(),
+            loadMyTimeStats()
+        ]);
     }
     catch (error) {
         console.error("refreshTaxiData Fehler:", error);
