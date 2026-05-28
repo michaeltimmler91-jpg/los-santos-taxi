@@ -150,11 +150,32 @@ async function refreshTaxiData() {
     refreshInProgress = true;
 
     try {
-        await Promise.all([
-            loadJobs(),
-            loadDriverStatus(),
-            loadDispatchers()
-        ]);
+        const active = document.activeElement;
+
+const isTyping =
+    active &&
+    (
+        active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.tagName === "SELECT"
+    );
+
+if (isTyping) {
+    await Promise.all([
+        loadOpenJobs(),
+        loadDashboardStats(),
+        loadDriverStatus(),
+        loadDispatchers()
+    ]);
+
+    return;
+}
+
+await Promise.all([
+    loadJobs(),
+    loadDriverStatus(),
+    loadDispatchers()
+]);
     }
     catch (error) {
         console.error("refreshTaxiData Fehler:", error);
@@ -189,7 +210,7 @@ function startFallbackRefresh() {
 
     fallbackRefreshTimer = setInterval(async () => {
         await refreshTaxiData();
-    }, 5000);
+    }, 15000);
 }
 
 function setupRealtimeReconnectWatcher() {
