@@ -11,6 +11,10 @@ let idleTimer = null;
 let idleConfirmTimer = null;
 let lastHeartbeatUpdate = null;
 let deliveriesEnabled = true;
+let refreshInProgress = false;
+let reconnectTimeout = null;
+let lastSoundTime = 0;
+let lastToastTime = 0;
 
 const IDLE_LIMIT_MS = 20 * 60 * 1000;
 const IDLE_CONFIRM_MS = 60 * 1000;
@@ -72,7 +76,6 @@ async function startApp() {
     setupRealtimeReconnectWatcher();
     loadSoundSettings();
     startIdleWatcher();
-    startEasterEggs();
 }
 
 function setupRealtime() {
@@ -140,24 +143,43 @@ function setupRealtime() {
 }
 
 async function refreshTaxiData() {
-    if (!currentUser) return;
 
-    await Promise.all([
-        loadJobs(),
-        loadDriverStatus(),
-        loadDispatchers()
-    ]);
+    if (!currentUser) return;
+    if (refreshInProgress) return;
+
+    refreshInProgress = true;
+
+    try {
+        await Promise.all([
+            loadJobs(),
+            loadDriverStatus(),
+            loadDispatchers()
+        ]);
+    }
+    catch (error) {
+        console.error("refreshTaxiData Fehler:", error);
+    }
+    finally {
+        refreshInProgress = false;
+    }
 }
 
 function restartRealtime() {
-    if (taxiLiveChannel) {
-        client.removeChannel(taxiLiveChannel);
-    }
 
-    taxiLiveChannel = null;
-    realtimeStarted = false;
+    clearTimeout(reconnectTimeout);
 
-    setupRealtime();
+    reconnectTimeout = setTimeout(() => {
+
+        if (taxiLiveChannel) {
+            client.removeChannel(taxiLiveChannel);
+        }
+
+        taxiLiveChannel = null;
+        realtimeStarted = false;
+
+        setupRealtime();
+
+    }, 1000);
 }
 
 function startFallbackRefresh() {
@@ -167,25 +189,26 @@ function startFallbackRefresh() {
 
     fallbackRefreshTimer = setInterval(async () => {
         await refreshTaxiData();
-    }, 10000);
+    }, 5000);
 }
 
 function setupRealtimeReconnectWatcher() {
-    window.addEventListener("focus", () => {
+
+    window.addEventListener("focus", async () => {
         restartRealtime();
-        refreshTaxiData();
+        await refreshTaxiData();
     });
 
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener("visibilitychange", async () => {
         if (!document.hidden) {
             restartRealtime();
-            refreshTaxiData();
+            await refreshTaxiData();
         }
     });
 
-    window.addEventListener("online", () => {
+    window.addEventListener("online", async () => {
         restartRealtime();
-        refreshTaxiData();
+        await refreshTaxiData();
     });
 }
 
@@ -1303,6 +1326,13 @@ function testSound() {
 }
 
 function playNewJobSound(force = false) {
+    const now = Date.now();
+
+    if (!force && now - lastSoundTime < 3000) {
+        return;
+    }
+
+    lastSoundTime = now;
     const enabled = localStorage.getItem("taxiSoundEnabled");
     const soundEnabled = enabled === null ? true : enabled === "true";
 
@@ -1596,15 +1626,9 @@ function updateLiveClock() {
 }
 
 setInterval(updateLiveClock, 1000);
-function startEasterEggs() {
-    setInterval(() => {
-        const chance = Math.random();
-
-       
-    }, 5 * 60 * 1000);
-}
-
-startApp();
+window.addEventListener("load", () => {
+    startApp();
+});
 
 
 /* =========================
