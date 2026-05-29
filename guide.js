@@ -1,4 +1,6 @@
 let guideTaxiAvailable = false;
+let guideCurrentJobId = null;
+let guideJobChannel = null;
 
 window.addEventListener("load", () => {
     loadGuideTaxiStatus();
@@ -8,27 +10,15 @@ async function loadGuideTaxiStatus() {
 
     const box = document.getElementById("guide_taxi_status");
 
-    const { data: dispatchers, error: dispatcherError } = await client
+    const { data: dispatchers } = await client
         .from("taxi_dispatchers")
         .select("*")
         .eq("active", true);
 
-    if (dispatcherError) {
-        console.error(dispatcherError);
-        box.innerHTML = "❌ Status konnte nicht geladen werden.";
-        return;
-    }
-
-    const { data: drivers, error: driverError } = await client
+    const { data: drivers } = await client
         .from("taxi_driver_status")
         .select("*")
         .in("status", ["Im Dienst", "Pause"]);
-
-    if (driverError) {
-        console.error(driverError);
-        box.innerHTML = "❌ Fahrerstatus konnte nicht geladen werden.";
-        return;
-    }
 
     guideTaxiAvailable =
         (dispatchers && dispatchers.length > 0) ||
@@ -63,7 +53,7 @@ async function createGuideBambiJob() {
         return;
     }
 
-    const { error } = await client
+    const { data, error } = await client
         .from("taxi_jobs")
         .insert([{
             created_by: "Guide",
@@ -75,9 +65,11 @@ async function createGuideBambiJob() {
             company_name: null,
             ems_staff_name: null,
             notes: "Bambi-Tour wurde durch einen Guide angefragt."
-        }]);
+        }])
+        .select()
+        .single();
 
-    if (error) {
+    if (error || !data) {
         console.error(error);
 
         result.innerHTML = `
@@ -89,6 +81,7 @@ async function createGuideBambiJob() {
         return;
     }
 
+    guideCurrentJobId = data.id;
     nameInput.value = "";
 
     result.innerHTML = `
@@ -97,5 +90,73 @@ async function createGuideBambiJob() {
         </div>
     `;
 
+    renderGuideJobStatus(data);
+    subscribeGuideJob(data.id);
     await loadGuideTaxiStatus();
+}
+
+function renderGuideJobStatus(job) {
+
+    const result = document.getElementById("guide_result");
+
+    let statusIcon = "📞";
+    let statusText = "Offen";
+    let driverLine = "Noch kein Fahrer zugewiesen.";
+
+    if (job.job_status === "Übernommen") {
+        statusIcon = "🚕";
+        statusText = "Taxi ist unterwegs";
+        driverLine = `Fahrer: <strong>${escapeHtml(job.assigned_driver || "-")}</strong>`;
+    }
+
+    if (job.job_status === "Erledigt") {
+        statusIcon = "✅";
+        statusText = "Fahrt erledigt";
+        driverLine = `Fahrer: <strong>${escapeHtml(job.assigned_driver || "-")}</strong>`;
+    }
+
+    if (job.job_status === "Nicht angetroffen") {
+        statusIcon = "❌";
+        statusText = "Fahrgast nicht angetroffen";
+        driverLine = `Fahrer: <strong>${escapeHtml(job.assigned_driver || "-")}</strong>`;
+    }
+
+    result.innerHTML = `
+        <div class="admin-card">
+            <h3>${statusIcon} ${statusText}</h3>
+
+            <p>
+                <strong>Spieler:</strong> ${escapeHtml(job.customer_name || "-")}<br>
+                <strong>Abholung:</strong> ${escapeHtml(job.pickup_location || "-")}<br>
+                ${driverLine}
+            </p>
+
+            <small>
+                Diese Anzeige aktualisiert sich automatisch.
+            </small>
+        </div>
+    `;
+}
+
+function subscribeGuideJob(jobId) {
+
+    if (guideJobChannel) {
+        client.removeChannel(guideJobChannel);
+    }
+
+    guideJobChannel = client
+        .channel(`guide-bambi-job-${jobId}`)
+        .on(
+            "postgres_changes",
+            {
+                event: "UPDATE",
+                schema: "public",
+                table: "taxi_jobs",
+                filter: `id=eq.${jobId}`
+            },
+            payload => {
+                renderGuideJobStatus(payload.new);
+            }
+        )
+        .subscribe();
 }
