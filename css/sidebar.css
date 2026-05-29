@@ -2038,3 +2038,20 @@ body[data-company-theme="rainbow"] button {
 .sound-card {
     opacity: 0.92;
 }
+.control-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.control-item {
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.control-item button {
+    width: 100%;
+    margin-top: 8px;
+}
