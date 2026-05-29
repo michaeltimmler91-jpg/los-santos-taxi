@@ -182,19 +182,50 @@
                     </button>
                 </div>
 
-                <div class="sidebar-card" id="deliveryControlBox">
-    <div class="sidebar-title">🚚 Lieferungen</div>
+<div class="sidebar-card">
 
-    <div id="delivery_status_text">
-        Status wird geladen...
+    <div class="sidebar-title">
+        🚕 Leitstellensteuerung
     </div>
 
-    <button
-        id="deliveryToggleBtn"
-        onclick="toggleDeliveriesEnabled()"
-    >
-        Lieferstatus ändern
-    </button>
+    <div class="control-grid">
+
+        <div class="control-item">
+
+            <strong>🚚 Lieferungen</strong>
+
+            <div id="delivery_status_text">
+                Status wird geladen...
+            </div>
+
+            <button
+                id="deliveryToggleBtn"
+                onclick="toggleDeliveriesEnabled()"
+            >
+                Lieferstatus ändern
+            </button>
+
+        </div>
+
+        <div class="control-item">
+
+            <strong>🐣 Bambi-Touren</strong>
+
+            <div id="bambi_status_text">
+                Status wird geladen...
+            </div>
+
+            <button
+                id="bambiToggleBtn"
+                onclick="toggleBambiToursEnabled()"
+            >
+                Bambi-Touren ändern
+            </button>
+
+        </div>
+
+    </div>
+
 </div>
 
                 <div class="sidebar-card">
