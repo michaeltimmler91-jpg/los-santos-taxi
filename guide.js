@@ -39,6 +39,18 @@ async function loadGuideTaxiStatus() {
 
 async function createGuideBambiJob() {
 
+    const enabled =
+    await getBambiToursEnabled();
+
+    if (!enabled) {
+
+        alert(
+            "Aktuell werden keine Bambi-Touren angenommen."
+        );
+
+        return;
+    }
+
     const nameInput = document.getElementById("guide_player_name");
     const result = document.getElementById("guide_result");
 
