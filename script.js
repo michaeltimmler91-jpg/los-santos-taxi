@@ -437,7 +437,7 @@ async function loadBambiControl() {
 function renderBambiControl() {
 
     const box =
-    document.getElementById("bambiControlBox");
+document.getElementById("leitstellenControlBox");
 
     const status =
     document.getElementById("bambi_status_text");
@@ -448,15 +448,6 @@ function renderBambiControl() {
     if (!box || !status || !button) {
         return;
     }
-
-    if (!isActiveDispatcher()) {
-
-        box.style.display = "none";
-
-        return;
-    }
-
-    box.style.display = "block";
 
     if (bambiToursEnabled) {
 
@@ -1766,7 +1757,7 @@ function canManageDeliveries() {
 function renderDeliveryControl() {
 
     const deliveryBox =
-document.getElementById("deliveryControlBox");
+document.getElementById("leitstellenControlBox");
 
 const statusBox =
 document.getElementById("delivery_status_text");
@@ -1777,13 +1768,6 @@ document.getElementById("deliveryToggleBtn");
 if (!deliveryBox || !statusBox || !button) {
     return;
 }
-if (!canManageDeliveries()) {
-
-    deliveryBox.style.display = "none";
-
-    return;
-}
-deliveryBox.style.display = "block";
     if (deliveriesEnabled) {
 
         statusBox.innerHTML = `
