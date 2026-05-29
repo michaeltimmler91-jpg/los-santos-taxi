@@ -436,41 +436,19 @@ async function loadBambiControl() {
 
 function renderBambiControl() {
 
-    const box =
-document.getElementById("leitstellenControlBox");
+    const status = document.getElementById("bambi_status_text");
+    const button = document.getElementById("bambiToggleBtn");
 
-    const status =
-    document.getElementById("bambi_status_text");
-
-    const button =
-    document.getElementById("bambiToggleBtn");
-
-    if (!box || !status || !button) {
-        return;
-    }
+    if (!status || !button) return;
 
     if (bambiToursEnabled) {
-
-        status.innerHTML = `
-            <div class="delivery-status delivery-status-open">
-                🟢 Bambi-Touren aktiv
-            </div>
-        `;
-
-        button.innerText =
-        "🐣 Bambi-Touren deaktivieren";
-
-    }
-    else {
-
-        status.innerHTML = `
-            <div class="delivery-status delivery-status-closed">
-                🔴 Bambi-Touren deaktiviert
-            </div>
-        `;
-
-        button.innerText =
-        "🐣 Bambi-Touren aktivieren";
+        status.innerHTML = `🟢 Aktiv`;
+        button.innerText = "Bambi-Touren deaktivieren";
+        button.classList.add("danger-btn");
+    } else {
+        status.innerHTML = `🔴 Deaktiviert`;
+        button.innerText = "Bambi-Touren aktivieren";
+        button.classList.remove("danger-btn");
     }
 }
 
@@ -1756,53 +1734,19 @@ function canManageDeliveries() {
 
 function renderDeliveryControl() {
 
-    const deliveryBox =
-document.getElementById("leitstellenControlBox");
+    const statusBox = document.getElementById("delivery_status_text");
+    const button = document.getElementById("deliveryToggleBtn");
 
-const statusBox =
-document.getElementById("delivery_status_text");
+    if (!statusBox || !button) return;
 
-const button =
-document.getElementById("deliveryToggleBtn");
-
-if (!deliveryBox || !statusBox || !button) {
-    return;
-}
     if (deliveriesEnabled) {
-
-        statusBox.innerHTML = `
-            <div class="delivery-status delivery-status-open">
-                🟢 Lieferungen aktiv
-            </div>
-            <small>
-                Firmen k&ouml;nnen Lieferauftr&auml;ge senden.
-            </small>
-        `;
-
-        button.innerText =
-        "🚚 Lieferungen deaktivieren";
-
-        button.classList.add(
-            "danger-btn"
-        );
-
+        statusBox.innerHTML = `🟢 Aktiv`;
+        button.innerText = "Lieferungen deaktivieren";
+        button.classList.add("danger-btn");
     } else {
-
-        statusBox.innerHTML = `
-            <div class="delivery-status delivery-status-closed">
-                🔴 Lieferungen deaktiviert
-            </div>
-            <small>
-                Firmen sehen einen Stopp-Hinweis und k&ouml;nnen nichts senden.
-            </small>
-        `;
-
-        button.innerText =
-        "✅ Lieferungen freigeben";
-
-        button.classList.remove(
-            "danger-btn"
-        );
+        statusBox.innerHTML = `🔴 Deaktiviert`;
+        button.innerText = "Lieferungen aktivieren";
+        button.classList.remove("danger-btn");
     }
 }
 
