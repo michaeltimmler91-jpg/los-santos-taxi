@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Taxi Ruf</title>
+
+    <link rel="stylesheet" href="style.css?v=30">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="card" style="max-width:520px;margin:80px auto;">
+
+        <h2>🚕 Bambi-Tour anfragen</h2>
+
+        <p style="color:#94a3b8;">
+            Für neu Eingereiste kann hier direkt ein Taxi zur Einreise gerufen werden.
+        </p>
+
+        <div id="guide_taxi_status" class="admin-card">
+            Status wird geladen...
+        </div>
+
+        <div class="field">
+            <label>Name des Spielers</label>
+            <input
+                type="text"
+                id="guide_player_name"
+                placeholder="Vorname Nachname"
+            >
+        </div>
+
+        <button onclick="createGuideBambiJob()">
+            🚕 Bambi-Tour anfragen
+        </button>
+
+        <div id="guide_result" style="margin-top:16px;"></div>
+
+    </div>
+
+</div>
+
+<script src="config.js?v=2"></script>
+<script src="utils.js?v=2"></script>
+<script src="api.js?v=1"></script>
+<script src="guide.js?v=1"></script>
+
+</body>
+</html>
