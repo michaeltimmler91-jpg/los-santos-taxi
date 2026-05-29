@@ -15,6 +15,7 @@ let refreshInProgress = false;
 let reconnectTimeout = null;
 let lastSoundTime = 0;
 let lastToastTime = 0;
+let bambiToursEnabled = true;
 
 const IDLE_LIMIT_MS = 20 * 60 * 1000;
 const IDLE_CONFIRM_MS = 60 * 1000;
@@ -69,7 +70,8 @@ async function startApp() {
     updateJobForm();
 
     await loadJobs();
-    await checkAnnouncements();    
+    await checkAnnouncements();
+    await loadBambiControl();
 
     setupRealtime();
     startFallbackRefresh();
@@ -422,6 +424,81 @@ if (status === "Offline" && isActiveDispatcher()) {
     await loadDispatchers();
     await loadDriverStatus();
     await loadDashboardStats();
+}
+
+async function loadBambiControl() {
+
+    bambiToursEnabled =
+    await getBambiToursEnabled();
+
+    renderBambiControl();
+}
+
+function renderBambiControl() {
+
+    const box =
+    document.getElementById("bambiControlBox");
+
+    const status =
+    document.getElementById("bambi_status_text");
+
+    const button =
+    document.getElementById("bambiToggleBtn");
+
+    if (!box || !status || !button) {
+        return;
+    }
+
+    if (!isActiveDispatcher()) {
+
+        box.style.display = "none";
+
+        return;
+    }
+
+    box.style.display = "block";
+
+    if (bambiToursEnabled) {
+
+        status.innerHTML = `
+            <div class="delivery-status delivery-status-open">
+                🟢 Bambi-Touren aktiv
+            </div>
+        `;
+
+        button.innerText =
+        "🐣 Bambi-Touren deaktivieren";
+
+    }
+    else {
+
+        status.innerHTML = `
+            <div class="delivery-status delivery-status-closed">
+                🔴 Bambi-Touren deaktiviert
+            </div>
+        `;
+
+        button.innerText =
+        "🐣 Bambi-Touren aktivieren";
+    }
+}
+
+async function toggleBambiToursEnabled() {
+
+    const ok =
+    await setBambiToursEnabled(
+        !bambiToursEnabled
+    );
+
+    if (!ok) {
+        alert("Speichern fehlgeschlagen.");
+        return;
+    }
+
+    bambiToursEnabled =
+    !bambiToursEnabled;
+
+    renderBambiControl();
 }
 
 async function loadDriverStatus() {
