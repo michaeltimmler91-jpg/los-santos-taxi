@@ -229,3 +229,27 @@ async function setDeliveriesEnabled(enabled) {
         enabled ? "true" : "false"
     );
 }
+async function getBambiToursEnabled() {
+
+    const { data } =
+    await client
+        .from("taxi_settings")
+        .select("value")
+        .eq("key", "bambi_tours_enabled")
+        .single();
+
+    return data?.value === "true";
+}
+
+async function setBambiToursEnabled(value) {
+
+    const { error } =
+    await client
+        .from("taxi_settings")
+        .upsert({
+            key: "bambi_tours_enabled",
+            value: value ? "true" : "false"
+        });
+
+    return !error;
+}
