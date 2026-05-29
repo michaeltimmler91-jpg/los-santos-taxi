@@ -1,14 +1,35 @@
 let guideTaxiAvailable = false;
 let guideCurrentJobId = null;
 let guideJobChannel = null;
+let bambiToursEnabled = true;
 
-window.addEventListener("load", () => {
-    loadGuideTaxiStatus();
+window.addEventListener("load", async () => {
+    await loadGuideTaxiStatus();
+
+    const savedJobId = localStorage.getItem("guideCurrentJobId");
+
+    if (savedJobId) {
+        guideCurrentJobId = savedJobId;
+        await loadGuideJob(savedJobId);
+        subscribeGuideJob(savedJobId);
+    }
 });
 
 async function loadGuideTaxiStatus() {
-
     const box = document.getElementById("guide_taxi_status");
+
+    bambiToursEnabled = await getBambiToursEnabled();
+
+    if (!bambiToursEnabled) {
+        guideTaxiAvailable = false;
+
+        box.innerHTML = `
+            <strong>🔴 Bambi-Touren deaktiviert</strong><br>
+            Die Taxi-Leitstelle nimmt aktuell keine Bambi-Touren an.
+        `;
+
+        return;
+    }
 
     const { data: dispatchers } = await client
         .from("taxi_dispatchers")
@@ -38,23 +59,21 @@ async function loadGuideTaxiStatus() {
 }
 
 async function createGuideBambiJob() {
-
-    const enabled =
-    await getBambiToursEnabled();
-
-    if (!enabled) {
-
-        alert(
-            "Aktuell werden keine Bambi-Touren angenommen."
-        );
-
-        return;
-    }
-
     const nameInput = document.getElementById("guide_player_name");
     const result = document.getElementById("guide_result");
 
     const playerName = nameInput.value.trim();
+
+    await loadGuideTaxiStatus();
+
+    if (!bambiToursEnabled) {
+        result.innerHTML = `
+            <div class="admin-card">
+                ❌ Aktuell werden keine Bambi-Touren angenommen.
+            </div>
+        `;
+        return;
+    }
 
     if (!playerName) {
         result.innerHTML = `
@@ -94,21 +113,39 @@ async function createGuideBambiJob() {
     }
 
     guideCurrentJobId = data.id;
-    nameInput.value = "";
+    localStorage.setItem("guideCurrentJobId", data.id);
 
-    result.innerHTML = `
-        <div class="admin-card">
-            ✅ Bambi-Tour wurde an die Taxi-Leitstelle gesendet.
-        </div>
-    `;
+    nameInput.value = "";
 
     renderGuideJobStatus(data);
     subscribeGuideJob(data.id);
+
     await loadGuideTaxiStatus();
 }
 
-function renderGuideJobStatus(job) {
+async function loadGuideJob(jobId) {
+    const { data, error } = await client
+        .from("taxi_jobs")
+        .select("*")
+        .eq("id", jobId)
+        .single();
 
+    if (error || !data) {
+        localStorage.removeItem("guideCurrentJobId");
+        return;
+    }
+
+    renderGuideJobStatus(data);
+
+    if (
+        data.job_status === "Erledigt" ||
+        data.job_status === "Nicht angetroffen"
+    ) {
+        localStorage.removeItem("guideCurrentJobId");
+    }
+}
+
+function renderGuideJobStatus(job) {
     const result = document.getElementById("guide_result");
 
     let statusIcon = "📞";
@@ -151,7 +188,6 @@ function renderGuideJobStatus(job) {
 }
 
 function subscribeGuideJob(jobId) {
-
     if (guideJobChannel) {
         client.removeChannel(guideJobChannel);
     }
@@ -168,6 +204,13 @@ function subscribeGuideJob(jobId) {
             },
             payload => {
                 renderGuideJobStatus(payload.new);
+
+                if (
+                    payload.new.job_status === "Erledigt" ||
+                    payload.new.job_status === "Nicht angetroffen"
+                ) {
+                    localStorage.removeItem("guideCurrentJobId");
+                }
             }
         )
         .subscribe();
