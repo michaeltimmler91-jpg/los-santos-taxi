@@ -641,3 +641,24 @@
 
     letter-spacing: 4px !important;
 }
+
+.spider-swarm {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    z-index: 999999;
+    pointer-events: none;
+    font-size: 36px;
+    animation: spiderRun linear forwards;
+}
+
+@keyframes spiderRun {
+    from {
+        transform: translate(0,0) rotate(0deg);
+    }
+
+    to {
+        transform: translate(var(--moveX), var(--moveY))
+                   rotate(720deg);
+    }
+}
