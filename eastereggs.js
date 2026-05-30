@@ -327,6 +327,8 @@ setTimeout(() => {
 }
 function runEasterEggByType(type, data = null) {
 
+    if (type === "spider") runSpiderEgg(); 
+
     if (type === "taxi") runTaxiEgg();
 
     if (type === "crash") runCrashEgg();
