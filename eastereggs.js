@@ -475,3 +475,43 @@ async function setupGlobalEasterEggs() {
 
     }, 3000);
 }
+function runSpiderEgg() {
+
+    alert("⚠️ Schädlingsbekämpfung fehlgeschlagen!");
+
+    for (let i = 0; i < 40; i++) {
+
+        const spider =
+            document.createElement("div");
+
+        spider.className =
+            "spider-swarm";
+
+        spider.innerHTML = "🕷️";
+
+        spider.style.left =
+            Math.random() * window.innerWidth + "px";
+
+        spider.style.top =
+            Math.random() * window.innerHeight + "px";
+
+        spider.style.setProperty(
+            "--moveX",
+            (Math.random() * 1200 - 600) + "px"
+        );
+
+        spider.style.setProperty(
+            "--moveY",
+            (Math.random() * 800 - 400) + "px"
+        );
+
+        spider.style.animationDuration =
+            (4 + Math.random() * 6) + "s";
+
+        document.body.appendChild(spider);
+
+        setTimeout(() => {
+            spider.remove();
+        }, 10000);
+    }
+}
