@@ -134,6 +134,7 @@ const vacationHtml =
             </span>
 
           </div>
+            ${vacationHtml}
 
           <button
             class="driver-profile-btn"
