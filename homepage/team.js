@@ -70,6 +70,20 @@ async function loadTeam() {
         "Noch keine Beschreibung vorhanden."
       );
 
+      const vacation =
+  getActiveVacationForDriver(driver.username);
+
+const vacationHtml =
+  vacation
+    ? `
+      <div class="driver-vacation-box">
+        🌴 Fahrer ist im Urlaub<br>
+        von ${formatDateDE(vacation.start_date)}
+        bis ${formatDateDE(vacation.end_date)}
+      </div>
+    `
+    : "";
+      
       return `
         <article class="driver-card">
 
