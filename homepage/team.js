@@ -5,6 +5,7 @@ document.getElementById(
 
 let allDrivers = [];
 let allStatuses = [];
+let allVacations = [];
 
 async function loadTeam() {
 
@@ -33,6 +34,9 @@ async function loadTeam() {
 
     allStatuses =
     statusData || [];
+
+    allVacations =
+    vacationData || [];
 
     if (!allDrivers.length) {
 
@@ -171,6 +175,12 @@ function openDriverModal(username) {
 
   const status =
   document.getElementById("modalDriverStatus");
+
+  const {
+  data: vacationData
+} = await supabaseClient
+  .from("taxi_vacations")
+  .select("*");
 
   status.classList.remove(
     "online",
