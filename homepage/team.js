@@ -29,6 +29,12 @@ async function loadTeam() {
       .from("taxi_driver_status")
       .select("*");
 
+    const {
+      data: vacationData
+    } = await supabaseClient
+      .from("taxi_vacations")
+      .select("*");
+    
     allDrivers =
     data || [];
 
@@ -189,12 +195,6 @@ function openDriverModal(username) {
 
   const status =
   document.getElementById("modalDriverStatus");
-
-  const {
-  data: vacationData
-} = await supabaseClient
-  .from("taxi_vacations")
-  .select("*");
 
   status.classList.remove(
     "online",
