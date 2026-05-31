@@ -68,6 +68,10 @@ function showAdminTab(tabId, clickedButton = null) {
     if (tabId === "tab_plz_admin" && typeof loadPlzReports === "function") {
         loadPlzReports();
     }
+
+    if (tabId === "tab_vacations") {
+        loadVacations();
+    }
 }
 
 async function loadAdminStats() {
@@ -1751,6 +1755,24 @@ async function loadVacations() {
             </div>
         `;
     });
+}
+
+async function deleteVacation(id) {
+    const ok = confirm("Urlaub wirklich löschen?");
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_vacations")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error(error);
+        alert("Urlaub konnte nicht gelöscht werden.");
+        return;
+    }
+
+    await loadVacations();
 }
 
 startAdmin();
