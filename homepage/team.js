@@ -323,22 +323,19 @@ function getActiveVacationForDriver(username) {
 
   today.setHours(0, 0, 0, 0);
 
-  return allVacations.find(vacation => {
+ return allVacations.find(vacation => {
 
-    if (vacation.username !== username) {
-      return false;
-    }
+  if (vacation.username !== username) {
+    return false;
+  }
 
-    const start =
-      new Date(vacation.start_date);
+  const end =
+    new Date(vacation.end_date);
 
-    const end =
-      new Date(vacation.end_date);
+  end.setHours(23, 59, 59, 999);
 
-    end.setHours(23, 59, 59, 999);
-
-    return today >= start && today <= end;
-  });
+  return today <= end;
+});
 }
 
 function formatDateDE(value) {
