@@ -210,6 +210,33 @@ function openDriverModal(username) {
   ? "Verf&uuml;gbar"
   : "Nicht verf&uuml;gbar";
 
+  const vacation =
+  getActiveVacationForDriver(driver.username);
+
+const vacationBox =
+  document.getElementById("modalDriverVacation");
+
+if (vacation && vacationBox) {
+
+  vacationBox.style.display =
+    "block";
+
+  vacationBox.innerHTML =
+    `
+      🌴 Fahrer ist im Urlaub<br>
+      von ${formatDateDE(vacation.start_date)}
+      bis ${formatDateDE(vacation.end_date)}
+    `;
+
+} else if (vacationBox) {
+
+  vacationBox.style.display =
+    "none";
+
+  vacationBox.innerHTML =
+    "";
+}
+
   if (driver.profile_image_url) {
 
     image.src =
