@@ -288,4 +288,40 @@ function escapeAttribute(value) {
     .replaceAll(">", "&gt;");
 }
 
+function getActiveVacationForDriver(username) {
+
+  const today =
+    new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  return allVacations.find(vacation => {
+
+    if (vacation.username !== username) {
+      return false;
+    }
+
+    const start =
+      new Date(vacation.start_date);
+
+    const end =
+      new Date(vacation.end_date);
+
+    end.setHours(23, 59, 59, 999);
+
+    return today >= start && today <= end;
+  });
+}
+
+function formatDateDE(value) {
+
+  if (!value) return "-";
+
+  return new Date(value).toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
 loadTeam();
