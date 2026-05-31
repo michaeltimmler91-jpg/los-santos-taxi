@@ -29,6 +29,7 @@ function setValue(id, value) {
 
     el.value = value || "";
 }
+await loadMyVacations();
 
 async function profileLogin() {
     const username = getEl("profile_login_username").value.trim();
@@ -316,4 +317,77 @@ async function saveVacation() {
 
     alert("Urlaub eingetragen.");
     loadMyVacations();
+}
+
+async function loadMyVacations() {
+    const box = document.getElementById("myVacationList");
+    if (!box || !profileUser) return;
+
+    const { data, error } = await client
+        .from("taxi_vacations")
+        .select("*")
+        .eq("username", profileUser.username)
+        .order("start_date", { ascending: true });
+
+    if (error) {
+        console.error(error);
+        box.innerHTML = "Urlaub konnte nicht geladen werden.";
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        box.innerHTML = `
+            <div class="admin-card" style="margin-top:16px;">
+                Kein Urlaub eingetragen.
+            </div>
+        `;
+        return;
+    }
+
+    box.innerHTML = data.map(vacation => `
+        <div class="admin-card" style="margin-top:16px;">
+            <strong>🌴 Urlaub</strong><br>
+            Von: ${formatDateDE(vacation.start_date)}<br>
+            Bis: ${formatDateDE(vacation.end_date)}<br>
+            Grund: ${escapeHtml(vacation.reason || "Kein Grund")}
+
+            <br><br>
+
+            <button
+                class="small-btn danger-btn"
+                onclick="deleteMyVacation('${vacation.id}')"
+            >
+                Löschen
+            </button>
+        </div>
+    `).join("");
+}
+
+async function deleteMyVacation(id) {
+    const ok = confirm("Urlaub wirklich löschen?");
+    if (!ok) return;
+
+    const { error } = await client
+        .from("taxi_vacations")
+        .delete()
+        .eq("id", id)
+        .eq("username", profileUser.username);
+
+    if (error) {
+        console.error(error);
+        alert("Urlaub konnte nicht gelöscht werden.");
+        return;
+    }
+
+    await loadMyVacations();
+}
+
+function formatDateDE(value) {
+    if (!value) return "-";
+
+    return new Date(value).toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+    });
 }
