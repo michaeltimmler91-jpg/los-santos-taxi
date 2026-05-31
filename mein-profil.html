@@ -74,6 +74,37 @@
                 Profil speichern
             </button>
 
+<div class="profile-card-main">
+
+    <h2>🌴 Urlaub</h2>
+
+    <div class="form-grid">
+
+        <div class="field">
+            <label>Von</label>
+            <input type="date" id="vacation_start">
+        </div>
+
+        <div class="field">
+            <label>Bis</label>
+            <input type="date" id="vacation_end">
+        </div>
+
+    </div>
+
+    <div class="field">
+        <label>Grund (optional)</label>
+        <input type="text" id="vacation_reason">
+    </div>
+
+    <button onclick="saveVacation()">
+        🌴 Urlaub eintragen
+    </button>
+
+    <div id="myVacationList"></div>
+
+</div>
+            
             <div id="profile_save_result" style="margin-top:16px;"></div>
 
         </div>
