@@ -27,6 +27,7 @@ async function startAdmin() {
     await loadAdminDoneJobs();
     await loadAdminTimeStats();
     await loadDriverProfiles();
+    await loadVacations();
 
     if (typeof loadPlzReports === "function") {
         await loadPlzReports();
@@ -1702,6 +1703,54 @@ async function deleteDriverReview(id, username) {
     alert("Bewertung gelöscht.");
 
     await loadDriverReviewsAdmin(username);
+}
+
+async function loadVacations() {
+
+    const box =
+        document.getElementById("adminVacationList");
+
+    if (!box) return;
+
+    const { data, error } = await client
+        .from("taxi_vacations")
+        .select("*")
+        .order("start_date");
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    box.innerHTML = "";
+
+    data.forEach(vacation => {
+
+        box.innerHTML += `
+            <div class="admin-card">
+
+                <strong>${vacation.display_name}</strong><br>
+
+                🌴 ${vacation.start_date}
+                bis
+                ${vacation.end_date}
+
+                <br>
+
+                📝 ${vacation.reason || "Kein Grund"}
+
+                <br><br>
+
+                <button
+                    class="small-btn danger-btn"
+                    onclick="deleteVacation('${vacation.id}')"
+                >
+                    Löschen
+                </button>
+
+            </div>
+        `;
+    });
 }
 
 startAdmin();
