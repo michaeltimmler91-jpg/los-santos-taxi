@@ -29,7 +29,7 @@ function setValue(id, value) {
 
     el.value = value || "";
 }
-await loadMyVacations();
+
 
 async function profileLogin() {
     const username = getEl("profile_login_username").value.trim();
@@ -127,6 +127,7 @@ async function loadMyProfile() {
 
     updateProfilePreview();
     updateProfileBioPreview();
+    await loadMyVacations();
 }
 
 function updateProfilePreview() {
