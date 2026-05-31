@@ -955,6 +955,9 @@ body[data-company-theme="rainbow"] button {
     width: 100%;
     max-width: 700px;
 
+    max-height: 85vh;
+    overflow-y: auto;
+
     background: linear-gradient(
         180deg,
         #111827,
@@ -962,7 +965,6 @@ body[data-company-theme="rainbow"] button {
     );
 
     border: 1px solid rgba(255,255,255,0.08);
-
     border-left: 5px solid #facc15;
 
     border-radius: 18px;
@@ -973,6 +975,18 @@ body[data-company-theme="rainbow"] button {
         0 25px 60px rgba(0,0,0,0.55);
 
     animation: announcementFade 0.25s ease;
+}
+.announcement-content {
+    color: #e2e8f0;
+    line-height: 1.7;
+    font-size: 16px;
+
+    white-space: pre-wrap;
+
+    margin-bottom: 24px;
+
+    max-height: 55vh;
+    overflow-y: auto;
 }
 
 .announcement-title {
