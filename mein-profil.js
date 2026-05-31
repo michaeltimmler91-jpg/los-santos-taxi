@@ -281,3 +281,39 @@ async function uploadProfileImage() {
 
     return data.publicUrl;
 }
+
+async function saveVacation() {
+
+    const start =
+        document.getElementById("vacation_start").value;
+
+    const end =
+        document.getElementById("vacation_end").value;
+
+    const reason =
+        document.getElementById("vacation_reason").value.trim();
+
+    if (!start || !end) {
+        alert("Bitte Zeitraum auswählen.");
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_vacations")
+        .insert([{
+            username: profileUser.username,
+            display_name: profileUser.display_name,
+            start_date: start,
+            end_date: end,
+            reason: reason
+        }]);
+
+    if (error) {
+        console.error(error);
+        alert("Urlaub konnte nicht gespeichert werden.");
+        return;
+    }
+
+    alert("Urlaub eingetragen.");
+    loadMyVacations();
+}
