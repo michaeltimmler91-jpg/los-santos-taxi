@@ -174,7 +174,9 @@ async function refreshTaxiData() {
                 loadDashboardStats(),
                 loadDriverStatus(),
                 loadDispatchers(),
-                loadMyTimeStats()
+                loadMyTimeStats(),
+                loadDeliveryControl(),
+                loadBambiControl()
             ]);
 
             return;
@@ -186,7 +188,9 @@ async function refreshTaxiData() {
             loadDashboardStats(),
             loadDriverStatus(),
             loadDispatchers(),
-            loadMyTimeStats()
+            loadMyTimeStats(),
+            loadDeliveryControl(),
+            loadBambiControl(),
         ]);
     }
     catch (error) {
