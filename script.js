@@ -16,9 +16,13 @@ let reconnectTimeout = null;
 let lastSoundTime = 0;
 let lastToastTime = 0;
 let bambiToursEnabled = true;
+let heartbeatTimer = null;
+let autoOfflineCheckRunning = false;
 
 const IDLE_LIMIT_MS = 20 * 60 * 1000;
 const IDLE_CONFIRM_MS = 60 * 1000;
+const HEARTBEAT_INTERVAL_MS = 2 * 60 * 1000;
+const AUTO_OFFLINE_LIMIT_MS = 25 * 60 * 1000;
 
 async function loginUser() {
     const username = document.getElementById("login_username").value.trim();
@@ -78,6 +82,7 @@ async function startApp() {
     setupRealtimeReconnectWatcher();
     loadSoundSettings();
     startIdleWatcher();
+    startDriverHeartbeat();
 }
 
 function setupRealtime() {
@@ -420,6 +425,9 @@ if (status === "Offline" && isActiveDispatcher()) {
     }]);
     
     currentDriverStatus = status;
+    lastHeartbeatUpdate = null;
+
+    await sendDriverHeartbeat();
 
     await loadDispatchers();
     await loadDriverStatus();
@@ -470,7 +478,141 @@ async function toggleBambiToursEnabled() {
     renderBambiControl();
 }
 
+async function autoOfflineInactiveDrivers() {
+    if (autoOfflineCheckRunning) return;
+
+    autoOfflineCheckRunning = true;
+
+    try {
+        const limit =
+            new Date(Date.now() - AUTO_OFFLINE_LIMIT_MS).toISOString();
+
+        const { data, error } = await client
+            .from("taxi_driver_status")
+            .select("*")
+            .in("status", ["Im Dienst", "Pause"])
+            .lt("updated_at", limit);
+
+        if (error) {
+            console.error("Inaktive Fahrer konnten nicht geladen werden:", error);
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            return;
+        }
+
+        for (const driver of data) {
+            const { error: updateError } = await client
+                .from("taxi_driver_status")
+                .update({
+                    status: "Offline",
+                    updated_at: new Date().toISOString()
+                })
+                .eq("username", driver.username);
+
+            if (updateError) {
+                console.error(
+                    "Fahrer konnte nicht automatisch offline gesetzt werden:",
+                    driver.username,
+                    updateError
+                );
+                continue;
+            }
+
+            const { error: dispatcherError } = await client
+                .from("taxi_dispatchers")
+                .update({
+                    active: false
+                })
+                .eq("username", driver.username)
+                .eq("active", true);
+
+            if (dispatcherError) {
+                console.error(
+                    "Leitstelle konnte beim Auto-Offline nicht verlassen werden:",
+                    driver.username,
+                    dispatcherError
+                );
+            }
+
+            if (typeof showToast === "function") {
+                showToast(
+                    "🔴 Fahrer automatisch offline",
+                    `${driver.display_name || driver.username} war zu lange inaktiv.`
+                );
+            }
+        }
+    }
+    finally {
+        autoOfflineCheckRunning = false;
+    }
+}
+
+function startDriverHeartbeat() {
+    if (heartbeatTimer) {
+        clearInterval(heartbeatTimer);
+    }
+
+    heartbeatTimer = setInterval(async () => {
+        await sendDriverHeartbeat();
+    }, HEARTBEAT_INTERVAL_MS);
+
+    sendDriverHeartbeat();
+}
+
+async function sendDriverHeartbeat() {
+    if (!currentUser) return;
+
+    if (
+        currentDriverStatus !== "Im Dienst" &&
+        currentDriverStatus !== "Pause"
+    ) {
+        return;
+    }
+
+    const active = document.activeElement;
+
+    const isEditing =
+        active &&
+        (
+            active.tagName === "INPUT" ||
+            active.tagName === "TEXTAREA" ||
+            active.tagName === "SELECT"
+        );
+
+    if (document.hidden && !isEditing) {
+        return;
+    }
+
+    const now = Date.now();
+
+    if (
+        lastHeartbeatUpdate &&
+        now - lastHeartbeatUpdate < HEARTBEAT_INTERVAL_MS - 5000
+    ) {
+        return;
+    }
+
+    const { error } = await client
+        .from("taxi_driver_status")
+        .update({
+            updated_at: new Date().toISOString()
+        })
+        .eq("username", currentUser.username)
+        .in("status", ["Im Dienst", "Pause"]);
+
+    if (error) {
+        console.error("Heartbeat konnte nicht gespeichert werden:", error);
+        return;
+    }
+
+    lastHeartbeatUpdate = now;
+}
+
 async function loadDriverStatus() {
+    await autoOfflineInactiveDrivers();
+
     const { data, error } = await client
         .from("taxi_driver_status")
         .select("*")
