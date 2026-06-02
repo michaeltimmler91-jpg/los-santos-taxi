@@ -573,18 +573,6 @@ async function sendDriverHeartbeat() {
 
     const active = document.activeElement;
 
-    const isEditing =
-        active &&
-        (
-            active.tagName === "INPUT" ||
-            active.tagName === "TEXTAREA" ||
-            active.tagName === "SELECT"
-        );
-
-    if (document.hidden && !isEditing) {
-        return;
-    }
-
     const now = Date.now();
 
     if (
