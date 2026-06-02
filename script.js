@@ -133,15 +133,19 @@ function setupRealtime() {
                 table: "taxi_settings"
             },
             async (payload) => {
-                if (
-                    payload.new &&
-                    payload.new.key === "deliveries_enabled"
-                ) {
-                    deliveriesEnabled = payload.new.value === "true";
-                    renderDeliveryControl();
-                }
+                if (payload.new) {
+    if (payload.new.key === "deliveries_enabled") {
+        deliveriesEnabled = payload.new.value === "true";
+        renderDeliveryControl();
+    }
 
-                await refreshTaxiData();
+    if (payload.new.key === "bambi_tours_enabled") {
+        bambiToursEnabled = payload.new.value === "true";
+        renderBambiControl();
+    }
+}
+
+await refreshTaxiData();
             }
         )
         .subscribe((status) => {
@@ -370,6 +374,19 @@ async function takeDispatcher() {
 }
 
 async function leaveDispatcher() {
+    const wasDispatcher = isActiveDispatcher();
+
+    if (wasDispatcher) {
+        await setDeliveriesEnabled(false);
+        await setBambiToursEnabled(false);
+
+        deliveriesEnabled = false;
+        bambiToursEnabled = false;
+
+        renderDeliveryControl();
+        renderBambiControl();
+    }
+
     const { error } = await client
         .from("taxi_dispatchers")
         .update({ active: false })
@@ -382,23 +399,21 @@ async function leaveDispatcher() {
         return;
     }
 
+    if (wasDispatcher) {
+        showToast(
+            "📡 Leitstelle verlassen",
+            "Lieferungen und Bambi-Touren wurden deaktiviert."
+        );
+    }
+
+    await loadDeliveryControl();
+    await loadBambiControl();
     await loadDispatchers();
     await loadDashboardStats();
 }
 
 async function setDriverStatus(status) {
 if (status === "Offline" && isActiveDispatcher()) {
-
-    await setDeliveriesEnabled(false);
-
-    deliveriesEnabled = false;
-
-    renderDeliveryControl();
-
-    showToast(
-        "🚚 Lieferungen deaktiviert",
-        "Leitstelle wurde verlassen."
-    );
 
     await leaveDispatcher();
 }
@@ -447,11 +462,12 @@ async function loadBambiControl() {
 }
 
 function renderBambiControl() {
-
     const status = document.getElementById("bambi_status_text");
     const button = document.getElementById("bambiToggleBtn");
 
     if (!status || !button) return;
+
+    const canControl = isActiveDispatcher();
 
     if (bambiToursEnabled) {
         status.innerHTML = `🟢 Aktiv`;
@@ -462,14 +478,20 @@ function renderBambiControl() {
         button.innerText = "Bambi-Touren aktivieren";
         button.classList.remove("danger-btn");
     }
+
+    button.style.display = canControl ? "inline-block" : "none";
 }
 
 async function toggleBambiToursEnabled() {
+    if (!isActiveDispatcher()) {
+        alert("Nur die aktive Leitstelle kann Bambi-Touren ändern.");
+        return;
+    }
 
     const ok =
-    await setBambiToursEnabled(
-        !bambiToursEnabled
-    );
+        await setBambiToursEnabled(
+            !bambiToursEnabled
+        );
 
     if (!ok) {
         alert("Speichern fehlgeschlagen.");
@@ -477,7 +499,7 @@ async function toggleBambiToursEnabled() {
     }
 
     bambiToursEnabled =
-    !bambiToursEnabled;
+        !bambiToursEnabled;
 
     renderBambiControl();
 }
@@ -1867,52 +1889,43 @@ function canManageDeliveries() {
 }
 
 function renderDeliveryControl() {
-
-    const statusBox = document.getElementById("delivery_status_text");
+    const status = document.getElementById("delivery_status_text");
     const button = document.getElementById("deliveryToggleBtn");
 
-    if (!statusBox || !button) return;
+    if (!status || !button) return;
+
+    const canControl = isActiveDispatcher();
 
     if (deliveriesEnabled) {
-        statusBox.innerHTML = `🟢 Aktiv`;
+        status.innerHTML = `🟢 Aktiv`;
         button.innerText = "Lieferungen deaktivieren";
         button.classList.add("danger-btn");
     } else {
-        statusBox.innerHTML = `🔴 Deaktiviert`;
+        status.innerHTML = `🔴 Deaktiviert`;
         button.innerText = "Lieferungen aktivieren";
         button.classList.remove("danger-btn");
     }
+
+    button.style.display = canControl ? "inline-block" : "none";
 }
-
 async function toggleDeliveriesEnabled() {
-
-    if (!canManageDeliveries()) {
-        alert("Nur aktive Leitstelle darf Lieferungen umschalten.");
+    if (!isActiveDispatcher()) {
+        alert("Nur die aktive Leitstelle kann Lieferungen ändern.");
         return;
     }
 
-    const newValue =
-    !deliveriesEnabled;
-
     const ok =
-    await setDeliveriesEnabled(
-        newValue
-    );
+        await setDeliveriesEnabled(
+            !deliveriesEnabled
+        );
 
     if (!ok) {
-        alert("Lieferstatus konnte nicht gespeichert werden.");
+        alert("Speichern fehlgeschlagen.");
         return;
     }
 
     deliveriesEnabled =
-    newValue;
+        !deliveriesEnabled;
 
     renderDeliveryControl();
-
-    showToast(
-        "🚚 Lieferstatus",
-        deliveriesEnabled
-            ? "Lieferungen wurden freigegeben."
-            : "Lieferungen wurden deaktiviert."
-    );
 }
