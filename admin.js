@@ -229,22 +229,142 @@ async function changePassword(id) {
 }
 
 async function deleteUser(id) {
-    const ok = confirm("Benutzer wirklich löschen?");
+    const { data: user, error: loadError } = await client
+        .from("taxi_users")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (loadError || !user) {
+        alert("Benutzer konnte nicht geladen werden.");
+        console.error(loadError);
+        return;
+    }
+
+    const username = user.username;
+    const displayName = user.display_name;
+
+    const ok = confirm(
+        `Benutzer "${displayName}" wirklich endg&uuml;ltig l&ouml;schen?\n\n` +
+        "Gel&ouml;scht werden:\n" +
+        "- Benutzerkonto\n" +
+        "- Fahrerstatus\n" +
+        "- aktive Leitstelle\n" +
+        "- Fahrerprofil\n" +
+        "- Bewertungen\n" +
+        "- Urlaub/Abwesenheiten\n" +
+        "- Info-Best&auml;tigungen\n\n" +
+        "Erledigte Fahrten bleiben erhalten, damit Abrechnung und Statistik nicht kaputt gehen."
+    );
+
     if (!ok) return;
 
-    const { error } = await client
+    const cleanupSteps = [
+        {
+            label: "Leitstelle",
+            query: client
+                .from("taxi_dispatchers")
+                .delete()
+                .eq("username", username)
+        },
+        {
+            label: "Fahrerstatus",
+            query: client
+                .from("taxi_driver_status")
+                .delete()
+                .eq("username", username)
+        },
+        {
+            label: "Fahrerprofil",
+            query: client
+                .from("taxi_driver_profiles")
+                .delete()
+                .eq("username", username)
+        },
+        {
+            label: "Bewertungen",
+            query: client
+                .from("taxi_driver_reviews")
+                .delete()
+                .eq("driver_username", username)
+        },
+        {
+            label: "Urlaub / Abwesenheiten",
+            query: client
+                .from("taxi_driver_absences")
+                .delete()
+                .eq("username", username)
+        },
+        {
+            label: "Info-Best&auml;tigungen",
+            query: client
+                .from("taxi_announcement_reads")
+                .delete()
+                .eq("username", username)
+        }
+    ];
+
+    for (const step of cleanupSteps) {
+        const { error } = await step.query;
+
+        if (error) {
+            alert(`${step.label} konnte nicht gel&ouml;scht werden.`);
+            console.error(step.label, error);
+            return;
+        }
+    }
+
+    const { error: resetJobsError } = await client
+        .from("taxi_jobs")
+        .update({
+            job_status: "Offen",
+            assigned_driver: null,
+            assigned_at: null
+        })
+        .eq("assigned_driver", displayName)
+        .eq("job_status", "Übernommen");
+
+    if (resetJobsError) {
+        alert("Aktuell &uuml;bernommene Fahrten konnten nicht zur&uuml;ckgesetzt werden.");
+        console.error(resetJobsError);
+        return;
+    }
+
+    const { error: deleteUserError } = await client
         .from("taxi_users")
         .delete()
         .eq("id", id);
 
-    if (error) {
-        alert("Benutzer konnte nicht gelöscht werden.");
-        console.error(error);
+    if (deleteUserError) {
+        alert("Benutzer konnte nicht gel&ouml;scht werden.");
+        console.error(deleteUserError);
         return;
     }
 
-    loadUsers();
-    loadAdminStats();
+    alert(`Benutzer "${displayName}" wurde vollst&auml;ndig gel&ouml;scht.`);
+
+    await loadUsers();
+    await loadAdminStats();
+
+    if (typeof loadAdminStatusUsers === "function") {
+        await loadAdminStatusUsers();
+    }
+
+    if (typeof loadAdminTimeStats === "function") {
+        await loadAdminTimeStats();
+    }
+
+    if (typeof loadDriverProfiles === "function") {
+        await loadDriverProfiles();
+    }
+
+    if (typeof loadVacations === "function") {
+        await loadVacations();
+    }
+
+    if (typeof loadTipsStats === "function") {
+        await loadTipsStats();
+    }
 }
 
 async function createCompany() {
