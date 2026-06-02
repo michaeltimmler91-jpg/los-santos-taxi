@@ -567,11 +567,20 @@ async function deleteCompany(id) {
 
 async function loadTipsStats() {
     const data = await getDoneJobs(500);
+    const users = await getTaxiUsers();
+
+    const activeDriverNames = users
+        .filter(user => user.role === "fahrer" || user.role === "admin")
+        .map(user => user.display_name);
 
     const grouped = {};
 
     data.forEach(job => {
         const driver = job.assigned_driver || "Unbekannt";
+
+        if (!activeDriverNames.includes(driver)) {
+            return;
+        }
 
         if (!grouped[driver]) {
             grouped[driver] = {
