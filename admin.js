@@ -1184,9 +1184,12 @@ async function loadAdminTimeStats() {
     });
 
     const { data, error } = await client
-        .from("taxi_status_logs")
-        .select("*")
-        .order("created_at", { ascending: true });
+    .from("taxi_status_logs")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(5000);
+
+const logs = (data || []).reverse();
 
     if (error) {
         console.error(error);
@@ -1229,11 +1232,11 @@ async function loadAdminTimeStats() {
         };
     });
 
-    (data || []).forEach(log => {
-        if (!activeUsers[log.username]) return;
+    logs.forEach(log => {
+    if (!activeUsers[log.username]) return;
 
-        groupedLogs[log.username].logs.push(log);
-    });
+    groupedLogs[log.username].logs.push(log);
+});
 
     const rows = Object.values(groupedLogs).map(driver => {
         const stats = {
