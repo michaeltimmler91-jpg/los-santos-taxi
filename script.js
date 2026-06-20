@@ -1733,7 +1733,10 @@ async function loadMyTimeStats() {
         .from("taxi_status_logs")
         .select("*")
         .eq("username", currentUser.username)
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: false })
+        .limit(1000);
+
+    const logs = (data || []).reverse();
 
     if (error) {
         console.error(error);
@@ -1744,7 +1747,7 @@ async function loadMyTimeStats() {
     const now = new Date();
 
     const startToday = new Date();
-    startToday.setHours(0,0,0,0);
+    startToday.setHours(0, 0, 0, 0);
 
     const startWeek = new Date();
 
@@ -1759,7 +1762,7 @@ async function loadMyTimeStats() {
         startWeek.getDate() - diff
     );
 
-    startWeek.setHours(0,0,0,0);
+    startWeek.setHours(0, 0, 0, 0);
 
     let todayDuty = 0;
     let todayPause = 0;
@@ -1767,10 +1770,10 @@ async function loadMyTimeStats() {
     let weekDuty = 0;
     let weekPause = 0;
 
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i < logs.length; i++) {
 
-        const current = data[i];
-        const next = data[i + 1];
+        const current = logs[i];
+        const next = logs[i + 1];
 
         const start = new Date(current.created_at);
 
@@ -1778,64 +1781,89 @@ async function loadMyTimeStats() {
             ? new Date(next.created_at)
             : now;
 
-        const diff = Math.floor((end - start) / 1000);
+        if (end <= start) continue;
 
-        if (current.new_status === "Im Dienst") {
-
-            if (start >= startToday) {
-                todayDuty += diff;
+        addTimeToMyStats(
+            current.new_status,
+            start,
+            end,
+            startToday,
+            "today",
+            {
+                addDuty: seconds => todayDuty += seconds,
+                addPause: seconds => todayPause += seconds
             }
+        );
 
-            if (start >= startWeek) {
-                weekDuty += diff;
+        addTimeToMyStats(
+            current.new_status,
+            start,
+            end,
+            startWeek,
+            "week",
+            {
+                addDuty: seconds => weekDuty += seconds,
+                addPause: seconds => weekPause += seconds
             }
-        }
-
-        if (current.new_status === "Pause") {
-
-            if (start >= startToday) {
-                todayPause += diff;
-            }
-
-            if (start >= startWeek) {
-                weekPause += diff;
-            }
-        }
+        );
     }
 
-box.innerHTML = `
-    <div class="time-stat-block compact-time">
+    box.innerHTML = `
+        <div class="time-stat-block compact-time">
 
-        <div class="time-section">
-            <strong>Heute</strong>
+            <div class="time-section">
+                <strong>Heute</strong>
 
-            <div class="time-row">
-                <span>🟢 Dienst</span>
-                <span class="time-value">${formatSeconds(todayDuty)}</span>
+                <div class="time-row">
+                    <span>🟢 Dienst</span>
+                    <span class="time-value">${formatSeconds(todayDuty)}</span>
+                </div>
+
+                <div class="time-row">
+                    <span>🟡 Pause</span>
+                    <span class="time-value">${formatSeconds(todayPause)}</span>
+                </div>
             </div>
 
-            <div class="time-row">
-                <span>🟡 Pause</span>
-                <span class="time-value">${formatSeconds(todayPause)}</span>
+            <div class="time-section">
+                <strong>Diese Woche</strong>
+
+                <div class="time-row">
+                    <span>🟢 Dienst</span>
+                    <span class="time-value">${formatSeconds(weekDuty)}</span>
+                </div>
+
+                <div class="time-row">
+                    <span>🟡 Pause</span>
+                    <span class="time-value">${formatSeconds(weekPause)}</span>
+                </div>
             </div>
+
         </div>
+    `;
+}
 
-        <div class="time-section">
-            <strong>Diese Woche</strong>
+function addTimeToMyStats(status, start, end, rangeStart, key, target) {
 
-            <div class="time-row">
-                <span>🟢 Dienst</span>
-                <span class="time-value">${formatSeconds(weekDuty)}</span>
-            </div>
+    if (end <= rangeStart) return;
 
-            <div class="time-row">
-                <span>🟡 Pause</span>
-                <span class="time-value">${formatSeconds(weekPause)}</span>
-            </div>
-        </div>
+    const effectiveStart =
+        start < rangeStart
+            ? rangeStart
+            : start;
 
-    </div>
-`;
+    const seconds =
+        Math.floor((end - effectiveStart) / 1000);
+
+    if (seconds <= 0) return;
+
+    if (status === "Im Dienst") {
+        target.addDuty(seconds);
+    }
+
+    if (status === "Pause") {
+        target.addPause(seconds);
+    }
 }
 function updateLiveClock() {
 
